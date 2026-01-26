@@ -16,6 +16,7 @@ import {
 import { UploadedFile } from './chat-input';
 import { normalizeFilenameToNFC, normalizeMimeType } from '@agentpress/shared';
 import { backendApi } from '@/lib/api-client';
+import { generateUUID } from '@/lib/utils';
 import JSZip from 'jszip';
 import {
   UPLOAD_LIMITS,
@@ -55,7 +56,7 @@ const handleLocalFilesOptimistic = async (
 
   const newUploadedFiles: UploadedFile[] = processedFiles.map((file) => {
     const normalizedName = normalizeFilenameToNFC(file.name);
-    const fileId = crypto.randomUUID();
+    const fileId = generateUUID();
 
     return {
       name: normalizedName,
@@ -154,7 +155,7 @@ const handleLocalFiles = async (
 
   const newUploadedFiles: UploadedFile[] = filteredFiles.map((file) => {
     const normalizedName = normalizeFilenameToNFC(file.name);
-    const fileId = crypto.randomUUID();
+    const fileId = generateUUID();
 
     return {
       name: normalizedName,

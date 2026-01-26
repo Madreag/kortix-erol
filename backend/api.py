@@ -317,6 +317,11 @@ if config.ENV_MODE == EnvMode.STAGING:
     allowed_origins.append("https://staging.kortix.com")
     allowed_origins.append("http://localhost:3000")
 
+# External IP access (for remote development) - set DEV_EXTERNAL_IP in .env
+dev_external_ip = os.getenv("DEV_EXTERNAL_IP")
+if dev_external_ip:
+    allowed_origins.append(f"http://{dev_external_ip}:3000")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

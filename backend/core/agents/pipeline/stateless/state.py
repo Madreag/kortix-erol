@@ -99,11 +99,24 @@ class RunState:
         return state
 
     async def _load_initial_state(self) -> None:
-        await asyncio.gather(
-            self._load_messages(),
-            self._check_credits(),
-            return_exceptions=True,
-        )
+        INIT_TIMEOUT = 30.0  # Hard timeout for initialization
+        try:
+            results = await asyncio.wait_for(
+                asyncio.gather(
+                    self._load_messages(),
+                    self._check_credits(),
+                    return_exceptions=True,
+                ),
+                timeout=INIT_TIMEOUT
+            )
+            # Log any exceptions that were captured by return_exceptions=True
+            for i, result in enumerate(results):
+                if isinstance(result, Exception):
+                    task_name = ["_load_messages", "_check_credits"][i]
+                    logger.error(f"[RunState] {task_name} failed: {result}")
+        except asyncio.TimeoutError:
+            logger.error(f"[RunState] Initialization timed out after {INIT_TIMEOUT}s")
+            raise RuntimeError(f"Agent initialization timed out after {INIT_TIMEOUT}s")
         logger.info(f"[RunState] {self.run_id}: {len(self._messages)} msgs, credits OK")
 
     async def _load_messages(self) -> None:

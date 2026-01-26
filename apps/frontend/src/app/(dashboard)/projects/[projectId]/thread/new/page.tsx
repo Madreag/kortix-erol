@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation';
 import { ThreadComponent } from '@/components/thread/ThreadComponent';
 import { createThreadInProject } from '@/lib/api/threads';
+import { generateUUID } from '@/lib/utils';
 
 export default function NewThreadPage({
   params,
@@ -15,7 +16,7 @@ export default function NewThreadPage({
   const router = useRouter();
 
   // Generate a stable temporary ID for display
-  const tempThreadId = useMemo(() => crypto.randomUUID(), []);
+  const tempThreadId = useMemo(() => generateUUID(), []);
 
   // Pre-created thread ID (stored but not used until submit)
   const preCreatedThreadId = useRef<string | null>(null);

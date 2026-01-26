@@ -201,8 +201,9 @@ supabase/.temp/storage-version
 redis_data
 
 .setup_progress
-
 .setup_env.json
+.setup/
+.pids/
 
 backend/.test_token_compression.py
 backend/test_token_compression_data.py

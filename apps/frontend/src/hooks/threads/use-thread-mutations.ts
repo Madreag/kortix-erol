@@ -48,12 +48,48 @@ interface DeleteThreadVariables {
 export const useDeleteThread = () => {
   const queryClient = useQueryClient();
   
-  return useMutation<void, Error, DeleteThreadVariables>({
+  type ThreadsSnapshot = [readonly unknown[], unknown][];
+  
+  return useMutation<void, Error, DeleteThreadVariables, { previousThreads: ThreadsSnapshot }>({
     mutationFn: async ({ threadId, sandboxId }: DeleteThreadVariables) => {
       return await deleteThread(threadId, sandboxId);
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: threadKeys.lists() });
+    onMutate: async ({ threadId }) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: threadKeys.lists() });
+      
+      // Snapshot current threads for rollback
+      const previousThreads = queryClient.getQueriesData({ queryKey: threadKeys.lists() });
+      
+      // Optimistically remove thread from all cached thread lists
+      queryClient.setQueriesData(
+        { queryKey: threadKeys.lists() },
+        (old: any) => {
+          if (!old?.threads) return old;
+          return {
+            ...old,
+            threads: old.threads.filter((t: any) => t.thread_id !== threadId),
+            pagination: old.pagination ? {
+              ...old.pagination,
+              total: Math.max(0, (old.pagination.total || 0) - 1),
+            } : old.pagination,
+          };
+        }
+      );
+      
+      return { previousThreads };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback to previous state on error
+      if (context?.previousThreads) {
+        for (const [queryKey, data] of context.previousThreads) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+    },
+    onSuccess: () => {
+      // Invalidate to ensure consistency (background refetch)
+      queryClient.invalidateQueries({ queryKey: threadKeys.lists() });
       invalidateAccountState(queryClient, true, true);
     },
   });
@@ -68,14 +104,21 @@ interface DeleteMultipleThreadsVariables {
 export const useDeleteMultipleThreads = () => {
   const queryClient = useQueryClient();
   
-  return useMutation<{ successful: string[]; failed: string[] }, Error, DeleteMultipleThreadsVariables>({
+  type ThreadsSnapshot = [readonly unknown[], unknown][];
+  
+  return useMutation<
+    { successful: string[]; failed: string[] }, 
+    Error, 
+    DeleteMultipleThreadsVariables,
+    { previousThreads: ThreadsSnapshot }
+  >({
     mutationFn: async ({ threadIds, threadSandboxMap, onProgress }: DeleteMultipleThreadsVariables) => {
       let completedCount = 0;
       const results = await Promise.all(
         threadIds.map(async (threadId) => {
           try {
             const sandboxId = threadSandboxMap?.[threadId];
-            const result = await deleteThread(threadId, sandboxId);
+            await deleteThread(threadId, sandboxId);
             completedCount++;
             onProgress?.(completedCount, threadIds.length);
             return { success: true, threadId };
@@ -90,8 +133,45 @@ export const useDeleteMultipleThreads = () => {
         failed: results.filter(r => !r.success).map(r => r.threadId),
       };
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: threadKeys.lists() });
+    onMutate: async ({ threadIds }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: threadKeys.lists() });
+      
+      // Snapshot for rollback
+      const previousThreads = queryClient.getQueriesData({ queryKey: threadKeys.lists() });
+      
+      // Optimistically remove all threads from cache
+      const threadIdSet = new Set(threadIds);
+      queryClient.setQueriesData(
+        { queryKey: threadKeys.lists() },
+        (old: any) => {
+          if (!old?.threads) return old;
+          return {
+            ...old,
+            threads: old.threads.filter((t: any) => !threadIdSet.has(t.thread_id)),
+            pagination: old.pagination ? {
+              ...old.pagination,
+              total: Math.max(0, (old.pagination.total || 0) - threadIds.length),
+            } : old.pagination,
+          };
+        }
+      );
+      
+      return { previousThreads };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousThreads) {
+        for (const [queryKey, data] of context.previousThreads) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+    },
+    onSuccess: async (data) => {
+      // If some failed, restore just those threads by invalidating
+      if (data.failed.length > 0) {
+        await queryClient.invalidateQueries({ queryKey: threadKeys.lists() });
+      }
       invalidateAccountState(queryClient, true, true);
     },
   });

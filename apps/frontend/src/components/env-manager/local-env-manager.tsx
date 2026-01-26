@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { backendApi } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
+import { generateUUID } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 
 interface APIKeyForm {
@@ -49,7 +50,7 @@ export function LocalEnvManager() {
   }
 
   const handleAddNewKey = () => {
-    setNewApiKeys([...newApiKeys, {key: "", value: "", id: crypto.randomUUID()}]);
+    setNewApiKeys([...newApiKeys, {key: "", value: "", id: generateUUID()}]);
   }
 
   const checkKeyIsDuplicate = (key: string) => {

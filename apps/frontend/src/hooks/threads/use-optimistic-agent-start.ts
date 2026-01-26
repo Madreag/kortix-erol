@@ -22,6 +22,7 @@ import {
   getStreamPreconnectService, 
   storePreconnectInfo 
 } from '@/lib/streaming/stream-preconnect';
+import { generateUUID } from '@/lib/utils';
 
 export interface OptimisticAgentStartOptions {
   message: string;
@@ -140,8 +141,8 @@ export function useOptimisticAgentStart(
 
     setIsStarting(true);
 
-    const threadId = crypto.randomUUID();
-    const projectId = crypto.randomUUID();
+    const threadId = generateUUID();
+    const projectId = generateUUID();
 
     try {
       sessionStorage.setItem('optimistic_prompt', message);

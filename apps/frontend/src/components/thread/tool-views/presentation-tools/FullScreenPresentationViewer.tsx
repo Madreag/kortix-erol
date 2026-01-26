@@ -122,7 +122,11 @@ export function FullScreenPresentationViewer({
       
       const response = await fetch(urlWithCacheBust, {
         cache: 'no-cache',
-        headers: { 'Cache-Control': 'no-cache' }
+        credentials: 'include',
+        headers: { 
+          'Cache-Control': 'no-cache',
+          'X-Daytona-Skip-Preview-Warning': 'true'
+        }
       });
       
       if (response.ok) {

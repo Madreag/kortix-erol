@@ -22,8 +22,8 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 20 * 1000,
-            gcTime: 2 * 60 * 1000,
+            staleTime: 60 * 1000, // 60 seconds - show cached data longer before refetching
+            gcTime: 5 * 60 * 1000, // 5 minutes - keep unused data in cache longer
             // Enable request deduplication - React Query will batch simultaneous requests
             structuralSharing: true,
             // Deduplicate requests within 1000ms window (default)
@@ -32,7 +32,7 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
               if (error?.status === 404) return false;
               return failureCount < 3;
             },
-            refetchOnMount: true,
+            refetchOnMount: false, // Use cached data on mount, only refetch if stale
             refetchOnWindowFocus: false,
             refetchOnReconnect: 'always',
           },
