@@ -88,13 +88,13 @@ async def main():
     print("-" * 60)
     
     print("\n[kortix/basic]")
-    basic_model = print_model_info("kortix/basic")
+    print_model_info("kortix/basic")
     
     print("\n[kortix/power]")
-    power_model = print_model_info("kortix/power")
+    print_model_info("kortix/power")
     
     print("\n[kortix/grok-4-1-fast]")
-    grok_model = print_model_info("kortix/grok-4-1-fast")
+    print_model_info("kortix/grok-4-1-fast")
     
     # Test actual LLM calls
     print()

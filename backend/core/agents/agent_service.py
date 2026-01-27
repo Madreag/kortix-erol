@@ -2,7 +2,6 @@ from typing import List, Dict, Any, Optional
 from core.utils.pagination import PaginationService, PaginationParams, PaginatedResponse, PaginationMeta
 from core.utils.logger import logger
 from core.agents.agent_loader import AgentLoader
-from core.utils.query_utils import batch_query_in
 
 
 class AgentFilters:
@@ -85,9 +84,8 @@ class AgentService:
         filters: AgentFilters
     ) -> PaginatedResponse[Dict[str, Any]]:
         try:
-            client = await self.db.client
-            base_query = client.table('agent_templates').select('*').eq('creator_id', user_id)
-            count_query = client.table('agent_templates').select('*', count='exact').eq('creator_id', user_id)
+            base_query = self.db.table('agent_templates').select('*').eq('creator_id', user_id)
+            count_query = self.db.table('agent_templates').select('*', count='exact').eq('creator_id', user_id)
             
             # Apply search filter
             if filters.search:
@@ -436,10 +434,15 @@ class AgentService:
         agent_data = await self.loader.load_template(template_data, fetch_creator_name=True)
         result = agent_data.to_dict()
         
+        # Extract mcp_requirements from the new config structure
+        config = template_data.get('config', {}) or {}
+        tools_config = config.get('tools', {}) or {}
+        mcp_requirements = tools_config.get('mcp', []) + tools_config.get('custom_mcp', [])
+        
         # Add template-specific fields
         result.update({
             "template_id": template_data.get('template_id'),
-            "mcp_requirements": template_data.get('mcp_requirements', []),
+            "mcp_requirements": mcp_requirements,
             "marketplace_published_at": template_data.get('marketplace_published_at'),
             "download_count": template_data.get('download_count', 0),
             "creator_name": agent_data.metadata.get('creator_name'),

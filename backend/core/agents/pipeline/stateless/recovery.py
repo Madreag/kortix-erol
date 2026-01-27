@@ -222,7 +222,6 @@ class RunRecovery:
             from core.agents import repo as agents_repo
             from core.agents.runner.services import update_agent_run_status
             from core.agents.api import start_agent_run
-            import asyncio
 
             agent_run = await agents_repo.get_agent_run_with_thread(run_id)
             if not agent_run:
@@ -270,7 +269,6 @@ class RunRecovery:
             return RecoveryResult(run_id, False, "force_resume", "Failed", str(e))
 
     async def get_stuck(self, min_age_minutes: int = 5) -> List[Dict[str, Any]]:
-        import time
         from core.agents.pipeline.stateless.ownership import ownership
         from core.services import redis
 

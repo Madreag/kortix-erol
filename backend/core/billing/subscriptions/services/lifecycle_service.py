@@ -6,14 +6,9 @@ from core.utils.logger import logger
 from core.utils.cache import Cache
 from core.utils.distributed_lock import DistributedLock
 from core.billing.shared.config import (
-    get_tier_by_price_id, 
-    get_tier_by_name,
-    TRIAL_DURATION_DAYS,
-    TRIAL_CREDITS,
-    get_plan_type
+    get_tier_by_price_id
 )
 from core.billing.credits.manager import credit_manager
-from core.billing.external.stripe import StripeAPIWrapper
 from core.billing import repo as billing_repo
 from ..repositories.credit_account import CreditAccountRepository
 from ..repositories.trial import TrialRepository
@@ -86,7 +81,7 @@ class LifecycleService:
         seconds_since_period_start = (now - billing_anchor).total_seconds()
         
         if 0 <= seconds_since_period_start < 1800:
-            logger.warning(f"[RENEWAL DETECTION] Within 30min of period start - likely renewal - BLOCKING")
+            logger.warning("[RENEWAL DETECTION] Within 30min of period start - likely renewal - BLOCKING")
             return True
         
         return False
@@ -96,7 +91,7 @@ class LifecycleService:
             return False
         
         if not current_tier_data:
-            logger.info(f"No existing tier data - will grant credits for new subscription")
+            logger.info("No existing tier data - will grant credits for new subscription")
             return True
         
         current_tier_name = current_tier_data.get('name', 'none')
@@ -157,7 +152,7 @@ class LifecycleService:
                 return False
             
             if abs((billing_anchor - last_grant_dt).total_seconds()) < 900 and current_tier_name == new_tier['name']:
-                logger.warning(f"[DOUBLE CREDIT BLOCK] Credits already granted near billing period start for SAME tier")
+                logger.warning("[DOUBLE CREDIT BLOCK] Credits already granted near billing period start for SAME tier")
                 return True
                 
         except Exception as e:
@@ -174,7 +169,7 @@ class LifecycleService:
         acquired = await lock.acquire(wait=True, wait_timeout=30)
         if not acquired:
             logger.error(f"[CREDIT GRANT] Failed to acquire lock for subscription grant to {account_id}")
-            raise Exception(f"Failed to acquire lock for credit grant - possible concurrent processing")
+            raise Exception("Failed to acquire lock for credit grant - possible concurrent processing")
         
         try:
             logger.info(f"[CREDIT GRANT] 🔒 Acquired lock for granting ${full_amount} credits to {account_id}")

@@ -1,22 +1,20 @@
 import structlog
 import json
-import os
-from typing import Optional, Dict, Any, List, Union
+from typing import Optional, Any, List, Union
 from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from apify_client import ApifyClient
-import requests
 import aiohttp
 import uuid
 
-from core.agentpress.tool import Tool, ToolResult, openapi_schema, tool_metadata
+from core.agentpress.tool import ToolResult, openapi_schema, tool_metadata
 from core.agentpress.thread_manager import ThreadManager
 from core.utils.config import config, EnvMode
 from core.utils.logger import logger
 from core.billing.credits.manager import CreditManager
 from core.billing.shared.config import TOKEN_PRICE_MULTIPLIER
 from core.services.supabase import DBConnection
-from core.services.redis import get_client, set as redis_set, get as redis_get, delete as redis_delete
+from core.services.redis import get_client, set as redis_set, get as redis_get
 from core.sandbox.tool_base import SandboxToolsBase
 
 
@@ -324,7 +322,7 @@ class ApifyTool(SandboxToolsBase):
                                     elif pricing_model == "PRICE_PER_EVENT":
                                         # For event-based pricing, we'd need event count (not available in dataset)
                                         # Fall through to other methods
-                                        logger.debug(f"PRICE_PER_EVENT model - cannot calculate without event count")
+                                        logger.debug("PRICE_PER_EVENT model - cannot calculate without event count")
                                     else:
                                         logger.debug(f"Unknown pricing model: {pricing_model}")
                             except Exception as e:
@@ -1321,7 +1319,7 @@ class ApifyTool(SandboxToolsBase):
                     return self.success_response({
                         "approval_id": existing_approval_id,
                         "status": "pending",
-                        "message": f"Found existing pending approval request. User must approve via UI before execution.",
+                        "message": "Found existing pending approval request. User must approve via UI before execution.",
                         "estimated_cost_usd": approval.get('estimated_cost_usd'),
                         "estimated_cost_credits": approval.get('estimated_cost_credits'),
                         "max_cost_usd": approval.get('max_cost_usd'),
@@ -1845,7 +1843,7 @@ class ApifyTool(SandboxToolsBase):
             elif status == "SUCCEEDED":
                 message = f"✅ Run completed successfully! ⚠️ MANDATORY: You MUST immediately use get_actor_run_results with run_id '{run_id}' to fetch and display the actual data to the user. Never just confirm completion - always show the results."
             elif status == "FAILED":
-                message = f"❌ Run failed. Check logs for details."
+                message = "❌ Run failed. Check logs for details."
             elif status == "ABORTED":
                 message = "🛑 Run was aborted/cancelled."
             elif status == "TIMED-OUT":
@@ -2193,9 +2191,9 @@ class ApifyTool(SandboxToolsBase):
             if status == "SUCCEEDED":
                 message = f"✅ Run completed successfully! Retrieved {item_count} items. ⚠️ MANDATORY: You MUST immediately use get_actor_run_results with run_id '{run_id}' to fetch and display the actual data to the user."
             elif status == "RUNNING":
-                message = f"⏳ Run is still in progress. Check again in a few seconds."
+                message = "⏳ Run is still in progress. Check again in a few seconds."
             elif status == "FAILED":
-                message = f"❌ Run failed. Check the logs for details."
+                message = "❌ Run failed. Check the logs for details."
             elif status == "ABORTED":
                 message = "🛑 Run was aborted/cancelled."
             elif status == "TIMED-OUT":
@@ -2276,11 +2274,11 @@ class ApifyTool(SandboxToolsBase):
             try:
                 abort_response = self.client.run(run_id).abort()
                 if isinstance(abort_response, dict):
-                    abort_data = abort_response
+                    pass
                 elif hasattr(abort_response, '__dict__'):
-                    abort_data = abort_response.__dict__
+                    pass
                 else:
-                    abort_data = {}
+                    pass
             except Exception as e:
                 error_message = str(e)
                 logger.error(f"Error stopping actor run: {error_message}")

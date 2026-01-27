@@ -4,7 +4,6 @@ Centralized database dependency helpers.
 This module provides reusable FastAPI dependencies for database connections,
 reducing duplication across 50+ files.
 """
-from typing import AsyncGenerator
 from core.services.supabase import DBConnection
 from core.utils.logger import logger
 

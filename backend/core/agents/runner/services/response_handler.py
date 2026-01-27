@@ -2,7 +2,6 @@ import json
 import asyncio
 from typing import Optional, Dict, Any, Tuple
 
-from core.utils.logger import logger
 from core.agentpress.error_processor import ErrorProcessor
 
 

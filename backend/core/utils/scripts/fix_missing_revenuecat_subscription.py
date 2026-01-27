@@ -17,7 +17,6 @@ from core.services.supabase import DBConnection
 from core.utils.config import config
 from core.utils.logger import logger
 from core.billing.external.revenuecat.utils import ProductMapper
-from core.billing.shared.config import get_tier_by_name
 from core.billing.credits.manager import credit_manager
 
 REVENUECAT_API_BASE = "https://api.revenuecat.com/v1"
@@ -131,7 +130,7 @@ async def fix_missing_revenuecat_subscription(user_email: str, dry_run: bool = F
         return
     
     subscriber = subscriber_data.get('subscriber', {})
-    logger.info(f"✅ Found RevenueCat subscriber")
+    logger.info("✅ Found RevenueCat subscriber")
     logger.info(f"   Original App User ID: {subscriber.get('original_app_user_id', 'N/A')}")
     logger.info(f"   First Seen: {subscriber.get('first_seen', 'N/A')}")
     
@@ -157,7 +156,7 @@ async def fix_missing_revenuecat_subscription(user_email: str, dry_run: bool = F
         logger.info("\nAll subscriptions have expired or been cancelled.")
         return
     
-    logger.info(f"\n✅ Active subscription found:")
+    logger.info("\n✅ Active subscription found:")
     logger.info(f"   Product ID: {product_id}")
     logger.info(f"   Expires: {sub_info.get('expires_date')}")
     logger.info(f"   Purchase Date: {sub_info.get('purchase_date')}")
@@ -191,7 +190,7 @@ async def fix_missing_revenuecat_subscription(user_email: str, dry_run: bool = F
     
     if credit_account.data:
         acc = credit_account.data[0]
-        logger.info(f"Current credit account state:")
+        logger.info("Current credit account state:")
         logger.info(f"  Tier: {acc.get('tier', 'none')}")
         logger.info(f"  Balance: ${acc.get('balance', 0)}")
         logger.info(f"  Provider: {acc.get('provider', 'N/A')}")
@@ -206,9 +205,9 @@ async def fix_missing_revenuecat_subscription(user_email: str, dry_run: bool = F
         logger.info("\n" + "="*80)
         logger.info("DRY RUN - NO CHANGES WILL BE MADE")
         logger.info("="*80)
-        logger.info(f"Would update database with:")
+        logger.info("Would update database with:")
         logger.info(f"  tier: {tier_name}")
-        logger.info(f"  provider: revenuecat")
+        logger.info("  provider: revenuecat")
         logger.info(f"  revenuecat_product_id: {original_product_id}")
         logger.info(f"  revenuecat_subscription_id: {dry_run_sub_id}")
         logger.info(f"  credits to grant: ${tier_info.monthly_credits}")
@@ -304,7 +303,7 @@ async def fix_missing_revenuecat_subscription(user_email: str, dry_run: bool = F
     
     if final_account.data:
         acc = final_account.data[0]
-        logger.info(f"Final credit account state:")
+        logger.info("Final credit account state:")
         logger.info(f"  ✅ Tier: {acc.get('tier')}")
         logger.info(f"  ✅ Balance: ${acc.get('balance')}")
         logger.info(f"  ✅ Provider: {acc.get('provider')}")
@@ -361,7 +360,7 @@ async def fix_by_account_id(account_id: str, dry_run: bool = False):
         return
     
     subscriber = subscriber_data.get('subscriber', {})
-    logger.info(f"✅ Found RevenueCat subscriber")
+    logger.info("✅ Found RevenueCat subscriber")
     
     subscriptions = subscriber.get('subscriptions', {})
     

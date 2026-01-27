@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useEffect, memo } from 'react';
+import React, { useEffect, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Paperclip } from 'lucide-react';
 import { KortixLoader } from '@/components/ui/kortix-loader';
@@ -463,111 +463,103 @@ interface FileUploadHandlerProps {
   isLoggedIn?: boolean;
 }
 
-export const FileUploadHandler = memo(forwardRef<
-  HTMLInputElement,
-  FileUploadHandlerProps
->(
-  (
-    {
-      loading,
-      disabled,
-      isAgentRunning,
-      isUploading,
+// React 19: ref as prop instead of forwardRef
+export const FileUploadHandler = memo(function FileUploadHandler({
+  loading,
+  disabled,
+  isAgentRunning,
+  isUploading,
+  sandboxId,
+  projectId,
+  setPendingFiles,
+  setUploadedFiles,
+  setIsUploading,
+  messages = [],
+  isLoggedIn = true,
+  ref,
+}: FileUploadHandlerProps & { ref?: React.Ref<HTMLInputElement> }) {
+  const queryClient = useQueryClient();
+  // Clean up object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clean up any object URLs to avoid memory leaks
+      setUploadedFiles(prev => {
+        prev.forEach(file => {
+          if (file.localUrl) {
+            URL.revokeObjectURL(file.localUrl);
+          }
+        });
+        return prev;
+      });
+    };
+  }, []);
+
+  const handleFileUpload = () => {
+    if (ref && 'current' in ref && ref.current) {
+      ref.current.click();
+    }
+  };
+
+  const processFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const files = Array.from(event.target.files);
+    // Use the helper function instead of the static method
+    handleFiles(
+      files,
       sandboxId,
       projectId,
       setPendingFiles,
       setUploadedFiles,
       setIsUploading,
-      messages = [],
-      isLoggedIn = true,
-    },
-    ref,
-  ) => {
-    const queryClient = useQueryClient();
-    // Clean up object URLs when component unmounts
-    useEffect(() => {
-      return () => {
-        // Clean up any object URLs to avoid memory leaks
-        setUploadedFiles(prev => {
-          prev.forEach(file => {
-            if (file.localUrl) {
-              URL.revokeObjectURL(file.localUrl);
-            }
-          });
-          return prev;
-        });
-      };
-    }, []);
-
-    const handleFileUpload = () => {
-      if (ref && 'current' in ref && ref.current) {
-        ref.current.click();
-      }
-    };
-
-    const processFileUpload = async (
-      event: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-      if (!event.target.files || event.target.files.length === 0) return;
-
-      const files = Array.from(event.target.files);
-      // Use the helper function instead of the static method
-      handleFiles(
-        files,
-        sandboxId,
-        projectId,
-        setPendingFiles,
-        setUploadedFiles,
-        setIsUploading,
-        messages,
-        queryClient,
-      );
-
-      event.target.value = '';
-    };
-
-    return (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="inline-block">
-              <Button
-                type="button"
-                onClick={handleFileUpload}
-                variant="outline"
-                size="sm"
-                className="h-10 w-10 p-0 bg-transparent border-[1.5px] border-border rounded-2xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
-                disabled={
-                  !isLoggedIn || loading || (disabled && !isAgentRunning) || isUploading
-                }
-              >
-                {isUploading ? (
-                  <KortixLoader size="small" />
-                ) : (
-                  <Paperclip className="h-4 w-4" strokeWidth={2} />
-                )}
-              </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side="top">
-            <p>{isLoggedIn ? 'Attach files' : 'Please login to attach files'}</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <input
-          type="file"
-          ref={ref}
-          className="hidden"
-          onChange={processFileUpload}
-          multiple
-          accept={ALLOWED_EXTENSIONS_STRING}
-        />
-      </>
+      messages,
+      queryClient,
     );
-  },
-));
 
-FileUploadHandler.displayName = 'FileUploadHandler';
+    event.target.value = '';
+  };
+
+  return (
+    <>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-block">
+            <Button
+              type="button"
+              onClick={handleFileUpload}
+              variant="outline"
+              size="sm"
+              className="h-10 w-10 p-0 bg-transparent border-[1.5px] border-border rounded-2xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
+              disabled={
+                !isLoggedIn || loading || (disabled && !isAgentRunning) || isUploading
+              }
+            >
+              {isUploading ? (
+                <KortixLoader size="small" />
+              ) : (
+                <Paperclip className="h-4 w-4" strokeWidth={2} />
+              )}
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p>{isLoggedIn ? 'Attach files' : 'Please login to attach files'}</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <input
+        type="file"
+        ref={ref}
+        className="hidden"
+        onChange={processFileUpload}
+        multiple
+        accept={ALLOWED_EXTENSIONS_STRING}
+      />
+    </>
+  );
+});
 
 export const uploadPendingFilesToProject = async (
   files: File[],

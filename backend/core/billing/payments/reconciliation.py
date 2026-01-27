@@ -1,11 +1,9 @@
-from typing import Dict, List, Optional
+from typing import Dict
 from decimal import Decimal
 from datetime import datetime, timezone, timedelta
 import stripe
 from core.utils.logger import logger
-from core.utils.cache import Cache
 from ..credits.manager import credit_manager
-from ..shared.config import get_tier_by_price_id
 from ..external.stripe import StripeAPIWrapper
 from .interfaces import ReconciliationManagerInterface
 from core.utils.config import config
@@ -210,7 +208,7 @@ class ReconciliationService(ReconciliationManagerInterface):
             payment_intent = await StripeAPIWrapper.retrieve_payment_intent(payment['stripe_payment_intent_id'])
             
             if payment_intent.status == 'succeeded':
-                result = await credit_manager.add_credits(
+                await credit_manager.add_credits(
                     account_id=payment['account_id'],
                     amount=Decimal(str(payment['amount_dollars'])),
                     is_expiring=False,

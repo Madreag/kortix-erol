@@ -43,7 +43,7 @@ export const useModelSelection = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
 
   // Get account state which includes models
-  const { data: accountState, isLoading } = useAccountState({
+  const { data: accountState, isPending: isLoading } = useAccountState({
     enabled: !!user && !isAuthLoading
   });
 

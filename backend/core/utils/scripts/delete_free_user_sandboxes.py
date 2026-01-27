@@ -32,8 +32,7 @@ import sys
 import argparse
 import json
 import re
-from datetime import datetime
-from typing import List, Optional, Dict, Set
+from typing import List, Optional, Dict
 from core.utils.config import config
 from core.utils.logger import logger
 from core.services.supabase import DBConnection

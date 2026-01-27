@@ -20,11 +20,11 @@ def migrate_thread_in_db(thread_id: str, dry_run: bool = False):
     # Initialize Supabase client
     client = create_client(config.SUPABASE_URL, config.SUPABASE_SERVICE_ROLE_KEY)
     
-    print(f"=" * 80)
+    print("=" * 80)
     print(f"MIGRATING THREAD IN DATABASE: {thread_id}")
     if dry_run:
-        print(f"⚠️  DRY RUN MODE - No changes will be written to database")
-    print(f"=" * 80)
+        print("⚠️  DRY RUN MODE - No changes will be written to database")
+    print("=" * 80)
     
     # Fetch messages
     print("\n1️⃣  Fetching messages from database...")
@@ -41,7 +41,7 @@ def migrate_thread_in_db(thread_id: str, dry_run: bool = False):
     assistant_messages = [m for m in messages if m.get('type') == 'assistant']
     tool_messages = [m for m in messages if m.get('type') == 'tool']
     
-    print(f"\n2️⃣  Migrating assistant messages...")
+    print("\n2️⃣  Migrating assistant messages...")
     migrated_assistants = []
     updated_assistants = 0
     
@@ -62,11 +62,11 @@ def migrate_thread_in_db(thread_id: str, dry_run: bool = False):
                             .eq('message_id', msg['message_id'])\
                             .execute()
                         updated_assistants += 1
-                        print(f"      ✓ Updated in database")
+                        print("      ✓ Updated in database")
                     except Exception as e:
                         print(f"      ❌ Error updating: {e}")
                 else:
-                    print(f"      [DRY RUN] Would update metadata")
+                    print("      [DRY RUN] Would update metadata")
                     updated_assistants += 1
             else:
                 migrated_assistants.append(msg)
@@ -74,7 +74,7 @@ def migrate_thread_in_db(thread_id: str, dry_run: bool = False):
             print(f"   Skipping (already migrated): {msg['message_id']}")
             migrated_assistants.append(msg)
     
-    print(f"\n3️⃣  Migrating tool messages...")
+    print("\n3️⃣  Migrating tool messages...")
     migrated_tools = []
     updated_tools = 0
     
@@ -95,11 +95,11 @@ def migrate_thread_in_db(thread_id: str, dry_run: bool = False):
                             .eq('message_id', msg['message_id'])\
                             .execute()
                         updated_tools += 1
-                        print(f"      ✓ Updated in database")
+                        print("      ✓ Updated in database")
                     except Exception as e:
                         print(f"      ❌ Error updating: {e}")
                 else:
-                    print(f"      [DRY RUN] Would update metadata")
+                    print("      [DRY RUN] Would update metadata")
                     updated_tools += 1
             else:
                 migrated_tools.append(msg)
@@ -109,23 +109,23 @@ def migrate_thread_in_db(thread_id: str, dry_run: bool = False):
     
     # Summary
     print(f"\n{'=' * 80}")
-    print(f"MIGRATION SUMMARY")
+    print("MIGRATION SUMMARY")
     print(f"{'=' * 80}")
     print(f"  Assistant messages migrated: {updated_assistants}/{len(assistant_messages)}")
     print(f"  Tool messages migrated: {updated_tools}/{len(tool_messages)}")
     print(f"  Total messages updated: {updated_assistants + updated_tools}")
     
     if dry_run:
-        print(f"\n⚠️  DRY RUN - No changes were written to database")
-        print(f"   Run without --dry-run flag to apply changes")
+        print("\n⚠️  DRY RUN - No changes were written to database")
+        print("   Run without --dry-run flag to apply changes")
     else:
-        print(f"\n✅ Migration complete! Database updated successfully.")
+        print("\n✅ Migration complete! Database updated successfully.")
     
     # Show sample migrated message
     if migrated_assistants:
         sample = migrated_assistants[0]
         metadata = safe_json_parse(sample.get('metadata', '{}'), {})
-        print(f"\n📄 Sample migrated assistant message:")
+        print("\n📄 Sample migrated assistant message:")
         print(f"   Message ID: {sample['message_id']}")
         print(f"   Has tool_calls: {'tool_calls' in metadata}")
         print(f"   Has text_content: {'text_content' in metadata}")
@@ -135,7 +135,7 @@ def migrate_thread_in_db(thread_id: str, dry_run: bool = False):
     if migrated_tools:
         sample = migrated_tools[0]
         metadata = safe_json_parse(sample.get('metadata', '{}'), {})
-        print(f"\n📄 Sample migrated tool message:")
+        print("\n📄 Sample migrated tool message:")
         print(f"   Message ID: {sample['message_id']}")
         print(f"   Has result: {'result' in metadata}")
         print(f"   Has tool_call_id: {'tool_call_id' in metadata}")

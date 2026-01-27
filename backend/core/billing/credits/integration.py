@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Optional, Dict, Tuple, List
+from typing import Optional, Dict, Tuple
 from datetime import datetime, timezone
 from core.billing.credits.calculator import calculate_token_cost, calculate_cached_token_cost, calculate_cache_write_cost
 from core.billing.credits.manager import credit_manager

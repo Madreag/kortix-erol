@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
 from uuid import uuid4
+import httpx
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt, get_optional_current_user_id_from_jwt
 from core.utils.logger import logger
 from core.utils.config import config, EnvMode
@@ -15,19 +16,17 @@ import asyncio
 import json
 import hashlib
 import time
-import re
 import base64
 
 from .composio_service import (
     get_integration_service,
 )
-from .toolkit_service import ToolkitService, ToolsListResponse
+from .toolkit_service import ToolkitService
 from .composio_profile_service import ComposioProfileService, ComposioProfile
 from .composio_trigger_service import ComposioTriggerService
 from .trigger_schema import TriggerSchemaService
 from core.triggers.trigger_service import get_trigger_service, TriggerEvent, TriggerType
 from core.triggers.execution_service import get_execution_service
-from .client import ComposioClient
 from core.triggers.api import sync_triggers_to_version_config
 
 router = APIRouter(prefix="/composio", tags=["composio"])
@@ -590,7 +589,6 @@ async def get_toolkit_icons_batch(
     request: Request,
     current_user_id: Optional[str] = Depends(get_optional_current_user_id_from_jwt)
 ):
-    import asyncio
     
     try:
         body = await request.json()
@@ -936,24 +934,22 @@ async def composio_webhook(request: Request):
 
         # Minimal request diagnostics (no secrets)
         try:
-            client_ip = request.client.host if request.client else None
-            header_names = list(request.headers.keys())
-            has_auth = bool(request.headers.get("authorization"))
-            has_x_secret = bool(request.headers.get("x-composio-secret") or request.headers.get("X-Composio-Secret"))
-            has_x_trigger = bool(request.headers.get("x-trigger-secret") or request.headers.get("X-Trigger-Secret"))
+            list(request.headers.keys())
+            bool(request.headers.get("authorization"))
+            bool(request.headers.get("x-composio-secret") or request.headers.get("X-Composio-Secret"))
+            bool(request.headers.get("x-trigger-secret") or request.headers.get("X-Trigger-Secret"))
             
             # Parse payload for logging
-            payload_preview = {"keys": []}
             try:
                 if body_str:
                     _p = json.loads(body_str)
-                    payload_preview = {
+                    {
                         "keys": list(_p.keys()) if isinstance(_p, dict) else [],
                         "id": _p.get("id") if isinstance(_p, dict) else None,
                         "triggerSlug": _p.get("triggerSlug") if isinstance(_p, dict) else None,
                     }
             except Exception:
-                payload_preview = {"keys": []}
+                pass
         except Exception:
             pass
 

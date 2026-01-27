@@ -10,7 +10,6 @@ from core.services.db import execute, execute_one, serialize_row
 from datetime import datetime, timezone, timedelta
 
 # Import get_credit_account from new module for backwards compatibility
-from .credit_accounts import get_credit_account
 
 
 async def list_transactions(
@@ -378,18 +377,6 @@ async def get_thread_details(thread_ids: List[str]) -> Dict[str, Dict[str, Any]]
 # Re-import here for backwards compatibility with existing code
 # =============================================================================
 
-from .credit_accounts import (
-    get_credit_account_by_id,
-    get_credit_account_subscription_info,
-    get_credit_account_subscription_details,
-    get_credit_account_scheduled_changes,
-    get_credit_account_balance,
-    get_credit_account_balances,
-    update_credit_account,
-    update_credit_account_balances,
-    clear_credit_account_scheduled_changes,
-    check_renewal_already_processed,
-)
 
 
 # =============================================================================

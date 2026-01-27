@@ -1,0 +1,96 @@
+{
+  "cli": {
+    "version": ">= 5.9.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_ENV_MODE": "staging",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://your-staging-project.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-staging-anon-key",
+        "EXPO_PUBLIC_BACKEND_URL": "https://staging-api.kortix.com/v1",
+        "EXPO_PUBLIC_FRONTEND_URL": "https://staging.kortix.com",
+        "EXPO_PUBLIC_USE_REVENUECAT": "true",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "your-ios-revenuecat-key",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "your-android-revenuecat-key"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "ios": {
+        "simulator": false,
+        "autoIncrement": true
+      },
+      "android": {
+        "autoIncrement": true
+      },
+      "env": {
+        "EXPO_PUBLIC_ENV_MODE": "production",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://your-prod-project.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-prod-anon-key",
+        "EXPO_PUBLIC_BACKEND_URL": "https://api.kortix.com/v1",
+        "EXPO_PUBLIC_FRONTEND_URL": "https://kortix.com",
+        "EXPO_PUBLIC_USE_REVENUECAT": "true",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "your-ios-revenuecat-key",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "your-android-revenuecat-key"
+      }
+    },
+    "testflight": {
+      "channel": "main",
+      "environment": "preview",
+      "ios": {
+        "simulator": false,
+        "distribution": "store",
+        "autoIncrement": true
+      },
+      "android": {
+        "autoIncrement": true
+      },
+      "env": {
+        "EXPO_PUBLIC_ENV_MODE": "staging",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://your-staging-project.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-staging-anon-key",
+        "EXPO_PUBLIC_BACKEND_URL": "https://staging-api.kortix.com/v1",
+        "EXPO_PUBLIC_FRONTEND_URL": "https://staging.kortix.com",
+        "EXPO_PUBLIC_USE_REVENUECAT": "true",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "your-ios-revenuecat-key",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "your-android-revenuecat-key"
+      }
+    },
+    "development-simulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "environment": "development"
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "your-apple-id@example.com",
+        "ascAppId": "your-app-store-connect-app-id",
+        "appleTeamId": "YOUR_TEAM_ID"
+      },
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    },
+    "testflight": {
+      "ios": {
+        "appleId": "your-apple-id@example.com",
+        "ascAppId": "your-app-store-connect-app-id",
+        "appleTeamId": "YOUR_TEAM_ID"
+      },
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    }
+  }
+}

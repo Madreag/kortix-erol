@@ -91,11 +91,6 @@ class ToolkitService:
                 {"id": "scheduling", "name": "Scheduling"},
             ]
 
-            special_apps=[
-                "googlesuper",
-                'googleclassroom',
-                "docusign"
-            ]
             
             categories = [CategoryInfo(**cat) for cat in popular_categories]
             logger.debug(f"Successfully fetched {len(categories)} categories")

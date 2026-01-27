@@ -1,11 +1,10 @@
 import os
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional, Any
 import novu_py
 from novu_py import Novu
 import aiohttp
 from core.utils.logger import logger
 from core.utils.config import config, EnvMode
-from .models import NotificationChannel, NotificationEvent, NotificationPayload
 
 
 class NovuService:

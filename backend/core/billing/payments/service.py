@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime, timezone
 import stripe
 from core.utils.logger import logger
-from ..external.stripe import generate_credit_purchase_idempotency_key, StripeAPIWrapper
+from ..external.stripe import StripeAPIWrapper
 from .interfaces import PaymentProcessorInterface
 from core.utils.config import config
 from core.billing import repo as billing_repo

@@ -229,7 +229,7 @@ class SandboxFileReaderTool(SandboxToolsBase):
                     return {
                         "file_path": cleaned_path,
                         "success": False,
-                        "error": f"Failed to extract Word doc text"
+                        "error": "Failed to extract Word doc text"
                     }
                 content = result.result
                 extraction_method = "catdoc"
@@ -335,7 +335,7 @@ class SandboxFileReaderTool(SandboxToolsBase):
                     return {
                         "file_path": cleaned_path,
                         "success": False,
-                        "error": f"Failed to read file"
+                        "error": "Failed to read file"
                     }
                 content = result.result
                 extraction_method = "cat"
@@ -546,7 +546,7 @@ Examples:
                 formatted_results = []
                 
                 for query_result in search_results:
-                    q = query_result.get("query", query)
+                    query_result.get("query", query)
                     hits = query_result.get("hits", [])
                     total_hits += len(hits)
                     

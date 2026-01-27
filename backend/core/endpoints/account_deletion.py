@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta, timezone
@@ -63,7 +63,7 @@ async def request_account_deletion(
             'is_deleted': False
         }).execute()
         
-        deletion_id = deletion_request.data[0]['id']
+        deletion_request.data[0]['id']
         
         await check_and_schedule_subscriptions(account_id, deletion_date, client)
         
@@ -206,7 +206,7 @@ async def check_and_schedule_subscriptions(account_id: str, cancel_at: datetime,
         stripe_sub_id = account_data.get('stripe_subscription_id')
         revenuecat_sub_id = account_data.get('revenuecat_subscription_id')
         tier = account_data.get('tier')
-        provider = account_data.get('provider', 'stripe')
+        account_data.get('provider', 'stripe')
         
         if revenuecat_sub_id and tier not in ['none', 'free']:
             logger.warning(f"[ACCOUNT_DELETION] User {account_id} has active RevenueCat subscription - must cancel through app store first")
@@ -294,7 +294,7 @@ async def cancel_account_subscriptions_immediately(account_id: str, client) -> d
         stripe_sub_id = account_data.get('stripe_subscription_id')
         revenuecat_sub_id = account_data.get('revenuecat_subscription_id')
         tier = account_data.get('tier')
-        provider = account_data.get('provider', 'stripe')
+        account_data.get('provider', 'stripe')
         
         if revenuecat_sub_id and tier not in ['none', 'free']:
             logger.warning(f"[ACCOUNT_DELETION] User {account_id} has active RevenueCat subscription - cannot delete immediately")

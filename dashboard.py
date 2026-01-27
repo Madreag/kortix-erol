@@ -859,21 +859,21 @@ class SunaDashboard(App):
     @work(exclusive=True, thread=True)
     def action_start_all(self) -> None:
         self.call_from_thread(self.notify, "Starting all services...", severity="information")
-        subprocess.run(["bash", str(SCRIPTS_DIR / "start.sh")], capture_output=True)
+        subprocess.run(["bash", str(PROJECT_DIR / "start.sh")], capture_output=True)
         self.call_from_thread(self.notify, "Services started!", severity="information")
         self.call_from_thread(self.refresh_services)
     
     @work(exclusive=True, thread=True)
     def action_stop_all(self) -> None:
         self.call_from_thread(self.notify, "Stopping all services...", severity="warning")
-        subprocess.run(["bash", str(SCRIPTS_DIR / "stop.sh")], capture_output=True)
+        subprocess.run(["bash", str(PROJECT_DIR / "stop.sh")], capture_output=True)
         self.call_from_thread(self.notify, "Services stopped", severity="information")
         self.call_from_thread(self.refresh_services)
     
     @work(exclusive=True, thread=True)
     def action_restart_all(self) -> None:
         self.call_from_thread(self.notify, "Restarting services...", severity="warning")
-        subprocess.run(["bash", str(SCRIPTS_DIR / "restart.sh")], capture_output=True)
+        subprocess.run(["bash", str(PROJECT_DIR / "restart.sh")], capture_output=True)
         self.call_from_thread(self.notify, "Services restarted!", severity="information")
         self.call_from_thread(self.refresh_services)
     
@@ -881,7 +881,7 @@ class SunaDashboard(App):
     def action_cleanup(self) -> None:
         self.call_from_thread(self.notify, "Cleaning up sandboxes...", severity="information")
         try:
-            subprocess.run(["uv", "run", "python", "scripts/cleanup_sandboxes.py"], cwd=str(BACKEND_DIR), capture_output=True, timeout=30)
+            subprocess.run(["uv", "run", "python", str(PROJECT_DIR / ".setup/scripts/cleanup_sandboxes.py")], cwd=str(BACKEND_DIR), capture_output=True, timeout=30)
             self.call_from_thread(self.notify, "Cleanup complete!", severity="information")
         except Exception:
             self.call_from_thread(self.notify, "Cleanup failed", severity="error")

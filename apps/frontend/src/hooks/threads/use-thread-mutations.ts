@@ -101,6 +101,74 @@ interface DeleteMultipleThreadsVariables {
   onProgress?: (completed: number, total: number) => void;
 }
 
+export const useUpdateThread = () => {
+  const queryClient = useQueryClient();
+  
+  type ThreadsSnapshot = [readonly unknown[], unknown][];
+  
+  return useMutation<
+    void, 
+    Error, 
+    { threadId: string; data: { title?: string; is_public?: boolean } },
+    { previousThreads: ThreadsSnapshot }
+  >({
+    mutationFn: async ({ threadId, data }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/threads/${threadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update thread');
+      }
+    },
+    onMutate: async ({ threadId, data }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: threadKeys.lists() });
+      
+      // Snapshot current threads for rollback
+      const previousThreads = queryClient.getQueriesData({ queryKey: threadKeys.lists() });
+      
+      // Optimistically update thread in all cached lists
+      queryClient.setQueriesData(
+        { queryKey: threadKeys.lists() },
+        (old: any) => {
+          if (!old?.threads) return old;
+          return {
+            ...old,
+            threads: old.threads.map((t: any) =>
+              t.thread_id === threadId
+                ? { ...t, ...data, updated_at: new Date().toISOString() }
+                : t
+            ),
+          };
+        }
+      );
+      
+      // Also update detail cache if exists
+      queryClient.setQueryData(
+        threadKeys.details(threadId),
+        (old: any) => old ? { ...old, ...data } : old
+      );
+      
+      return { previousThreads };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousThreads) {
+        for (const [queryKey, data] of context.previousThreads) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+    },
+    onSuccess: (_data, { threadId }) => {
+      // Invalidate to ensure consistency
+      queryClient.invalidateQueries({ queryKey: threadKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: threadKeys.details(threadId) });
+    },
+  });
+};
+
 export const useDeleteMultipleThreads = () => {
   const queryClient = useQueryClient();
   

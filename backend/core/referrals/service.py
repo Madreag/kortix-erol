@@ -7,7 +7,6 @@ from .config import REFERRAL_CREDITS, MAX_EARNABLE_CREDITS_FROM_REFERRAL
 import json
 import re
 from core.notifications.notification_service import NotificationService
-from core.utils.config import config
 
 class ReferralService:
     def __init__(self, db: DBConnection):
@@ -108,7 +107,7 @@ class ReferralService:
         
         if total_earned >= MAX_EARNABLE_CREDITS_FROM_REFERRAL:
             logger.warning(
-                f"Referrer has reached max earnable credits limit",
+                "Referrer has reached max earnable credits limit",
                 referrer_id=referrer_id,
                 total_earned=total_earned,
                 max_limit=MAX_EARNABLE_CREDITS_FROM_REFERRAL

@@ -7,7 +7,6 @@ This module provides various test datasets for evaluation:
 3. Dataset loading utilities
 """
 
-import os
 import json
 from typing import List, Dict, Any, Optional
 from pathlib import Path
@@ -236,7 +235,6 @@ def create_golden_dataset_from_logs(
         List of high-quality input/output pairs
     """
     try:
-        import braintrust
         
         # This would query the Braintrust API for high-scoring logs
         # Implementation depends on Braintrust API capabilities

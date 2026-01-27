@@ -2,7 +2,6 @@
 Utility functions for retrieving user locale preferences from Supabase Auth.
 """
 
-from typing import Optional
 from core.utils.logger import logger
 from core.services.supabase import DBConnection
 

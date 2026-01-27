@@ -227,7 +227,7 @@ class SubscriptionLifecycleHandler:
             prev_subscription_status == 'trialing' and 
             current_subscription_status == 'active'):
             
-            logger.info(f"[TRIAL END] Subscription transitioned from trialing to active - marking trial as converted")
+            logger.info("[TRIAL END] Subscription transitioned from trialing to active - marking trial as converted")
             await self.trial_service.convert_trial(account_id, 'converted')
 
 
@@ -290,7 +290,7 @@ class SubscriptionLifecycleHandler:
         
         is_tier_change = current_tier_name != new_tier['name']
         if not is_tier_change and self.lifecycle_service.is_duplicate_credit_grant(last_grant_date, billing_anchor, current_tier_name, new_tier):
-            logger.warning(f"[DOUBLE CREDIT BLOCK] Duplicate credit grant detected for SAME tier - updating metadata only")
+            logger.warning("[DOUBLE CREDIT BLOCK] Duplicate credit grant detected for SAME tier - updating metadata only")
             await self._update_subscription_metadata_only(account_id, subscription, subscription['items']['data'][0]['price']['id'])
             return
         elif is_tier_change:

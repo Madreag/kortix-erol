@@ -234,7 +234,7 @@ async def apply_caching_strategy(
                 logger.debug(f"Reusing stored system prompt tokens: {system_prompt_tokens}")
         else:
             should_recalculate = True
-            logger.debug(f"No stored threshold - will calculate and store")
+            logger.debug("No stored threshold - will calculate and store")
     
     if context_window_tokens is None:
         try:
@@ -306,7 +306,7 @@ async def apply_caching_strategy(
     max_cacheable_tokens = int(context_window_tokens * 0.8)
     
     if total_conversation_tokens <= max_cacheable_tokens:
-        logger.debug(f"Conversation fits within cache limits - use chunked approach")
+        logger.debug("Conversation fits within cache limits - use chunked approach")
         
         if max_conversation_blocks > 0:
             optimal_chunk_size = total_conversation_tokens // max_conversation_blocks
@@ -533,7 +533,7 @@ def create_conversation_chunks(
                     current_chunk_groups = []
                     current_chunk_tokens = 0
                 else:
-                    logger.debug(f"No valid cache breakpoint in current chunk, adding uncached")
+                    logger.debug("No valid cache breakpoint in current chunk, adding uncached")
                     for grp in current_chunk_groups:
                         prepared_messages.extend(grp)
                     current_chunk_groups = []
@@ -543,7 +543,7 @@ def create_conversation_chunks(
                     prepared_messages.extend(grp)
                 for remaining_group in message_groups[i:]:
                     prepared_messages.extend(remaining_group)
-                logger.debug(f"Hit max blocks limit, added remaining messages uncached")
+                logger.debug("Hit max blocks limit, added remaining messages uncached")
                 return chunks_created, last_cached_message_id
         
         current_chunk_groups.append(group)

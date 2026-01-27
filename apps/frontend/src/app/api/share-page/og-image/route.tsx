@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
 
-// Add route segment config for caching
-export const runtime = 'edge'; // Use edge runtime for better performance
-export const revalidate = 3600; // Cache for 1 hour
-
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const title = searchParams.get('title');

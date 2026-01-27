@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional, AsyncGenerator, List, Set
 from datetime import datetime, timezone
 from core.utils.logger import logger
 from core.utils.config import config
-from core.agentpress.native_tool_parser import is_tool_call_complete, convert_to_exec_tool_call
+from core.agentpress.native_tool_parser import is_tool_call_complete
 from .tool_executor import PendingToolExecution
 
 TERMINATING_TOOLS = {"ask", "complete"}
@@ -378,7 +378,7 @@ class ResponseProcessor:
             
             logger.info(f"💰 [ResponseProcessor] Usage data for billing: {response_data['usage']}")
         else:
-            logger.warning(f"⚠️ [ResponseProcessor] No usage data available from LLM response")
+            logger.warning("⚠️ [ResponseProcessor] No usage data available from LLM response")
         
         return response_data
 

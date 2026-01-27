@@ -22,7 +22,7 @@ from ..repo import get_credit_account
 
 router = APIRouter(tags=["billing-account-state"])
 
-from ..shared.cache_utils import ACCOUNT_STATE_CACHE_TTL, invalidate_account_state_cache
+from ..shared.cache_utils import ACCOUNT_STATE_CACHE_TTL
 
 # Stripe subscription cache TTL (10 minutes - Stripe data rarely changes)
 # Increased from 5 min to reduce Stripe API calls in production

@@ -4,7 +4,6 @@ import uuid
 import re
 from typing import Dict, Any
 from pathlib import Path
-import mimetypes
 import chardet
 
 import PyPDF2
@@ -54,7 +53,7 @@ class FileProcessor:
                 # Check if most characters are printable
                 printable_ratio = len([c for c in decoded if c.isprintable() or c.isspace()]) / len(decoded)
                 return printable_ratio > 0.8
-        except:
+        except Exception:
             pass
         return False
     
@@ -178,7 +177,7 @@ class FileProcessor:
                 await client.table('knowledge_base_entries').update({
                     'summary': f"Error generating summary: {str(e)}"
                 }).eq('entry_id', entry_id).execute()
-            except:
+            except Exception:
                 pass
 
     async def process_file(
@@ -243,7 +242,7 @@ class FileProcessor:
                 'is_active': True
             }
             
-            result = await client.table('knowledge_base_entries').insert(entry_data).execute()
+            await client.table('knowledge_base_entries').insert(entry_data).execute()
             
             return {
                 'success': True,
@@ -433,7 +432,7 @@ Keep it under 200 words and make it actionable for context injection."""
                     # Only return if it seems to be mostly text content
                     if len([c for c in content[:1000] if c.isprintable() or c.isspace()]) > 800:
                         return content
-                except:
+                except Exception:
                     pass
                 
                 # If we can't extract text content, return a placeholder

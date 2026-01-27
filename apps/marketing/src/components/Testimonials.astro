@@ -1,0 +1,50 @@
+---
+const testimonials = [
+  {
+    quote: "Kortix has completely transformed how our team builds software. We shipped our MVP in 2 weeks instead of 2 months.",
+    author: "Sarah Chen",
+    role: "CTO, TechStartup",
+    avatar: "/avatars/sarah.jpg",
+  },
+  {
+    quote: "The AI agent understands context so well. It's like having a senior developer pair programming with you 24/7.",
+    author: "Marcus Johnson",
+    role: "Lead Developer, DevCorp",
+    avatar: "/avatars/marcus.jpg",
+  },
+  {
+    quote: "We reduced our development costs by 60% while shipping features faster than ever. Game changer.",
+    author: "Emily Rodriguez",
+    role: "VP Engineering, ScaleUp",
+    avatar: "/avatars/emily.jpg",
+  },
+];
+---
+
+<section class="container mx-auto px-6 py-20">
+  <div class="text-center max-w-2xl mx-auto mb-16">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4">Loved by Developers</h2>
+    <p class="text-gray-400">
+      See what teams are saying about building with Kortix.
+    </p>
+  </div>
+  
+  <div class="grid md:grid-cols-3 gap-8">
+    {testimonials.map(testimonial => (
+      <div class="bg-gray-800 rounded-2xl p-6">
+        <blockquote class="text-gray-300 mb-6">
+          "{testimonial.quote}"
+        </blockquote>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center font-bold">
+            {testimonial.author[0]}
+          </div>
+          <div>
+            <div class="font-medium">{testimonial.author}</div>
+            <div class="text-sm text-gray-500">{testimonial.role}</div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

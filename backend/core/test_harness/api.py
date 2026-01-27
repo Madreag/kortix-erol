@@ -363,7 +363,6 @@ async def run_e2e_tests(
         Test execution results with status, returncode, stdout, and stderr
     """
     import subprocess
-    import os
     from pathlib import Path
     
     # Get backend directory path

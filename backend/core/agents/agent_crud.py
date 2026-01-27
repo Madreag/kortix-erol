@@ -1,12 +1,11 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Query, Request
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger
 from core.utils.config import config, EnvMode
 from core.utils.pagination import PaginationParams
 from core.utils.core_tools_helper import ensure_core_tools_enabled
-from core.ai_models import model_manager
 
 from core.api_models import (
     AgentUpdateRequest, AgentResponse, AgentVersionResponse, AgentsResponse, 
@@ -56,7 +55,7 @@ async def update_agent(
             
             if (agent_data.name is not None and 
                 agent_data.name != existing_data.get('name') and 
-                restrictions.get('name_editable') == False):
+                not restrictions.get('name_editable')):
                 logger.error(f"User {user_id} attempted to modify restricted name of Suna agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
@@ -65,7 +64,7 @@ async def update_agent(
             
             
             if (agent_data.system_prompt is not None and 
-                restrictions.get('system_prompt_editable') == False):
+                not restrictions.get('system_prompt_editable')):
                 logger.error(f"User {user_id} attempted to modify restricted system prompt of Suna agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
@@ -73,7 +72,7 @@ async def update_agent(
                 )
             
             if (agent_data.agentpress_tools is not None and 
-                restrictions.get('tools_editable') == False):
+                not restrictions.get('tools_editable')):
                 logger.error(f"User {user_id} attempted to modify restricted tools of Suna agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
@@ -81,7 +80,7 @@ async def update_agent(
                 )
             
             if ((agent_data.configured_mcps is not None or agent_data.custom_mcps is not None) and 
-                restrictions.get('mcps_editable') == False):
+                not restrictions.get('mcps_editable')):
                 logger.error(f"User {user_id} attempted to modify restricted MCPs of Suna agent {agent_id}")
                 raise HTTPException(
                     status_code=403, 
@@ -338,7 +337,6 @@ async def update_agent(
                     user_id=user_id
                 )
                 current_version_data = current_version_obj.to_dict()
-                version_data = current_version_data
                 
                 current_version = AgentVersionResponse(
                     version_id=current_version_data['version_id'],
@@ -360,20 +358,8 @@ async def update_agent(
             except Exception as e:
                 logger.warning(f"Failed to get version data for updated agent {agent_id}: {e}")
         
-        version_data = None
         if current_version:
-            version_data = {
-                'version_id': current_version.version_id,
-                'agent_id': current_version.agent_id,
-                'version_number': current_version.version_number,
-                'version_name': current_version.version_name,
-                'system_prompt': current_version.system_prompt,
-                'model': current_version.model,
-                'configured_mcps': current_version.configured_mcps,
-                'custom_mcps': current_version.custom_mcps,
-                'agentpress_tools': current_version.agentpress_tools,
-                'is_active': current_version.is_active,
-            }
+            pass
         
         # Load the updated agent with full config
         from .agent_loader import get_agent_loader
@@ -622,7 +608,7 @@ async def create_agent(
             agent['current_version_id'] = version.version_id
             agent['version_count'] = 1
 
-            current_version = AgentVersionResponse(
+            AgentVersionResponse(
                 version_id=version.version_id,
                 agent_id=version.agent_id,
                 version_number=version.version_number,

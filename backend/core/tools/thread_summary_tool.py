@@ -217,7 +217,7 @@ This allows you to continue working without losing important context.""",
             from core.cache.runtime_cache import invalidate_message_history_cache
             await invalidate_message_history_cache(thread_id)
             
-            logger.info(f"[ThreadSummary] ✅ Compression complete and persisted")
+            logger.info("[ThreadSummary] ✅ Compression complete and persisted")
             
             return self.success_response({
                 "status": "compressed",

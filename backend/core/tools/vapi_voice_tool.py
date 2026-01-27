@@ -1,8 +1,9 @@
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict
 import json
 import asyncio
+import httpx
 import phonenumbers
-from phonenumbers import NumberParseException, geocoder
+from phonenumbers import geocoder
 import structlog
 import re
 from core.agentpress.tool import Tool, ToolResult, openapi_schema, tool_metadata
@@ -78,7 +79,7 @@ def normalize_phone_number(raw_number: str, default_region: str = "US") -> tuple
         for length in range(1, 5):
             if len(digits_only) > length:
                 test_with_plus = '+' + digits_only
-                parsing_strategies.append((f"Testing with + prefix added", test_with_plus, None))
+                parsing_strategies.append(("Testing with + prefix added", test_with_plus, None))
                 break
         
         for region in sorted_regions[:50]:
@@ -120,7 +121,7 @@ def normalize_phone_number(raw_number: str, default_region: str = "US") -> tuple
         error_context += "2. Use E.164 format: +[country code][number] (e.g., +14155552671)\n"
         error_context += "3. Check for typos or invalid digits\n"
         if len(parsing_errors) <= 5:
-            error_context += f"\nParsing attempts:\n" + "\n".join(f"  - {err}" for err in parsing_errors[:5])
+            error_context += "\nParsing attempts:\n" + "\n".join(f"  - {err}" for err in parsing_errors[:5])
         raise ValueError(error_context)
     
     if not phonenumbers.is_valid_number(parsed_number):
@@ -483,7 +484,7 @@ class VapiVoiceTool(Tool):
                         "agent_id": agent_id,
                         "transcript": []
                     }
-                    fallback_result = await client.table("vapi_calls").upsert(minimal_record).execute()
+                    await client.table("vapi_calls").upsert(minimal_record).execute()
                     logger.info(f"Created minimal call record via fallback for {call_id} with thread_id: {thread_id}")
                 except Exception as e2:
                     logger.error(f"Even minimal record failed for {call_id}: {str(e2)}")
@@ -684,7 +685,7 @@ class VapiVoiceTool(Tool):
                 await self.thread_manager.add_message(
                     thread_id=thread_id,
                     type="assistant",
-                    content=f"📞 **Monitoring Call**\n\nI'm now monitoring the active call. The conversation will appear here in real-time.\n\n---\n\n*Live Transcript:*",
+                    content="📞 **Monitoring Call**\n\nI'm now monitoring the active call. The conversation will appear here in real-time.\n\n---\n\n*Live Transcript:*",
                     is_llm_message=False,
                     metadata={
                         "call_id": call_id,
@@ -707,7 +708,7 @@ class VapiVoiceTool(Tool):
                     if isinstance(transcript, str):
                         try:
                             transcript = json.loads(transcript)
-                        except:
+                        except Exception:
                             transcript = []
                     
                     transcript_count = len(transcript) if isinstance(transcript, list) else 0

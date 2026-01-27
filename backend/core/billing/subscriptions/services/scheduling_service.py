@@ -2,7 +2,6 @@ from typing import Dict, Optional, Tuple
 from datetime import datetime, timezone
 
 from core.utils.logger import logger
-from core.billing.shared.config import get_tier_by_name, get_price_type
 from core.billing.external.stripe import StripeAPIWrapper
 from ..repositories.credit_account import CreditAccountRepository
 import stripe # type: ignore
@@ -15,7 +14,7 @@ class SchedulingService:
         from fastapi import HTTPException # type: ignore
         
         if not target_tier:
-            raise HTTPException(status_code=400, detail=f"Invalid target tier")
+            raise HTTPException(status_code=400, detail="Invalid target tier")
         
         if not current_tier:
             raise HTTPException(status_code=400, detail="Could not determine current tier")

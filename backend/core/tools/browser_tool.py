@@ -277,7 +277,7 @@ class BrowserTool(SandboxToolsBase):
                         logger.warning(f"Stagehand API server responded but with invalid JSON: {response.result}")
                 elif response.exit_code == 7:
                     # Connection refused - server not ready yet
-                    logger.debug(f"Browser API server not ready yet (connection refused)")
+                    logger.debug("Browser API server not ready yet (connection refused)")
                 else:
                     logger.debug(f"Health check failed with exit code {response.exit_code}")
                 

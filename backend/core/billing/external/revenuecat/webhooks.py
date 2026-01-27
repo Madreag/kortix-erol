@@ -123,7 +123,7 @@ class RevenueCatService:
         product_id = event.get('product_id')
         
         if not app_user_id or not product_id:
-            logger.warning(f"[REVENUECAT VERIFY] Missing app_user_id or product_id in webhook")
+            logger.warning("[REVENUECAT VERIFY] Missing app_user_id or product_id in webhook")
             return True  # Process anyway if we can't verify
         
         try:

@@ -1,9 +1,8 @@
 from typing import Dict, Optional
-from datetime import datetime, timezone
 
 from core.utils.config import config
 from core.utils.logger import logger
-from core.billing.shared.config import TIERS, get_tier_by_price_id
+from core.billing.shared.config import TIERS
 from core.billing.external.stripe import StripeAPIWrapper
 from core.billing import repo as billing_repo
 

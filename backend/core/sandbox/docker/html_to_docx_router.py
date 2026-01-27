@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import json
-import os
 from pathlib import Path
-from typing import Dict, Optional
-import tempfile
+from typing import Optional
 import re
 from io import BytesIO
 
@@ -16,7 +14,7 @@ try:
     from docx import Document
     from docx.shared import Inches, Pt, RGBColor
     from docx.enum.text import WD_ALIGN_PARAGRAPH
-    from docx.enum.style import WD_STYLE_TYPE
+    from docx.enum.style import WD_STYLE_TYPE  # noqa: F401 - may be used for styling
 except ImportError as e:
     raise ImportError(f"python-docx is not installed. Please install it with: pip install python-docx. Error: {e}")
 
@@ -96,7 +94,7 @@ class HTMLToDocxConverter:
                 
         elif element.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
             level = int(element.name[1])
-            heading = self.document.add_heading(element.get_text(), level)
+            self.document.add_heading(element.get_text(), level)
             
         elif element.name == 'ul':
             for li in element.find_all('li', recursive=False):
@@ -280,7 +278,7 @@ async def convert_document_to_docx(request: ConvertRequest):
         
         return ConvertResponse(
             success=True,
-            message=f"DOCX generated successfully",
+            message="DOCX generated successfully",
             docx_url=docx_url,
             filename=docx_path.name
         )

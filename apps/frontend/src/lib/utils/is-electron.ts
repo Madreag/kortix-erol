@@ -16,8 +16,9 @@ export function isElectron(): boolean {
 
   // Check for Electron-specific globals
   if (typeof window !== 'undefined') {
-    // @ts-expect-error - Electron may inject these
-    return !!(window.process && window.process.type === 'renderer');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const win = window as any;
+    return !!(win.process && win.process.type === 'renderer');
   }
 
   return false;

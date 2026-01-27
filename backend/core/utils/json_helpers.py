@@ -115,7 +115,7 @@ def repair_json(json_string: str) -> Tuple[str, bool]:
     try:
         json.loads(repaired)
         if was_repaired:
-            logger.info(f"🔧 [JSON REPAIR] Successfully repaired malformed JSON")
+            logger.info("🔧 [JSON REPAIR] Successfully repaired malformed JSON")
             logger.debug(f"🔧 [JSON REPAIR] Original (first 200 chars): {original[:200]}")
             logger.debug(f"🔧 [JSON REPAIR] Repaired (first 200 chars): {repaired[:200]}")
         return repaired, was_repaired

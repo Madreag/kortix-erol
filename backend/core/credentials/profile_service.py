@@ -1,12 +1,9 @@
 import uuid
-import json
-import hashlib
 import base64
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime
+from typing import Dict, List, Any, Optional
 
-from cryptography.fernet import Fernet
 
 from core.services.supabase import DBConnection
 from core.utils.logger import logger
@@ -74,7 +71,7 @@ class ProfileService:
         encrypted_config, config_hash = self._encryption.encrypt_config(config)
         encoded_config = base64.b64encode(encrypted_config).decode('utf-8')
         
-        client = await self._db.client
+        await self._db.client
 
         from core.credentials import repo as credentials_repo
         

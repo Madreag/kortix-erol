@@ -8,7 +8,6 @@ magic link expiration due to email security scanners (e.g., Microsoft Defender).
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
 import httpx
-import os
 from core.utils.logger import logger
 from core.utils.config import config
 from core.services.email import email_service

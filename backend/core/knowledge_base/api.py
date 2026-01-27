@@ -664,7 +664,7 @@ async def move_file(
         # Move file in storage
         try:
             # Copy file to new location
-            copy_result = await client.storage.from_('file-uploads').copy(
+            await client.storage.from_('file-uploads').copy(
                 current_file_path, new_file_path
             )
             

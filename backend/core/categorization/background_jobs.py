@@ -2,7 +2,6 @@
 
 import asyncio
 from datetime import datetime, timezone, timedelta
-from typing import List, Dict, Any
 
 from core.utils.logger import logger
 from core.services.supabase import DBConnection
@@ -107,7 +106,7 @@ class _DispatchWrapper:
     def send(self, *args, **kwargs):
         import asyncio
         try:
-            loop = asyncio.get_running_loop()
+            asyncio.get_running_loop()
             asyncio.create_task(self._dispatch_fn(*args, **kwargs))
         except RuntimeError:
             asyncio.run(self._dispatch_fn(*args, **kwargs))

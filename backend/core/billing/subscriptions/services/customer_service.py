@@ -2,7 +2,6 @@ from typing import Optional
 from fastapi import HTTPException # type: ignore
 import stripe # type: ignore
 
-from core.utils.config import config
 from core.utils.logger import logger
 from core.billing.external.stripe import StripeAPIWrapper
 from core.billing import repo as billing_repo

@@ -63,7 +63,7 @@ class SandboxDocumentParserTool(SandboxToolsBase):
             # Upload to Chunkr and get the task result
             task = await self.chunkr.upload(url)
             
-            logger.debug(f"Chunkr task completed successfully")
+            logger.debug("Chunkr task completed successfully")
             
             # Extract meaningful content from the Chunkr response
             parsed_content = self._extract_meaningful_content(task, extract_tables, extract_structured_data)

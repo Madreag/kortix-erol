@@ -32,10 +32,15 @@ import {
   reconstructToolCalls,
 } from './tool-accumulator';
 import { StreamConnection } from './stream-connection';
+import { ResilientStreamClient, createResilientStream } from './stream-resilience';
+import { ChunkProcessor, createChunkProcessor } from './chunk-processor';
+import { AdaptiveThrottle, getGlobalThrottle } from './adaptive-throttle';
 import { 
   getStreamPreconnectService, 
   consumePreconnectInfo,
 } from './stream-preconnect';
+import { getNavigationGuard } from './navigation-guard';
+import { streamingMetrics } from './metrics';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
@@ -91,7 +96,7 @@ export function useAgentStream(
   const [error, setError] = useState<string | null>(null);
   const [agentRunId, setAgentRunId] = useState<string | null>(null);
   
-  const connectionRef = useRef<StreamConnection | null>(null);
+  const connectionRef = useRef<StreamConnection | ResilientStreamClient | null>(null);
   const accumulatorRef = useRef<ToolCallAccumulatorState>(createAccumulatorState());
   const currentRunIdRef = useRef<string | null>(null);
   const threadIdRef = useRef(threadId);
@@ -105,8 +110,11 @@ export function useAgentStream(
   const handleConnectionCloseRef = useRef<(() => void) | null>(null);
   const statusRef = useRef(status);
   
-  const pendingChunksRef = useRef<Array<{ content: string; sequence: number }>>([]);
-  const rafIdRef = useRef<number | null>(null);
+  // ChunkProcessor for RAF-based batching (replaces inline RAF logic)
+  const chunkProcessorRef = useRef<ChunkProcessor | null>(null);
+  
+  // AdaptiveThrottle for FPS-aware tool call rendering
+  const adaptiveThrottleRef = useRef<AdaptiveThrottle | null>(null);
   
   const toolCallThrottleRef = useRef<{
     lastUpdate: number;
@@ -138,13 +146,33 @@ export function useAgentStream(
     statusRef.current = status;
   }, [status]);
   
+  // Initialize ChunkProcessor and AdaptiveThrottle
   useEffect(() => {
     isMountedRef.current = true;
+    
+    // Initialize ChunkProcessor with callback to update textChunks
+    chunkProcessorRef.current = createChunkProcessor((text, lastSequence) => {
+      if (!isMountedRef.current) return;
+      setTextChunks(prev => {
+        const newChunk = { content: text, sequence: lastSequence };
+        const combined = [...prev, newChunk];
+        const deduplicated = new Map<number, { content: string; sequence: number }>();
+        for (const chunk of combined) {
+          deduplicated.set(chunk.sequence, chunk);
+        }
+        return Array.from(deduplicated.values()).sort((a, b) => a.sequence - b.sequence);
+      });
+    });
+    
+    // Initialize AdaptiveThrottle for tool call rendering
+    adaptiveThrottleRef.current = getGlobalThrottle();
+    adaptiveThrottleRef.current.startMonitoring();
+    
     return () => {
       isMountedRef.current = false;
-      if (rafIdRef.current) {
-        cancelAnimationFrame(rafIdRef.current);
-      }
+      chunkProcessorRef.current?.destroy();
+      chunkProcessorRef.current = null;
+      adaptiveThrottleRef.current?.stopMonitoring();
       if (toolCallThrottleRef.current.timeoutId) {
         clearTimeout(toolCallThrottleRef.current.timeoutId);
       }
@@ -157,33 +185,16 @@ export function useAgentStream(
     return sorted.map(chunk => chunk.content).join('');
   }, [textChunks]);
   
+  // Flush pending chunks via ChunkProcessor
   const flushPendingChunks = useCallback(() => {
     if (!isMountedRef.current) return;
-    
-    if (pendingChunksRef.current.length > 0) {
-      const chunksToAdd = [...pendingChunksRef.current];
-      pendingChunksRef.current = [];
-      
-      setTextChunks(prev => {
-        const combined = [...prev, ...chunksToAdd];
-        const deduplicated = new Map<number, { content: string; sequence: number }>();
-        for (const chunk of combined) {
-          deduplicated.set(chunk.sequence, chunk);
-        }
-        return Array.from(deduplicated.values()).sort((a, b) => a.sequence - b.sequence);
-      });
-    }
-    
-    rafIdRef.current = null;
+    chunkProcessorRef.current?.forceFlush();
   }, []);
   
+  // Add text chunk via ChunkProcessor (replaces inline RAF logic)
   const addTextChunk = useCallback((content: string, sequence: number) => {
-    pendingChunksRef.current.push({ content, sequence });
-    
-    if (!rafIdRef.current) {
-      rafIdRef.current = requestAnimationFrame(flushPendingChunks);
-    }
-  }, [flushPendingChunks]);
+    chunkProcessorRef.current?.addChunk(content, sequence);
+  }, []);
   
   const updateToolCall = useCallback((message: UnifiedMessage) => {
     const now = performance.now();
@@ -231,12 +242,21 @@ export function useAgentStream(
     setToolCall(null);
     setError(null);
     clearAccumulator(accumulatorRef.current);
-    pendingChunksRef.current = [];
     
-    if (rafIdRef.current) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
+    // Clean up ChunkProcessor
+    chunkProcessorRef.current?.destroy();
+    chunkProcessorRef.current = createChunkProcessor((text, lastSequence) => {
+      if (!isMountedRef.current) return;
+      setTextChunks(prev => {
+        const newChunk = { content: text, sequence: lastSequence };
+        const combined = [...prev, newChunk];
+        const deduplicated = new Map<number, { content: string; sequence: number }>();
+        for (const chunk of combined) {
+          deduplicated.set(chunk.sequence, chunk);
+        }
+        return Array.from(deduplicated.values()).sort((a, b) => a.sequence - b.sequence);
+      });
+    });
     
     if (toolCallThrottleRef.current.timeoutId) {
       clearTimeout(toolCallThrottleRef.current.timeoutId);
@@ -246,6 +266,35 @@ export function useAgentStream(
     toolCallThrottleRef.current.lastUpdate = 0;
     
     optionsRef.current.clearToolTracking?.();
+  }, []);
+  
+  // Navigation cleanup effect - runs after resetState is defined
+  useEffect(() => {
+    const navigationGuard = getNavigationGuard();
+    
+    const handleNavigation = () => {
+      // Immediately abort any ongoing streams
+      if (connectionRef.current) {
+        connectionRef.current.destroy();
+        connectionRef.current = null;
+      }
+      // End metrics tracking
+      streamingMetrics.onStreamEnd();
+      // Unregister from navigation guard
+      if (threadIdRef.current) {
+        navigationGuard.unregisterStream(threadIdRef.current);
+      }
+    };
+    
+    // Listen for back/forward navigation
+    window.addEventListener('popstate', handleNavigation);
+    window.addEventListener('beforeunload', handleNavigation);
+    
+    return () => {
+      window.removeEventListener('popstate', handleNavigation);
+      window.removeEventListener('beforeunload', handleNavigation);
+      handleNavigation();
+    };
   }, []);
   
   const finalizeStream = useCallback((finalStatus: AgentStatus, runId: string | null = agentRunId) => {
@@ -261,6 +310,13 @@ export function useAgentStream(
     }
 
     flushPendingChunks();
+
+    // End metrics tracking
+    streamingMetrics.onStreamEnd();
+    
+    // Unregister from navigation guard
+    const navigationGuard = getNavigationGuard();
+    navigationGuard.unregisterStream(threadIdRef.current);
 
     setStatus(finalStatus);
     callbacksRef.current.onStatusChange?.(finalStatus);
@@ -318,6 +374,9 @@ export function useAgentStream(
         if (processed.content) {
           // First text chunk marks reasoning phase as complete
           setIsReasoningComplete(true);
+          // Track first token for TTFT metrics
+          streamingMetrics.onFirstToken();
+          streamingMetrics.onToken();
           addTextChunk(processed.content, processed.message?.sequence ?? Date.now());
           callbacksRef.current.onAssistantChunk?.({ content: processed.content });
         }
@@ -582,7 +641,11 @@ export function useAgentStream(
     callbacksRef.current.onStatusChange?.('connecting');
     callbacksRef.current.onAssistantStart?.();
     
+    // Start metrics tracking
+    streamingMetrics.onStreamStart();
+    
     const preconnectService = getStreamPreconnectService();
+    const navigationGuard = getNavigationGuard();
     const adopted = preconnectService.adopt(runId);
     
     if (adopted) {
@@ -623,6 +686,9 @@ export function useAgentStream(
         originalDestroy();
       };
       
+      // Register with navigation guard
+      navigationGuard.registerStream(threadId, connectionRef.current);
+      
       // Update status based on connection state
       if (connectionRef.current.isConnected()) {
         setStatus('running');
@@ -652,6 +718,10 @@ export function useAgentStream(
     });
     
     connectionRef.current = connection;
+    
+    // Register with navigation guard
+    navigationGuard.registerStream(threadId, connection);
+    
     await connection.connect();
   }, [
     resetState,

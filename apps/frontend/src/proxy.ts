@@ -73,7 +73,7 @@ function detectMobilePlatformFromUA(userAgent: string | null): 'ios' | 'android'
   return null;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // 🚀 HYPER-FAST: Mobile app store redirect for /milano, /berlin, and /app

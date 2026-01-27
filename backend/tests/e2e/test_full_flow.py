@@ -4,6 +4,7 @@ Complete end-to-end API test flow
 This single comprehensive test covers the entire user journey from account setup
 through all API routes, testing everything in sequence.
 """
+import os
 import pytest
 import httpx
 import json
@@ -25,6 +26,10 @@ def check_billing_response(response: httpx.Response, step_name: str):
 @pytest.mark.e2e
 @pytest.mark.slow
 @pytest.mark.billing
+@pytest.mark.skipif(
+    os.getenv("RUN_BILLING_TESTS", "").lower() not in ("1", "true", "yes"),
+    reason="Billing tests require RUN_BILLING_TESTS=1 and a funded test account"
+)
 async def test_complete_api_flow(client: httpx.AsyncClient, test_config: E2ETestConfig, test_user: dict):
     """
     Complete E2E API flow testing all routes from top to bottom:
@@ -49,7 +54,7 @@ async def test_complete_api_flow(client: httpx.AsyncClient, test_config: E2ETest
       11. POST /agent-run/{id}/stop - Stop agent run (if still running)
     """
     print(f"\n{'='*70}")
-    print(f"🧪 Starting Complete E2E API Flow Test")
+    print("🧪 Starting Complete E2E API Flow Test")
     print(f"   Test User: {test_user['email']}")
     print(f"{'='*70}")
     
@@ -118,14 +123,14 @@ async def test_complete_api_flow(client: httpx.AsyncClient, test_config: E2ETest
     assert thread_id, "Should have thread_id"
     assert agent_run_id, "Should have agent_run_id"
     
-    print(f"✅ Agent run started:")
+    print("✅ Agent run started:")
     print(f"   Project: {project_id}")
     print(f"   Thread:  {thread_id}")
     print(f"   Run:     {agent_run_id}")
     
     # Step 4: GET /agent-run/{id}/stream
     print(f"\n📋 Step 4: GET /agent-run/{agent_run_id}/stream - Stream agent run...")
-    print(f"📡 Connecting to stream immediately...")
+    print("📡 Connecting to stream immediately...")
     
     chunks = []
     completed = False
@@ -280,13 +285,13 @@ async def test_complete_api_flow(client: httpx.AsyncClient, test_config: E2ETest
             f"Expected 200/204/400, got {response.status_code}: {response.text}"
         print(f"✅ Stop request sent (status: {response.status_code})")
     else:
-        print(f"✅ Run already completed, skipping stop")
+        print("✅ Run already completed, skipping stop")
     
     # ========================================================================
     # FINAL SUMMARY
     # ========================================================================
     print(f"\n{'='*70}")
-    print(f"✅ Complete E2E API Flow Test PASSED")
+    print("✅ Complete E2E API Flow Test PASSED")
     print(f"{'='*70}")
     print(f"   Test User Email: {test_user['email']}")
     print(f"   Test User ID:    {test_user['user_id']}")
@@ -296,5 +301,5 @@ async def test_complete_api_flow(client: httpx.AsyncClient, test_config: E2ETest
     print(f"   Agent Run:       {agent_run_id}")
     print(f"   Messages:        {len(messages)}")
     print(f"   Stream Chunks:   {len(chunks)}")
-    print(f"   Endpoints:       11")
+    print("   Endpoints:       11")
     print(f"{'='*70}\n")

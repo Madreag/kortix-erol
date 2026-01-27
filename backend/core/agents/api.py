@@ -11,7 +11,6 @@ import json
 import time
 import traceback
 import uuid
-from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any, Tuple
 
 from fastapi import APIRouter, HTTPException, Depends, Request, File, UploadFile, Form
@@ -210,7 +209,6 @@ async def _check_billing_and_limits(
 
 async def _check_concurrent_runs_limit(account_id: str):
     from core.cache.runtime_cache import get_cached_running_runs, get_cached_tier_info
-    from core.billing.subscriptions import subscription_service
     
     tier_info = await get_cached_tier_info(account_id)
     if not tier_info:
@@ -598,12 +596,12 @@ async def _background_setup_and_execute(
                 logger.debug(f"⚠️ Cache miss for thread {thread_id}, writing message to DB first")
                 await write_user_message_for_existing_thread(thread_id, final_message_content)
         
-        logger.debug(f"⚡ [BG] Caches ready, starting agent + DB writes in parallel")
+        logger.debug("⚡ [BG] Caches ready, starting agent + DB writes in parallel")
         
         asyncio.create_task(prewarm_user_context(account_id))
         
         from core.agents.runner.setup_manager import prewarm_credit_balance
-        credit_prewarm_task = asyncio.create_task(prewarm_credit_balance(account_id))
+        asyncio.create_task(prewarm_credit_balance(account_id))
         
         async def do_db_writes():
             db_start = time.time()
@@ -648,7 +646,7 @@ async def _background_setup_and_execute(
         log_run_start(agent_run_id, thread_id)
         
         db_task = asyncio.create_task(do_db_writes())
-        logger.info(f"✅ [BG] Starting agent execution")
+        logger.info("✅ [BG] Starting agent execution")
         
         cleanup_reason = None
         final_status = "unknown"
@@ -686,7 +684,7 @@ async def _background_setup_and_execute(
             try:
                 await asyncio.wait_for(db_task, timeout=30.0)
             except asyncio.TimeoutError:
-                logger.warning(f"⚠️ [BG] DB writes timed out after 30s")
+                logger.warning("⚠️ [BG] DB writes timed out after 30s")
             except Exception as e:
                 logger.warning(f"⚠️ [BG] DB writes failed: {e}")
             
@@ -790,7 +788,7 @@ async def unified_agent_start(
         if files_data and model_name == "kortix/minimax":
             has_images = any(mime.startswith("image/") for _, _, mime, _ in files_data)
             if has_images:
-                logger.info(f"⚡ [IMAGE_UPGRADE] Free tier user uploaded image - injecting upgrade prompt")
+                logger.info("⚡ [IMAGE_UPGRADE] Free tier user uploaded image - injecting upgrade prompt")
                 final_prompt = f"""[SYSTEM INSTRUCTION: The user uploaded an image but they are on the FREE tier which does not support image analysis. You MUST respond by:
 1. Acknowledge you see they uploaded an image
 2. Explain that image analysis requires an upgrade
@@ -960,7 +958,7 @@ async def stream_agent_run(
         if not agent_run_data:
             raise HTTPException(status_code=404, detail="Worker run not found")
     
-    thread_id = agent_run_data['thread_id']
+    agent_run_data['thread_id']
     account_id = agent_run_data['thread_account_id']
     
     if user_id != account_id:

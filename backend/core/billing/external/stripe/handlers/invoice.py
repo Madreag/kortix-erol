@@ -95,10 +95,10 @@ class InvoiceHandler:
                 if billing_reason == 'subscription_cycle':
                     is_prorated_upgrade = False
                     has_full_cycle_charge = True
-                    logger.debug(f"[RENEWAL] Billing reason is subscription_cycle, forcing has_full_cycle=True")
+                    logger.debug("[RENEWAL] Billing reason is subscription_cycle, forcing has_full_cycle=True")
                     
                 elif billing_reason == 'subscription_update':
-                    logger.debug(f"[RENEWAL] Billing reason is subscription_update")
+                    logger.debug("[RENEWAL] Billing reason is subscription_update")
                     if is_prorated_upgrade:
                         # account_id already set from early customer lookup
                         logger.info(f"[RENEWAL] Processing prorated upgrade for account {account_id}")
@@ -124,14 +124,14 @@ class InvoiceHandler:
                                     })
                                     
                                     return
-                        logger.debug(f"[RENEWAL] No price_id found, returning")
+                        logger.debug("[RENEWAL] No price_id found, returning")
                         return
                     
                     if not has_full_cycle_charge:
-                        logger.info(f"[RENEWAL] subscription_update without full cycle charge - skipping (likely mid-period change)")
+                        logger.info("[RENEWAL] subscription_update without full cycle charge - skipping (likely mid-period change)")
                         return
                     
-                    logger.info(f"[RENEWAL] subscription_update WITH full cycle charge detected - treating as renewal and continuing processing")
+                    logger.info("[RENEWAL] subscription_update WITH full cycle charge detected - treating as renewal and continuing processing")
                 
                 logger.debug(f"[RENEWAL] Fetching account for customer {invoice.get('customer')}")
                 
@@ -160,7 +160,7 @@ class InvoiceHandler:
                 logger.debug(f"[RENEWAL] subscription_status={subscription_status}, trial_status={trial_status}, billing_reason={billing_reason}")
                 
                 if trial_status == 'active' and billing_reason == 'subscription_create' and is_still_trialing:
-                    logger.debug(f"[RENEWAL] Trial + subscription_create + still trialing, updating invoice ID only")
+                    logger.debug("[RENEWAL] Trial + subscription_create + still trialing, updating invoice ID only")
                     await billing_repo.update_credit_account(account_id, {
                         'last_processed_invoice_id': invoice_id
                     })
@@ -178,7 +178,7 @@ class InvoiceHandler:
                 price_id = subscription['items']['data'][0]['price']['id'] if subscription.get('items') and subscription['items']['data'] else None
                 
                 if not price_id:
-                    logger.warning(f"[RENEWAL] No price_id from subscription, attempting to extract from invoice")
+                    logger.warning("[RENEWAL] No price_id from subscription, attempting to extract from invoice")
                     if invoice.get('lines', {}).get('data'):
                         for line in invoice['lines']['data']:
                             if line.get('price') and line.get('price', {}).get('id'):
@@ -195,11 +195,11 @@ class InvoiceHandler:
                         logger.error(f"[RENEWAL] Price ID {price_id} not recognized in tier configuration - cannot process invoice")
                         raise ValueError(f"Unrecognized price_id: {price_id}")
                 else:
-                    logger.error(f"[RENEWAL] Could not determine price_id from subscription or invoice - cannot process invoice")
+                    logger.error("[RENEWAL] Could not determine price_id from subscription or invoice - cannot process invoice")
                     raise ValueError("Could not determine price_id from subscription or invoice")
                 
                 if trial_status == 'cancelled' and billing_reason == 'subscription_create':
-                    logger.info(f"[RENEWAL] Cancelled trial user subscribing - resetting trial status to 'none'")
+                    logger.info("[RENEWAL] Cancelled trial user subscribing - resetting trial status to 'none'")
                     trial_status = 'none'
                 
                 # Check tier config first to see if monthly_refill is enabled

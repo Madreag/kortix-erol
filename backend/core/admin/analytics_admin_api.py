@@ -21,7 +21,6 @@ from core.services.supabase import DBConnection
 from core.utils.logger import logger
 from core.utils.pagination import PaginationService, PaginationParams, PaginatedResponse
 from core.utils.config import config
-from core.utils.query_utils import batch_query_in
 import openai
 import stripe
 
@@ -33,8 +32,8 @@ try:
         DateRange,
         Dimension,
         Metric,
-        FilterExpression,
-        Filter,
+        FilterExpression,  # noqa: F401 - may be used for filtering
+        Filter,  # noqa: F401 - may be used for filtering
     )
     from google.oauth2 import service_account
     GA_AVAILABLE = True
@@ -774,7 +773,7 @@ async def _enrich_threads(client, threads: List[Dict]) -> List[ThreadAnalytics]:
     if not threads:
         return []
     
-    thread_ids = [t['thread_id'] for t in threads]
+    [t['thread_id'] for t in threads]
     account_ids = list(set(t['account_id'] for t in threads if t.get('account_id')))
     project_ids = list(set(t['project_id'] for t in threads if t.get('project_id')))
     
@@ -1869,7 +1868,7 @@ async def update_arr_weekly_actual(
             'overrides': new_overrides,
         }
         
-        result = await client.from_('arr_weekly_actuals').upsert(
+        await client.from_('arr_weekly_actuals').upsert(
             upsert_data,
             on_conflict='week_number,platform'
         ).execute()
@@ -2425,7 +2424,7 @@ async def get_revenue_summary(
         
         now = datetime.now(BERLIN_TZ)
         month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        last_month_start = (month_start - timedelta(days=1)).replace(day=1)
+        (month_start - timedelta(days=1)).replace(day=1)
         
         # Get all active paid subscriptions from Stripe
         subscribers_by_tier: Dict[str, int] = {}
@@ -3312,7 +3311,7 @@ async def get_profitability(
 
             # Per-user averages
             avg_cost = cost_with_markup / unique_users if unique_users > 0 else 0.0
-            avg_revenue = tier_revenue / unique_users if unique_users > 0 else 0.0
+            tier_revenue / unique_users if unique_users > 0 else 0.0
             avg_profit = gross_profit / unique_users if unique_users > 0 else 0.0
 
             # Determine primary provider for this tier entry

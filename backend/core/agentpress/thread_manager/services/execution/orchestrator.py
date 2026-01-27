@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 
 from core.utils.logger import logger
 from core.agentpress.processor_config import ProcessorConfig
-from core.agentpress.error_processor import ErrorProcessor
 
 from core.agentpress.thread_manager.services.messages.preparer import MessagePreparer
 from core.agentpress.thread_manager.services.execution.llm_executor import LLMExecutor

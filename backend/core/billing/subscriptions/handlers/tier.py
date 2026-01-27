@@ -9,7 +9,7 @@ class TierHandler:
     @staticmethod
     async def get_user_subscription_tier(account_id: str, skip_cache: bool = False) -> Dict:
         import time
-        t_start = time.time()
+        time.time()
         
         if not skip_cache:
             try:

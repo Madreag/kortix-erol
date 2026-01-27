@@ -100,14 +100,17 @@ async def _ensure_test_user_exists(test_config: E2ETestConfig) -> Dict[str, str]
         logger.info(f"✅ Created test user: {TEST_USER_EMAIL} (ID: {user_id})")
 
         # Create profile (some APIs may require this)
+        # Note: profiles table may not exist or may use RLS - this is non-blocking
         try:
             client.table('profiles').insert({
                 'user_id': user_id,
                 'email': TEST_USER_EMAIL,
                 'full_name': 'E2E Test User',
             }).execute()
-        except Exception:
-            pass  # Profile might be auto-created by trigger
+            logger.debug(f"Profile created for {TEST_USER_EMAIL}")
+        except Exception as profile_err:
+            # Profile table may not exist, use RLS, or auto-create via trigger
+            logger.debug(f"Profile creation skipped (non-blocking): {profile_err}")
 
         # Account initialization happens automatically when user hits API
         # No need to call initialize_user_account here

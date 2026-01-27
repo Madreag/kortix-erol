@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const plans = [
+  {
+    name: 'Free',
+    price: '$0',
+    period: 'forever',
+    features: [
+      '100 agent runs/month',
+      '1 project',
+      'Community support',
+      'Basic analytics',
+    ],
+    cta: 'Get Started',
+    ctaHref: '/auth/signup',
+    popular: false,
+  },
+  {
+    name: 'Pro',
+    price: '$29',
+    period: '/month',
+    features: [
+      'Unlimited agent runs',
+      'Unlimited projects',
+      'Priority support',
+      'Advanced analytics',
+      'Custom agents',
+      'API access',
+    ],
+    cta: 'Start Free Trial',
+    ctaHref: '/auth/signup?plan=pro',
+    popular: true,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: '',
+    features: [
+      'Everything in Pro',
+      'Dedicated support',
+      'SSO/SAML',
+      'Custom integrations',
+      'SLA guarantee',
+      'On-premise option',
+    ],
+    cta: 'Contact Sales',
+    ctaHref: '/contact',
+    popular: false,
+  },
+];
+---
+
+<BaseLayout title="Pricing">
+  <Header />
+  
+  <main class="pt-28 pb-20">
+    <div class="container mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">Simple, Transparent Pricing</h1>
+        <p class="text-xl text-gray-400">
+          Start free, scale as you grow. No hidden fees.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        {plans.map(plan => (
+          <div class:list={[
+            'relative bg-gray-800 rounded-2xl p-8',
+            plan.popular && 'ring-2 ring-primary-500'
+          ]}>
+            {plan.popular && (
+              <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary-600 rounded-full text-sm font-medium">
+                Most Popular
+              </div>
+            )}
+            
+            <h3 class="text-xl font-semibold mb-4">{plan.name}</h3>
+            <div class="mb-6">
+              <span class="text-4xl font-bold">{plan.price}</span>
+              <span class="text-gray-400">{plan.period}</span>
+            </div>
+            
+            <ul class="space-y-3 mb-8">
+              {plan.features.map(feature => (
+                <li class="flex items-center gap-3 text-gray-300">
+                  <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            
+            <a 
+              href={plan.ctaHref}
+              class:list={[
+                'block w-full py-3 text-center font-medium rounded-xl transition-colors',
+                plan.popular 
+                  ? 'bg-primary-600 hover:bg-primary-700' 
+                  : 'bg-gray-700 hover:bg-gray-600'
+              ]}
+            >
+              {plan.cta}
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </main>
+  
+  <Footer />
+</BaseLayout>

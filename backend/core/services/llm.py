@@ -1,6 +1,5 @@
 from typing import Union, Dict, Any, Optional, AsyncGenerator, List
 import os
-import json
 import asyncio
 
 os.environ.setdefault("AIOHTTP_CONNECTOR_LIMIT", "0")
@@ -52,14 +51,14 @@ class LLMTimingCallback(CustomLogger):
             if duration > 30.0:
                 model = kwargs.get("model", "unknown")
                 logger.warning(f"[LLM] SLOW: {model} took {duration:.2f}s")
-        except:
+        except Exception:
             pass
     
     def log_failure_event(self, kwargs, response_obj, start_time, end_time):
         model = kwargs.get("model", "unknown")
         try:
             duration = (end_time - start_time).total_seconds()
-        except:
+        except Exception:
             duration = 0
         
         exception = kwargs.get("exception", response_obj)
@@ -161,12 +160,12 @@ async def make_llm_api_call(
     headers: Optional[Dict[str, str]] = None,
     extra_headers: Optional[Dict[str, str]] = None,
     stop: Optional[List[str]] = None,
-    frequency_penalty: Optional[float] = 0.2,
+    frequency_penalty: Optional[float] = 0,
 ) -> Union[Dict[str, Any], AsyncGenerator, ModelResponse]:
     messages = _strip_internal_properties(messages)
     
     if model_name == "mock-ai":
-        logger.info(f"[LLM] Using mock provider for testing")
+        logger.info("[LLM] Using mock provider for testing")
         from core.test_harness.mock_llm import get_mock_provider
         mock_provider = get_mock_provider(delay_ms=20)
         return mock_provider.acompletion(

@@ -2,10 +2,9 @@ import json
 import uuid
 import base64
 import os
-from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 from urllib.parse import urlencode
 
 from fastapi import HTTPException

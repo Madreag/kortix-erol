@@ -1,7 +1,6 @@
 from typing import Dict, Type, Any, List, Optional, Callable
 from core.agentpress.tool import Tool, SchemaType
 from core.utils.logger import logger
-import json
 
 
 class ToolRegistry:

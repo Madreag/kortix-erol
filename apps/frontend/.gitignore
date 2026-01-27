@@ -10,6 +10,9 @@ frontend/.env
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/.playwright/
 
 # next.js
 /.next/
@@ -47,3 +50,4 @@ supabase/**/*.env
 
 # Sentry Config File
 .env.sentry-build-plugin
+.auth/

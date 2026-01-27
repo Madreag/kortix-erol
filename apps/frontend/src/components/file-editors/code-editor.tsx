@@ -100,15 +100,15 @@ const languageMap: Record<string, () => any> = {
   markdown: () => getLangExtension('markdown'),
   mdx: () => getLangExtension('markdown'),
   
-  // Python
-  python: () => getLangExtension('python'),
-  py: () => getLangExtension('python'),
-  pyi: () => getLangExtension('python'),
-  pyw: () => getLangExtension('python'),
+  // Python - use 'py' key which is the actual export from @uiw/codemirror-extensions-langs
+  python: () => getLangExtension('py'),
+  py: () => getLangExtension('py'),
+  pyi: () => getLangExtension('py'),
+  pyw: () => getLangExtension('pyw'),
   
-  // Systems languages
-  rust: () => getLangExtension('rust'),
-  rs: () => getLangExtension('rust'),
+  // Systems languages - use correct package keys
+  rust: () => getLangExtension('rs'),
+  rs: () => getLangExtension('rs'),
   go: () => getLangExtension('go'),
   golang: () => getLangExtension('go'),
   c: () => getLangExtension('c'),
@@ -119,32 +119,32 @@ const languageMap: Record<string, () => any> = {
   hpp: () => getLangExtension('cpp'),
   hxx: () => getLangExtension('cpp'),
   
-  // Java family
+  // Java family - use correct package keys
   java: () => getLangExtension('java'),
-  cs: () => getLangExtension('csharp'),
-  csharp: () => getLangExtension('csharp'),
-  kotlin: () => getLangExtension('kotlin'),
-  kt: () => getLangExtension('kotlin'),
+  cs: () => getLangExtension('cs'),
+  csharp: () => getLangExtension('cs'),
+  kotlin: () => getLangExtension('kt'),
+  kt: () => getLangExtension('kt'),
   scala: () => getLangExtension('scala'),
   
-  // Scripting languages
+  // Scripting languages - use correct package keys
   php: () => getLangExtension('php'),
-  ruby: () => getLangExtension('ruby'),
-  rb: () => getLangExtension('ruby'),
-  rbx: () => getLangExtension('ruby'),
-  rjs: () => getLangExtension('ruby'),
+  ruby: () => getLangExtension('rb'),
+  rb: () => getLangExtension('rb'),
+  rbx: () => getLangExtension('rb'),
+  rjs: () => getLangExtension('rb'),
   perl: () => getLangExtension('perl'),
   pl: () => getLangExtension('perl'),
   pm: () => getLangExtension('perl'),
   lua: () => getLangExtension('lua'),
   r: () => getLangExtension('r'),
   
-  // Shell scripts
-  sh: () => getLangExtension('shell'),
-  bash: () => getLangExtension('shell'),
-  zsh: () => getLangExtension('shell'),
-  fish: () => getLangExtension('shell'),
-  shell: () => getLangExtension('shell'),
+  // Shell scripts - use correct package keys
+  sh: () => getLangExtension('sh'),
+  bash: () => getLangExtension('bash'),
+  zsh: () => getLangExtension('sh'),
+  fish: () => getLangExtension('sh'),
+  shell: () => getLangExtension('sh'),
   
   // Data/Config
   sql: () => getLangExtension('sql'),
@@ -153,7 +153,7 @@ const languageMap: Record<string, () => any> = {
   xml: () => getLangExtension('xml'),
   toml: () => getLangExtension('toml'),
   
-  // Mobile
+  // Mobile - use correct package keys
   swift: () => getLangExtension('swift'),
   
   // Other

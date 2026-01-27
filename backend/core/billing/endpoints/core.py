@@ -1,17 +1,12 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict
-from decimal import Decimal
 from datetime import datetime, timezone, timedelta
 from core.services.credits import credit_service
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
-from core.utils.config import config, EnvMode
 from core.utils.logger import logger
 from ..shared.config import (
-    TOKEN_PRICE_MULTIPLIER, 
-    get_tier_by_name,
     TIERS,
-    CREDITS_PER_DOLLAR,
-    get_tier_limits
+    CREDITS_PER_DOLLAR
 )
 from ..shared.models import TokenUsageRequest
 from ..credits.calculator import calculate_token_cost
@@ -116,7 +111,6 @@ async def get_usage_history(
     account_id: str = Depends(verify_and_get_user_id_from_jwt)
 ) -> Dict:
     from core.billing import repo as billing_repo
-    from datetime import timedelta
     
     try:
         total_usage, usage_history = await billing_repo.get_usage_history(account_id, days)

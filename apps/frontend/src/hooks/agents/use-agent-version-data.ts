@@ -119,11 +119,11 @@ export function useAgentVersionData({ agentId }: UseAgentVersionDataProps): UseA
   const searchParams = useSearchParams();
   const versionParam = searchParams.get('version');
   
-  const { data: agent, isLoading: agentLoading, error: agentError } = useAgent(agentId);
+  const { data: agent, isPending: agentLoading, error: agentError } = useAgent(agentId);
   const shouldLoadVersion = versionParam || agent?.current_version_id;
   const versionToLoad = versionParam || agent?.current_version_id || '';
   
-  const { data: rawVersionData, isLoading: versionLoading, error: versionError } = useAgentVersion(
+  const { data: rawVersionData, isPending: versionLoading, error: versionError } = useAgentVersion(
     agentId,
     shouldLoadVersion ? versionToLoad : null
   );

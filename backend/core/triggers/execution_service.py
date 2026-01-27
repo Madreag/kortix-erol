@@ -4,13 +4,10 @@ Trigger execution service - executes agents when triggers fire.
 This is a thin wrapper that reuses existing agent_runs infrastructure.
 """
 import json
-import uuid
-from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 from core.services.supabase import DBConnection
-from core.services import redis
-from core.utils.logger import logger, structlog
+from core.utils.logger import logger
 from core.utils.config import config, EnvMode
 from .trigger_service import TriggerEvent, TriggerResult
 

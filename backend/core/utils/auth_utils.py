@@ -7,9 +7,8 @@ from core.utils.logger import structlog
 from core.utils.config import config
 from core.services.supabase import DBConnection
 from core.services import redis
-from core.utils.logger import logger, structlog
+from core.utils.logger import logger
 import httpx
-import json
 import base64
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec

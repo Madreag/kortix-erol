@@ -1,0 +1,53 @@
+---
+const features = [
+  {
+    icon: '🚀',
+    title: 'AI-Powered Coding',
+    description: 'Write code 10x faster with intelligent code generation and completion.',
+  },
+  {
+    icon: '🔧',
+    title: 'Smart Debugging',
+    description: 'Automatically detect and fix bugs with AI-driven analysis.',
+  },
+  {
+    icon: '📦',
+    title: 'Project Management',
+    description: 'Organize your projects with built-in version control and collaboration.',
+  },
+  {
+    icon: '🔒',
+    title: 'Enterprise Security',
+    description: 'SOC 2 compliant with end-to-end encryption and SSO support.',
+  },
+  {
+    icon: '⚡',
+    title: 'Real-time Collaboration',
+    description: 'Work together with your team in real-time with live cursors.',
+  },
+  {
+    icon: '🌐',
+    title: 'Deploy Anywhere',
+    description: 'One-click deployment to any cloud provider or self-hosted infrastructure.',
+  },
+];
+---
+
+<section class="container mx-auto px-6 py-20">
+  <div class="text-center max-w-2xl mx-auto mb-16">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4">Everything You Need to Ship Faster</h2>
+    <p class="text-gray-400">
+      Powerful features that help you build, test, and deploy with confidence.
+    </p>
+  </div>
+  
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {features.map(feature => (
+      <div class="bg-gray-800/50 rounded-2xl p-6 hover:bg-gray-800 transition-colors">
+        <div class="text-4xl mb-4">{feature.icon}</div>
+        <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+        <p class="text-gray-400">{feature.description}</p>
+      </div>
+    ))}
+  </div>
+</section>

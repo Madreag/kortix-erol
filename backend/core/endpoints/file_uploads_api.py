@@ -85,7 +85,7 @@ async def regenerate_signed_link(
             success=True,
             signed_url=signed_url,
             expires_at=url_expires_at.strftime('%Y-%m-%d %H:%M:%S UTC'),
-            message=f"Secure URL regenerated successfully. Expires in 24 hours."
+            message="Secure URL regenerated successfully. Expires in 24 hours."
         )
         
     except HTTPException:

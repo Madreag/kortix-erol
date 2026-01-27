@@ -1,7 +1,7 @@
 from __future__ import annotations
 import base64
 import io
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional
 from .async_parser import ImageAnalysisResult
 
 

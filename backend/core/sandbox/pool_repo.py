@@ -1,7 +1,6 @@
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone, timedelta
 from core.services.db import execute, execute_one, execute_mutate
-from core.utils.logger import logger
 
 
 async def get_pool_size() -> int:

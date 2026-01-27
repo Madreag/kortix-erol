@@ -5,7 +5,7 @@ import uvicorn
 import os
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 # Import PDF router, PPTX router, DOCX router, and Visual HTML Editor router
 from html_to_pdf_router import router as pdf_router

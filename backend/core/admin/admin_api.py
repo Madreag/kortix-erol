@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from core.auth import require_admin
@@ -10,7 +10,6 @@ from core.utils.auth_utils import verify_admin_api_key
 from core.utils.suna_default_agent_service import SunaDefaultAgentService
 from core.utils.config import config, EnvMode
 from dotenv import load_dotenv, set_key, find_dotenv, dotenv_values
-import os
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -270,7 +269,7 @@ async def get_user_activity(
         # Format activity data
         activities = []
         for run in activity_result.data or []:
-            thread = run.get('threads', {})
+            run.get('threads', {})
             
             activities.append({
                 'id': run.get('id'),
@@ -358,7 +357,7 @@ async def get_user_threads_by_email(
             )
         
         # Get project information
-        thread_ids = [t['thread_id'] for t in threads_result.data]
+        [t['thread_id'] for t in threads_result.data]
         project_ids = [t['project_id'] for t in threads_result.data if t.get('project_id')]
         
         projects_map = {}

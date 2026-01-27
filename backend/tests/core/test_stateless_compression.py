@@ -1,8 +1,7 @@
-import asyncio
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import patch, AsyncMock
 
-from core.agents.pipeline.stateless.compression import ContextCompressor, CompressionResult
+from core.agents.pipeline.stateless.compression import ContextCompressor
 
 
 class TestContextCompressor:

@@ -18,6 +18,7 @@ import { KortixLoader } from '@/components/ui/kortix-loader';
 import { ThreadIcon } from './thread-icon';
 import { toast } from '@/lib/toast';
 import Link from 'next/link';
+import { PrefetchViewTransitionLink } from '@/components/ui/prefetch-view-transition-link';
 import {
   Collapsible,
   CollapsibleContent,
@@ -107,12 +108,15 @@ const ThreadItemCard: React.FC<ThreadItemCardProps> = ({
     onClick(e, thread.threadId, thread.url);
   };
 
-  const CardWrapper = mode === 'chats' ? Link : 'div';
-  const cardProps = mode === 'chats' 
-    ? { href: thread.url, prefetch: true, onClick: handleCardClick }
-    : { onClick: handleCardClick };
-
   const threadUrl = thread.url;
+
+  // Build prefetch queries for thread data
+  const prefetchQueries = mode === 'chats' ? [
+    {
+      queryKey: ['threads', 'detail', thread.threadId],
+      staleTime: 30 * 1000, // 30 seconds
+    },
+  ] : [];
 
   return (
     <SpotlightCard
@@ -121,118 +125,197 @@ const ThreadItemCard: React.FC<ThreadItemCardProps> = ({
         isActive ? "bg-muted" : "bg-transparent"
       )}
     >
-      <CardWrapper
-        {...(cardProps as any)}
-        className="block"
-      >
-        <div
-          className="flex items-center gap-3 p-2.5 text-sm"
-          onMouseEnter={() => setIsHoveringCard(true)}
-          onMouseLeave={() => setIsHoveringCard(false)}
+      {mode === 'chats' ? (
+        <PrefetchViewTransitionLink
+          href={threadUrl}
+          className="block"
+          prefetchQueries={prefetchQueries}
+          viewTransitionName={`thread-${thread.threadId}`}
+          onClick={handleCardClick}
         >
-          {/* Icon */}
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-card border-[1.5px] border-border flex-shrink-0">
-            {isThreadLoading ? (
-              <KortixLoader size="small" />
-            ) : (
-              <ThreadIcon
-                iconName={projectGroup.iconName}
-                className="text-muted-foreground"
-                size={14}
-              />
-            )}
-            {isAgentRunning && (
-              <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-background animate-pulse" />
-            )}
-          </div>
-          
-          {/* Name */}
-          <span className="flex-1 truncate">{projectGroup.projectName}</span>
-          
-          {/* Date & Menu */}
-          <div className="flex-shrink-0 relative">
-            <span
-              className={cn(
-                "text-xs text-muted-foreground transition-opacity",
-                isHoveringCard ? "opacity-0" : "opacity-100"
+          <div
+            className="flex items-center gap-3 p-2.5 text-sm"
+            onMouseEnter={() => setIsHoveringCard(true)}
+            onMouseLeave={() => setIsHoveringCard(false)}
+          >
+            {/* Icon */}
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-card border-[1.5px] border-border flex-shrink-0">
+              {isThreadLoading ? (
+                <KortixLoader size="small" />
+              ) : (
+                <ThreadIcon
+                  iconName={projectGroup.iconName}
+                  className="text-muted-foreground"
+                  size={14}
+                />
               )}
-            >
-              {formatDateForList(thread.updatedAt)}
-            </span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={cn(
-                    "absolute top-1/2 right-0 -translate-y-1/2 p-1 rounded-2xl hover:bg-accent transition-all text-muted-foreground",
-                    isHoveringCard ? "opacity-100" : "opacity-0 pointer-events-none"
-                  )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                >
-                  <MoreHorizontal className="h-4 w-4 rotate-90" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {mode === 'library' && (
-                  <>
+              {isAgentRunning && (
+                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-background animate-pulse" />
+              )}
+            </div>
+            
+            {/* Name */}
+            <span className="flex-1 truncate">{projectGroup.projectName}</span>
+            
+            {/* Date & Menu */}
+            <div className="flex-shrink-0 relative">
+              <span
+                className={cn(
+                  "text-xs text-muted-foreground transition-opacity",
+                  isHoveringCard ? "opacity-0" : "opacity-100"
+                )}
+              >
+                {formatDateForList(thread.updatedAt)}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={cn(
+                      "absolute top-1/2 right-0 -translate-y-1/2 p-1 rounded-2xl hover:bg-accent transition-all text-muted-foreground",
+                      isHoveringCard ? "opacity-100" : "opacity-0 pointer-events-none"
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  >
+                    <MoreHorizontal className="h-4 w-4 rotate-90" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {onCreateNewChat && (
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        window.open(threadUrl, '_blank');
+                        onCreateNewChat(projectGroup.projectId);
                       }}
+                      disabled={isCreatingChat}
                     >
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Open chat
+                      {isCreatingChat ? (
+                        <KortixLoader size="small" className="mr-2" />
+                      ) : (
+                        <Plus className="mr-2 h-4 w-4" />
+                      )}
+                      New chat
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
-                {mode === 'chats' && onCreateNewChat && (
+                  )}
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      onCreateNewChat(projectGroup.projectId);
+                      onRename(projectGroup.projectId, projectGroup.projectName);
                     }}
-                    disabled={isCreatingChat}
                   >
-                    {isCreatingChat ? (
-                      <KortixLoader size="small" className="mr-2" />
-                    ) : (
-                      <Plus className="mr-2 h-4 w-4" />
-                    )}
-                    New chat
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Rename
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDelete(thread.threadId, thread.projectName);
+                    }}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </PrefetchViewTransitionLink>
+      ) : (
+        <div className="block" onClick={handleCardClick}>
+          <div
+            className="flex items-center gap-3 p-2.5 text-sm"
+            onMouseEnter={() => setIsHoveringCard(true)}
+            onMouseLeave={() => setIsHoveringCard(false)}
+          >
+            {/* Icon */}
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-2xl bg-card border-[1.5px] border-border flex-shrink-0">
+              {isThreadLoading ? (
+                <KortixLoader size="small" />
+              ) : (
+                <ThreadIcon
+                  iconName={projectGroup.iconName}
+                  className="text-muted-foreground"
+                  size={14}
+                />
+              )}
+              {isAgentRunning && (
+                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-background animate-pulse" />
+              )}
+            </div>
+            
+            {/* Name */}
+            <span className="flex-1 truncate">{projectGroup.projectName}</span>
+            
+            {/* Date & Menu */}
+            <div className="flex-shrink-0 relative">
+              <span
+                className={cn(
+                  "text-xs text-muted-foreground transition-opacity",
+                  isHoveringCard ? "opacity-0" : "opacity-100"
                 )}
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onRename(projectGroup.projectId, projectGroup.projectName);
-                  }}
-                >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Rename
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onDelete(thread.threadId, thread.projectName);
-                  }}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              >
+                {formatDateForList(thread.updatedAt)}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={cn(
+                      "absolute top-1/2 right-0 -translate-y-1/2 p-1 rounded-2xl hover:bg-accent transition-all text-muted-foreground",
+                      isHoveringCard ? "opacity-100" : "opacity-0 pointer-events-none"
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  >
+                    <MoreHorizontal className="h-4 w-4 rotate-90" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.open(threadUrl, '_blank');
+                    }}
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Open chat
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onRename(projectGroup.projectId, projectGroup.projectName);
+                    }}
+                  >
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDelete(thread.threadId, thread.projectName);
+                    }}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
-      </CardWrapper>
+      )}
     </SpotlightCard>
   );
 };

@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const featureGroups = [
+  {
+    title: 'AI-Powered Development',
+    features: [
+      {
+        name: 'Intelligent Code Generation',
+        description: 'Generate production-ready code from natural language descriptions. The AI understands context, follows best practices, and produces clean, maintainable code.',
+      },
+      {
+        name: 'Smart Debugging',
+        description: 'Automatically detect bugs, understand root causes, and get suggested fixes. Save hours of debugging time with AI-powered analysis.',
+      },
+      {
+        name: 'Code Review Assistant',
+        description: 'Get instant feedback on your code quality, security vulnerabilities, and performance optimizations.',
+      },
+    ],
+  },
+  {
+    title: 'Collaboration',
+    features: [
+      {
+        name: 'Real-time Editing',
+        description: 'Work together with your team in real-time. See cursors, selections, and changes as they happen.',
+      },
+      {
+        name: 'Version Control',
+        description: 'Built-in Git integration with visual diff views, branch management, and conflict resolution.',
+      },
+      {
+        name: 'Comments & Threads',
+        description: 'Leave comments on code, start discussions, and resolve issues without leaving your workspace.',
+      },
+    ],
+  },
+  {
+    title: 'Deployment',
+    features: [
+      {
+        name: 'One-Click Deploy',
+        description: 'Deploy to any cloud provider with a single click. Automatic CI/CD pipelines and preview environments.',
+      },
+      {
+        name: 'Environment Management',
+        description: 'Manage development, staging, and production environments with secure secrets handling.',
+      },
+      {
+        name: 'Monitoring & Logs',
+        description: 'Real-time monitoring, error tracking, and log aggregation built right into your workspace.',
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title="Features">
+  <Header />
+  
+  <main class="pt-28 pb-20">
+    <div class="container mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto mb-20">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">Powerful Features</h1>
+        <p class="text-xl text-gray-400">
+          Everything you need to build, ship, and scale modern applications.
+        </p>
+      </div>
+      
+      {featureGroups.map((group) => (
+        <section class="mb-20">
+          <h2 class="text-2xl font-bold mb-8">{group.title}</h2>
+          <div class="grid md:grid-cols-3 gap-8">
+            {group.features.map(feature => (
+              <div class="bg-gray-800/50 rounded-xl p-6 hover:bg-gray-800 transition-colors">
+                <h3 class="text-lg font-semibold mb-3">{feature.name}</h3>
+                <p class="text-gray-400">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </main>
+  
+  <Footer />
+</BaseLayout>

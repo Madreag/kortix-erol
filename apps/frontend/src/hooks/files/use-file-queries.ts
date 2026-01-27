@@ -421,7 +421,7 @@ export function useCachedFile<T = string>(
   
   return {
     data: processedData,
-    isLoading: query.isLoading,
+    isLoading: query.isPending,
     error: query.error,
     refreshCache: query.refreshCache,
     // Legacy compatibility methods

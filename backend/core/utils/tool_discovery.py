@@ -10,12 +10,10 @@ PERFORMANCE OPTIMIZATION:
 - The schema cache uses tool class identity as key for O(1) lookups
 """
 
-import importlib
 import inspect
 from typing import Dict, List, Any, Optional, Type
-from pathlib import Path
 
-from core.agentpress.tool import Tool, ToolMetadata, MethodMetadata, ToolSchema
+from core.agentpress.tool import Tool, ToolSchema
 from core.utils.logger import logger
 
 
@@ -312,7 +310,7 @@ def _extract_tool_metadata(tool_name: str, tool_class: Type[Tool]) -> Dict[str, 
                 method_info["visible"] = True
             
             metadata["methods"].append(method_info)
-        except Exception as e:
+        except Exception:
             # logger.debug(f"Could not extract metadata for method {method_name}: {e}")
             continue
     

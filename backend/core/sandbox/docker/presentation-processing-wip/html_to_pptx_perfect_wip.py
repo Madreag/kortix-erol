@@ -1,17 +1,12 @@
 
 import json
-import os
 import sys
 import re
 import asyncio
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Tuple
 import tempfile
-import subprocess
 from dataclasses import dataclass
-import base64
-import io
-import datetime
 
 try:
     from playwright.async_api import async_playwright
@@ -22,7 +17,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from bs4 import BeautifulSoup, Tag
+    from bs4 import BeautifulSoup, Tag  # noqa: F401 - availability check
 except ImportError:
     print("Error: BeautifulSoup is not installed. Please install it with:")
     print("pip install beautifulsoup4")
@@ -40,7 +35,7 @@ except ImportError as e:
     sys.exit(1)
 
 try:
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw, ImageFont  # noqa: F401 - availability check
 except ImportError:
     print("Error: Pillow is not installed. Please install it with:")
     print("pip install Pillow")
@@ -177,7 +172,7 @@ class PerfectHTMLToPPTXConverter:
             self.slides_info.sort(key=lambda x: x['number'])
             
             if not self.slides_info:
-                print(f"---")
+                print("---")
                 raise ValueError("No valid slides found in metadata.json")
             
             # Set default output path if not provided
@@ -841,7 +836,7 @@ class PerfectHTMLToPPTXConverter:
                                     containers.forEach(container => container.remove());
                                 }
                             """)
-                        except:
+                        except Exception:
                             pass
                         continue
             
@@ -876,7 +871,7 @@ class PerfectHTMLToPPTXConverter:
                         containers.forEach(container => container.remove());
                     }
                 """)
-                print(f"🧹 Final cleanup completed: backgrounds restored, capture IDs removed")
+                print("🧹 Final cleanup completed: backgrounds restored, capture IDs removed")
             except Exception as e:
                 print(f"Warning: Failed to perform final cleanup: {e}")
             
@@ -907,7 +902,7 @@ class PerfectHTMLToPPTXConverter:
                         elementsWithCaptureId.forEach(el => el.removeAttribute('data-capture-id'));
                     }
                 """)
-            except:
+            except Exception:
                 pass
             return []
 
@@ -1004,7 +999,7 @@ class PerfectHTMLToPPTXConverter:
             
             return background_path
             
-        except Exception as e:
+        except Exception:
             # Create a simple white background as fallback
             from PIL import Image
             background_path = temp_dir / f"clean_background_{html_path.stem}.png"
@@ -1181,7 +1176,7 @@ class PerfectHTMLToPPTXConverter:
                         else:
                             try:
                                 line_height = float(line_height_str)
-                            except:
+                            except Exception:
                                 line_height = 1.2
                     
                     # Parse color - handle complex color scenarios
@@ -1302,7 +1297,7 @@ class PerfectHTMLToPPTXConverter:
                     spacing_px = float(letter_spacing[:-2])
                     if hasattr(font, 'character_spacing'):
                         font.character_spacing = spacing_px
-                except:
+                except Exception:
                     pass
             
             # Handle text transform
@@ -1349,7 +1344,7 @@ class PerfectHTMLToPPTXConverter:
     
     async def build_slide_from_analysis(self, presentation, slide_analysis: Dict, temp_dir: Path) -> None:
         """Build a PowerPoint slide from pre-analyzed data."""
-        slide_info = slide_analysis['slide_info']
+        slide_analysis['slide_info']
         visual_elements = slide_analysis['visual_elements']
         background_path = slide_analysis['background_path']
         text_elements = slide_analysis['text_elements']
@@ -1416,8 +1411,8 @@ class PerfectHTMLToPPTXConverter:
             width = Inches(20)  # 1920px at 96 DPI
             height = Inches(11.25)  # 1080px at 96 DPI
             
-            picture = slide.shapes.add_picture(str(background_image_path), left, top, width, height)
-            print(f"    ✅ Perfect background added (1920x1080)")
+            slide.shapes.add_picture(str(background_image_path), left, top, width, height)
+            print("    ✅ Perfect background added (1920x1080)")
         
         # Step 3: Extract and add editable text elements
         print("  📝 Extracting editable text elements...")
@@ -1477,7 +1472,7 @@ class PerfectHTMLToPPTXConverter:
                     async def process_single_slide(slide_info: Dict) -> Dict:
                         """Process a single slide with controlled concurrency."""
                         async with semaphore:
-                            slide_num = slide_info['number']
+                            slide_info['number']
                             
                             try:
                                 # Create a new page for this slide
@@ -1617,7 +1612,7 @@ class PerfectHTMLToPPTXConverter:
         presentation.save(str(self.output_path))
         print(f"\n🎉 PERFECT 1:1 PPTX created successfully: {self.output_path}")
         print(f"📊 Total slides: {len(presentation.slides)}")
-        print(f"✨ Clean background + Visual elements + Fully editable text!")
+        print("✨ Clean background + Visual elements + Fully editable text!")
 
 
 def check_dependencies():
@@ -1625,17 +1620,17 @@ def check_dependencies():
     missing_deps = []
     
     try:
-        import playwright
+        import playwright  # noqa: F401 - availability check
     except ImportError:
         missing_deps.append("playwright (pip install playwright)")
     
     try:
-        from pptx import Presentation
+        from pptx import Presentation  # noqa: F401 - availability check
     except ImportError:
         missing_deps.append("python-pptx (pip install python-pptx)")
     
     try:
-        from PIL import Image
+        from PIL import Image  # noqa: F401 - availability check
     except ImportError:
         missing_deps.append("Pillow (pip install Pillow)")
     

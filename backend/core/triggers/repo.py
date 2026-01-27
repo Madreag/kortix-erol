@@ -1,6 +1,5 @@
-from typing import List, Dict, Any, Optional
-from core.services.db import execute, serialize_row
-from core.utils.logger import logger
+from typing import List, Dict, Any
+from core.services.db import execute
 import json
 
 

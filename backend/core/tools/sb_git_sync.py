@@ -2,8 +2,6 @@ import os
 import uuid
 import shlex
 import structlog
-from datetime import datetime
-from typing import Optional
 
 from core.agentpress.tool import ToolResult, openapi_schema, tool_metadata
 from core.sandbox.tool_base import SandboxToolsBase
@@ -238,7 +236,7 @@ class SandboxGitTool(SandboxToolsBase):
             more_count = max(0, len(changed_lines) - len(changed_files_preview))
 
             msg_lines = [
-                f"✅ Local git commit created in /workspace",
+                "✅ Local git commit created in /workspace",
                 f"🔑 Commit hash: {commit_hash}",
                 f"📝 Message: {message}",
                 f"📂 Files changed: {len(changed_lines)}",

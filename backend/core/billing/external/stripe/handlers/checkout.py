@@ -26,10 +26,10 @@ class CheckoutHandler:
         elif session.get('metadata', {}).get('type') == 'yearly_upgrade':
             await CheckoutHandler._handle_yearly_upgrade_payment(session)
         elif session.get('subscription'):
-            logger.info(f"[WEBHOOK] Routing to subscription checkout handler")
+            logger.info("[WEBHOOK] Routing to subscription checkout handler")
             await CheckoutHandler._handle_subscription_checkout(session)
         else:
-            logger.warning(f"[WEBHOOK] Checkout session has neither credit_purchase type nor subscription")
+            logger.warning("[WEBHOOK] Checkout session has neither credit_purchase type nor subscription")
 
     @staticmethod
     async def _handle_credit_purchase(session):
@@ -42,7 +42,7 @@ class CheckoutHandler:
             
         try:
             credit_amount = Decimal(credit_amount_str)
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError):
             return
         
         try:
@@ -98,7 +98,7 @@ class CheckoutHandler:
                         status='failed',
                         error_message=str(e)
                     )
-            except:
+            except Exception:
                 pass
             return
         
@@ -108,8 +108,8 @@ class CheckoutHandler:
             before = current_state if current_state else {'balance': 0, 'expiring_credits': 0, 'non_expiring_credits': 0}
             after = final_state
             
-            expected_total = float(before['balance']) + float(credit_amount)
-            actual_total = float(after['balance'])
+            float(before['balance']) + float(credit_amount)
+            float(after['balance'])
 
     @staticmethod
     async def _handle_yearly_upgrade_payment(session):
@@ -255,9 +255,8 @@ class CheckoutHandler:
                 
                 current_balance = await billing_repo.get_credit_account_balances(account_id)
                 
-                old_non_expiring = 0
                 if current_balance:
-                    old_non_expiring = float(current_balance.get('non_expiring_credits', 0))
+                    float(current_balance.get('non_expiring_credits', 0))
                 
                 billing_anchor = datetime.fromtimestamp(subscription['current_period_start'], tz=timezone.utc)
                 next_grant_date = datetime.fromtimestamp(subscription['current_period_end'], tz=timezone.utc)

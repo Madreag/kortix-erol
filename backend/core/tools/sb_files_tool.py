@@ -9,7 +9,6 @@ import json
 import litellm
 import openai
 import asyncio
-import re
 from typing import Optional
 
 @tool_metadata(
@@ -282,7 +281,7 @@ Usage:
             await self.sandbox.fs.upload_file(new_content.encode(), full_path)
             
             return ToolResult(success=True, output=json.dumps({
-                "message": f"Replacement successful.",
+                "message": "Replacement successful.",
                 "file_path": file_path,
                 "original_content": content,
                 "updated_content": new_content
@@ -537,7 +536,7 @@ Usage:
                             try:
                                 new_html_content = json.loads(content_match.group(1).strip())
                                 original_wrapper["content"] = new_html_content
-                            except:
+                            except Exception:
                                 pass
                     
                     if "metadata" in instructions:
@@ -546,7 +545,7 @@ Usage:
                             try:
                                 new_metadata = json.loads(metadata_match.group(1))
                                 original_wrapper["metadata"] = new_metadata
-                            except:
+                            except Exception:
                                 pass
                     
                     if "updated_at" in instructions:
@@ -595,7 +594,7 @@ Usage:
                 full_path_on_error = f"{self.workspace_path}/{self.clean_path(target_file)}"
                 if await self._file_exists(full_path_on_error):
                     original_content_on_error = (await self.sandbox.fs.download_file(full_path_on_error)).decode()
-            except:
+            except Exception:
                 pass
             
             return ToolResult(success=False, output=json.dumps({

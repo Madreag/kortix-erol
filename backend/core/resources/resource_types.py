@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Literal
 
 class ResourceType(str, Enum):
     SANDBOX = "sandbox"

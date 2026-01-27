@@ -261,7 +261,7 @@ def from_dict(cls, data: Dict[str, Any]):
 
 
 class AgentsClient:
-    """SDK client for Kortix Agents API with httpx client supporting custom headers"""
+    """SDK client for Kortix Agents API with V2 fallback support."""
 
     def __init__(
         self,
@@ -269,18 +269,26 @@ class AgentsClient:
         auth_token: Optional[str] = None,
         custom_headers: Optional[Dict[str, str]] = None,
         timeout: float = 30.0,
+        fallback_url: Optional[str] = None,
     ):
         """
         Initialize the Agents API client
 
         Args:
-            base_url: Base URL of the API (e.g., "https://api.kortix.com/v1")
+            base_url: Base URL of the API (V2 if fallback enabled)
             auth_token: JWT token for authentication
             custom_headers: Additional headers to include in all requests
             timeout: Request timeout in seconds
+            fallback_url: Optional V1 fallback URL for resilience
         """
         self.base_url = base_url.rstrip("/")
+        self.fallback_url = fallback_url.rstrip("/") if fallback_url else None
         self.timeout = timeout
+        
+        # V2 circuit breaker state
+        self._v2_failure_count = 0
+        self._v2_circuit_open = False
+        self._v2_failure_threshold = 5
 
         # Build default headers
         default_headers = {
@@ -296,14 +304,19 @@ class AgentsClient:
         if custom_headers:
             default_headers.update(custom_headers)
 
-        # Create httpx client with configured headers and timeout
+        # Create httpx clients with configured headers and timeout
         self.client = httpx.AsyncClient(
             headers=default_headers, timeout=timeout, base_url=self.base_url
         )
+        self.fallback_client = httpx.AsyncClient(
+            headers=default_headers, timeout=timeout, base_url=self.fallback_url
+        ) if self.fallback_url else None
 
     async def close(self):
-        """Close the httpx client"""
+        """Close the httpx clients."""
         await self.client.aclose()
+        if self.fallback_client:
+            await self.fallback_client.aclose()
 
     async def __aenter__(self):
         return self
@@ -531,23 +544,26 @@ def create_agents_client(
     auth_token: Optional[str] = None,
     custom_headers: Optional[Dict[str, str]] = None,
     timeout: float = 30.0,
+    fallback_url: Optional[str] = None,
 ) -> AgentsClient:
     """
     Create an AgentsClient instance
 
     Args:
-        base_url: Base URL of the API
+        base_url: Base URL of the API (V2 if fallback enabled)
         auth_token: JWT token for authentication
         custom_headers: Additional headers to include in all requests
         timeout: Request timeout in seconds
+        fallback_url: Optional V1 fallback URL for resilience
 
     Returns:
-        AgentsClient instance
+        AgentsClient instance with V2→V1 fallback support
     """
     return AgentsClient(
         base_url=base_url,
         auth_token=auth_token,
         custom_headers=custom_headers,
         timeout=timeout,
+        fallback_url=fallback_url,
     )
 

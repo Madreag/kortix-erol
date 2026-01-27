@@ -193,7 +193,7 @@ async def archive_pool_sandboxes(count: int, batch_size: int, dry_run: bool = Fa
             
             # Delay between batches to avoid rate limiting and let operations complete
             if batch_num < batches - 1:
-                logger.info(f"Waiting 5 seconds before next batch...")
+                logger.info("Waiting 5 seconds before next batch...")
                 await asyncio.sleep(5)
         
         logger.info(

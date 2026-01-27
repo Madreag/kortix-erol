@@ -48,7 +48,7 @@ async def check_wal_health():
         warnings.append(f"⚠️  WARNING: Flush latency P99 is {metrics_dict['flush_latency_p99']:.2f}s (threshold: 10s)")
     
     if backpressure_state.level.value == "critical":
-        warnings.append(f"⚠️  WARNING: Backpressure level is CRITICAL - system overloaded")
+        warnings.append("⚠️  WARNING: Backpressure level is CRITICAL - system overloaded")
     
     if wal_stats["local_buffer_runs"] > 0:
         warnings.append(f"⚠️  WARNING: {wal_stats['local_buffer_runs']} runs using local buffer (Redis issues)")

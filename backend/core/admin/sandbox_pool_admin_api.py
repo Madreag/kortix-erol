@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-from typing import Optional
 from pydantic import BaseModel
 from core.auth import require_admin
 from core.utils.logger import logger

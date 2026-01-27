@@ -96,7 +96,6 @@ class VapiWebhookHandler:
             raise HTTPException(status_code=500, detail=str(e))
     
     async def _handle_conversation_update(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        from core.agentpress.thread_manager import ThreadManager
         
         call_id = self._extract_call_id(payload)
         call = self._extract_call_data(payload)
@@ -391,7 +390,6 @@ class VapiWebhookHandler:
             
             if user_id and cost > 0:
                 try:
-                    from core.billing.credits.manager import CreditManager
                     # credit_manager instance is already available from the import
                     
                     cost_in_credits = Decimal(str(cost)) * TOKEN_PRICE_MULTIPLIER

@@ -4,7 +4,6 @@ import React, {
   useState,
   useRef,
   useEffect,
-  forwardRef,
   useImperativeHandle,
   useCallback,
   useMemo,
@@ -70,7 +69,8 @@ interface IsolatedTextareaProps {
   onHasContentChange: (hasContent: boolean) => void;
 }
 
-const IsolatedTextarea = memo(forwardRef<HTMLTextAreaElement, IsolatedTextareaProps>(function IsolatedTextarea({
+// React 19: ref as prop instead of forwardRef
+const IsolatedTextarea = memo(function IsolatedTextarea({
   initialValue = '',
   placeholder,
   disabled,
@@ -83,7 +83,8 @@ const IsolatedTextarea = memo(forwardRef<HTMLTextAreaElement, IsolatedTextareaPr
   isUploading,
   valueRef,
   onHasContentChange,
-}, ref) {
+  ref,
+}: IsolatedTextareaProps & { ref?: React.Ref<HTMLTextAreaElement> }) {
   const [value, setValue] = useState(initialValue);
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const prevHasContent = useRef(false);
@@ -197,7 +198,7 @@ const IsolatedTextarea = memo(forwardRef<HTMLTextAreaElement, IsolatedTextareaPr
       />
     </div>
   );
-}));
+});
 
 // ============================================================================
 // MEMOIZED SUB-COMPONENTS (to prevent re-renders on typing)
@@ -787,46 +788,44 @@ export interface UploadedFile {
 }
 
 
-export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
-  (
-    {
-      onSubmit,
-      placeholder = 'Describe what you need help with...',
-      loading = false,
-      disabled = false,
-      isAgentRunning = false,
-      onStopAgent,
-      autoFocus = true,
-      value: controlledValue,
-      onChange: controlledOnChange,
-      onFileBrowse,
-      sandboxId,
-      hideAttachments = false,
-      selectedAgentId,
-      onAgentSelect,
-      agentName,
-      messages = [],
-      bgColor = 'bg-card',
-      toolCalls = [],
-      toolCallIndex = 0,
-      showToolPreview = false,
-      onExpandToolPreview,
-      isLoggedIn = true,
-      enableAdvancedConfig = false,
-      onConfigureAgent,
-      hideAgentSelection = true,
-      defaultShowSnackbar = false,
-      showToLowCreditUsers = true,
-      showScrollToBottomIndicator = false,
-      onScrollToBottom,
-      selectedMode,
-      onModeDeselect,
-      animatePlaceholder = false,
-      threadId = null,
-      projectId,
-    },
-    ref,
-  ) => {
+// React 19: ref as prop instead of forwardRef
+export const ChatInput = memo(function ChatInput({
+  onSubmit,
+  placeholder = 'Describe what you need help with...',
+  loading = false,
+  disabled = false,
+  isAgentRunning = false,
+  onStopAgent,
+  autoFocus = true,
+  value: controlledValue,
+  onChange: controlledOnChange,
+  onFileBrowse,
+  sandboxId,
+  hideAttachments = false,
+  selectedAgentId,
+  onAgentSelect,
+  agentName,
+  messages = [],
+  bgColor = 'bg-card',
+  toolCalls = [],
+  toolCallIndex = 0,
+  showToolPreview = false,
+  onExpandToolPreview,
+  isLoggedIn = true,
+  enableAdvancedConfig = false,
+  onConfigureAgent,
+  hideAgentSelection = true,
+  defaultShowSnackbar = false,
+  showToLowCreditUsers = true,
+  showScrollToBottomIndicator = false,
+  onScrollToBottom,
+  selectedMode,
+  onModeDeselect,
+  animatePlaceholder = false,
+  threadId = null,
+  projectId,
+  ref,
+}: ChatInputProps & { ref?: React.Ref<ChatInputHandles> }) {
     // =========================================================================
     // STATE MANAGEMENT - Optimized to prevent re-renders on typing
     // =========================================================================
@@ -1718,7 +1717,6 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
         </div>
       </TooltipProvider>
     );
-  },
-));
+});
 
 ChatInput.displayName = 'ChatInput';

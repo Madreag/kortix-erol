@@ -1,16 +1,14 @@
 import asyncio
 import sys
 import os
-import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dotenv import load_dotenv
 load_dotenv()
 
-from core.utils.logger import logger
 from core.services.supabase import DBConnection
-from core.sandbox.resolver import resolve_sandbox, get_resolver
+from core.sandbox.resolver import resolve_sandbox
 
 
 async def test_resolver_consistency():

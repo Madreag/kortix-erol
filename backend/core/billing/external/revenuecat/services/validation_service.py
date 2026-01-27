@@ -1,5 +1,3 @@
-from typing import Dict
-from core.utils.logger import logger
 
 
 class ValidationService:

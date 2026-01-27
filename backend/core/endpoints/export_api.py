@@ -5,18 +5,17 @@ This module provides endpoints for exporting content from the mobile/web app
 to various formats (PDF, DOCX, HTML, Markdown).
 """
 
-from pathlib import Path
 from io import BytesIO
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from urllib.parse import quote
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 
 try:
-    from weasyprint import HTML, CSS
+    from weasyprint import HTML, CSS  # noqa: F401 - CSS used conditionally
 except (ImportError, OSError) as e:
     weasyprint_available = False
     print(f"[WARNING] WeasyPrint not available: {e}")
@@ -27,7 +26,7 @@ else:
 try:
     from docx import Document
     from docx.shared import Inches, Pt, RGBColor
-    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.enum.text import WD_ALIGN_PARAGRAPH  # noqa: F401 - may be used conditionally
 except ImportError:
     docx_available = False
 else:

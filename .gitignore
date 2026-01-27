@@ -217,6 +217,50 @@ backend/core/agentpress/debug_streams/
 
 dump.rdb
 
+# Logs directory
+logs/
+
+# Temp test/debug scripts (auto-generated during development)
+repro_*.ts
+repro_*.py
+demo_*.ts
+demo_*.py
+scratch_*
+*_scratch.*
+
+# Playwright test artifacts
+playwright-report/
+test-results/
+.playwright/
+
+# Next.js build output
+.next/
+**/.next/
+
+# Build outputs
+dist/
+**/dist/
+
+# Turbo cache
+.turbo/
+**/.turbo/
+
+# Editor/IDE temp files
+*.swp
+*.swo
+*~
+.idea/
+
+# Test artifacts and reports
+*.test-output
+*_AUDIT_REPORT.md
+SECURITY_AUDIT_REPORT.md
+backend/tests/reports/
+backend/tests/security/SECURITY_AUDIT_REPORT.md
+**/tests/reports/
+**/*_audit_*.md
+**/*_qa_*.md
+
 # CodeWebChat state and logs (auto-added)
 .cwc/
 

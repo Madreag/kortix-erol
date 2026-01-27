@@ -1,5 +1,4 @@
 from typing import Dict
-from datetime import datetime, timezone
 
 from core.utils.logger import logger
 from ..repositories.subscription_repository import SubscriptionRepository

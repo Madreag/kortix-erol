@@ -9,7 +9,6 @@ Endpoints:
 - Presentations: POST /presentation-tools/convert-and-upload-to-slides
 """
 
-import os
 import tempfile
 from pathlib import Path
 from typing import Optional
@@ -240,7 +239,7 @@ async def convert_and_upload_to_google_slides(
             if not convert_response.is_success:
                 try:
                     error_detail = convert_response.json().get("detail", "Unknown error")
-                except:
+                except Exception:
                     error_detail = convert_response.text
                 raise HTTPException(
                     status_code=convert_response.status_code,
@@ -286,7 +285,7 @@ async def convert_and_upload_to_google_slides(
             
             return ConvertToSlidesResponse(
                 success=True,
-                message=f"Successfully converted and uploaded to Google Slides",
+                message="Successfully converted and uploaded to Google Slides",
                 pptx_url=None,  # No local URL since we generated content live
                 google_slides_url=upload_result["web_view_link"],
                 google_slides_file_id=upload_result["file_id"]
@@ -296,7 +295,7 @@ async def convert_and_upload_to_google_slides(
             # Clean up temporary file
             try:
                 temp_pptx_path.unlink()
-            except:
+            except Exception:
                 pass  # Ignore cleanup errors
     
     except HTTPException as e:

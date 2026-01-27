@@ -1,7 +1,6 @@
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 from core.utils.logger import logger
-from enum import Enum
 from .client import ComposioClient
 import json
 

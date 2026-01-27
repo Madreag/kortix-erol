@@ -34,7 +34,7 @@ async def upload_base64_image(base64_data: str, bucket_name: str = "image-upload
         # Upload to Supabase storage - use singleton, already initialized
         db = DBConnection()
         client = await db.client
-        storage_response = await client.storage.from_(bucket_name).upload(
+        await client.storage.from_(bucket_name).upload(
             filename,
             image_data,
             {"content-type": "image/png"}

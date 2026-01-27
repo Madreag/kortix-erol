@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from core.utils.tool_discovery import get_tool_group, get_tools_metadata, get_enabled_methods_for_tool
 from core.utils.logger import logger
 

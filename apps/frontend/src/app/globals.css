@@ -326,7 +326,7 @@
     @apply border-border outline-ring/50;
   }
   html {
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth; -- REMOVED: Performance anti-pattern, causes jank during navigation */
     zoom: 100%;
     font-size: 105%;
     text-rendering: optimizeLegibility;
@@ -949,4 +949,54 @@
 
 .animate-text-shimmer {
   animation: text-shimmer 1.2s ease-in-out infinite;
+}
+
+/* ============================================================================
+   View Transitions API Styles
+   Provides smooth page transition animations using the View Transitions API.
+   @see https://developer.chrome.com/docs/web-platform/view-transitions
+   ============================================================================ */
+
+/* Default crossfade for all transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+}
+
+/* Slide transition for thread/project navigation */
+::view-transition-old(thread-content) {
+  animation: vt-slide-out-left 200ms ease-out both;
+}
+
+::view-transition-new(thread-content) {
+  animation: vt-slide-in-right 200ms ease-out both;
+}
+
+@keyframes vt-slide-out-left {
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes vt-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+/* Fade transition for sidebar items */
+::view-transition-old(sidebar),
+::view-transition-new(sidebar) {
+  animation-duration: 150ms;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

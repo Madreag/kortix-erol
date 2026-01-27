@@ -5,12 +5,12 @@ from uuid import uuid4
 import os
 import json
 import re
+import httpx
 
 from core.services.supabase import DBConnection
 from core.services.http_client import get_http_client
 from core.utils.logger import logger
 from .template_service import AgentTemplate, MCPRequirementValue, ConfigType, ProfileId, QualifiedName
-from core.triggers.api import sync_triggers_to_version_config
 
 @dataclass(frozen=True)
 class AgentInstance:

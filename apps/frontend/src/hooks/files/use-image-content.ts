@@ -13,7 +13,7 @@ export function useImageContent(
 
   const {
     data: blobData,
-    isLoading,
+    isPending: isLoading,
     error,
     failureCount,
   } = useFileContentQuery(sandboxId, filePath, {

@@ -3,7 +3,7 @@
 from typing import Optional, Dict, Any
 from datetime import datetime
 from core.utils.logger import logger
-from core.resources.resource_types import ResourceType, ResourceStatus, SandboxConfig
+from core.resources.resource_types import ResourceType, ResourceStatus
 
 
 class ResourceService:

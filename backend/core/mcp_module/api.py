@@ -1,8 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 
-from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger
 from .mcp_service import mcp_service, MCPException
 

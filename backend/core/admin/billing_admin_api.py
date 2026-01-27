@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-from typing import Optional, List
+from typing import Optional
 from decimal import Decimal
 from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel, Field

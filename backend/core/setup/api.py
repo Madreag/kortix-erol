@@ -1,12 +1,11 @@
 import hmac
 import hashlib
 import json
-from fastapi import APIRouter, Depends, HTTPException, Header, BackgroundTasks, Request
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from pydantic import BaseModel
 from typing import Dict, Optional
 from datetime import datetime, timezone
 import os
-import concurrent.futures
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger
 from core.utils.config import config

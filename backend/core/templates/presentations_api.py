@@ -4,7 +4,7 @@ API endpoints for serving presentation template static files (images, PDFs, slid
 import os
 import re
 import json
-from typing import List, Optional
+from typing import List
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel

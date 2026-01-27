@@ -4,7 +4,6 @@ from core.sandbox.tool_base import SandboxToolsBase
 from core.agentpress.thread_manager import ThreadManager
 from core.services.http_client import get_http_client
 from io import BytesIO
-import uuid
 from litellm import aimage_generation, aimage_edit
 import base64
 from core.utils.file_name_generator import generate_smart_filename
@@ -71,7 +70,7 @@ class SandboxDesignerTool(SandboxToolsBase):
         await self._ensure_sandbox()
         try:
             await self.sandbox.fs.make_dir(self.designs_dir)
-        except:
+        except Exception:
             pass
 
     @openapi_schema(

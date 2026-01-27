@@ -1,6 +1,6 @@
 import asyncio
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Any, Optional, Callable, Awaitable, TypeVar, Tuple, Type
 

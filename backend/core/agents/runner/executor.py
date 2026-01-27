@@ -1,21 +1,17 @@
-import os
 import json
 import asyncio
 import time
-from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from typing import Optional
 
 import structlog
 
 from core.utils.logger import logger
 from core.services import redis
-from core.services.langfuse import langfuse
 from core.utils.tool_output_streaming import (
     set_tool_output_streaming_context,
     clear_tool_output_streaming_context,
 )
 
-from core.agents.runner.config import AgentConfig
 from core.agents.runner.services import (
     REDIS_STREAM_TTL_SECONDS,
     STOP_CHECK_INTERVAL,
@@ -152,7 +148,7 @@ async def execute_agent_run(
                     try:
                         await asyncio.wait_for(redis.expire(stream_key, REDIS_STREAM_TTL_SECONDS), timeout=2.0)
                         stream_ttl_set = True
-                    except:
+                    except Exception:
                         pass
             except Exception as e:
                 logger.warning(f"Failed to write to stream: {e}")
@@ -186,7 +182,7 @@ async def execute_agent_run(
             completion_msg = {"type": "status", "status": "completed", "message": "Completed successfully"}
             try:
                 await redis.stream_add(stream_key, {'data': json.dumps(completion_msg)}, maxlen=200, approximate=True)
-            except:
+            except Exception:
                 pass
 
             await send_completion_notification(thread_id, agent_config, complete_tool_called)

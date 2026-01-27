@@ -1,7 +1,6 @@
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone
 from core.services.db import execute, execute_one, execute_mutate, serialize_row, serialize_rows
-from core.utils.logger import logger
 
 
 async def check_agent_access(agent_id: str, user_id: str) -> Dict[str, bool]:
@@ -50,7 +49,6 @@ async def count_agent_versions(agent_id: str) -> int:
 
 
 async def update_agent_version_stats(agent_id: str, version_count: int) -> bool:
-    from datetime import datetime, timezone
     
     sql = """
     UPDATE agents
@@ -114,7 +112,6 @@ async def create_agent_version(
     triggers: List[Dict[str, Any]],
     previous_version_id: Optional[str] = None
 ) -> Optional[str]:
-    from datetime import datetime, timezone
     import uuid
     
     version_id = str(uuid.uuid4())
@@ -152,7 +149,6 @@ async def create_agent_version(
 
 
 async def deactivate_agent_versions(agent_id: str) -> bool:
-    from datetime import datetime, timezone
     
     sql = """
     UPDATE agent_versions
@@ -167,7 +163,6 @@ async def deactivate_agent_versions(agent_id: str) -> bool:
 
 
 async def activate_agent_version(version_id: str) -> bool:
-    from datetime import datetime, timezone
     
     sql = """
     UPDATE agent_versions
@@ -182,7 +177,6 @@ async def activate_agent_version(version_id: str) -> bool:
 
 
 async def update_agent_current_version(agent_id: str, version_id: str) -> bool:
-    from datetime import datetime, timezone
     
     sql = """
     UPDATE agents
@@ -202,7 +196,6 @@ async def update_agent_version(
     version_name: Optional[str] = None,
     change_description: Optional[str] = None
 ) -> bool:
-    from datetime import datetime, timezone
     
     updates = ["updated_at = :updated_at"]
     params = {"version_id": version_id, "updated_at": datetime.now(timezone.utc)}
@@ -262,7 +255,6 @@ async def create_agent_version_with_config(
     change_description: Optional[str] = None,
     previous_version_id: Optional[str] = None
 ) -> bool:
-    from datetime import datetime, timezone
     
     now = datetime.now(timezone.utc)
     

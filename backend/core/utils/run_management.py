@@ -1,6 +1,5 @@
 """Agent run management utilities - starting, stopping, and monitoring agent runs."""
-import json
-from typing import Optional, List
+from typing import Optional
 from fastapi import HTTPException
 from core.services import redis
 from core.utils.logger import logger
@@ -24,7 +23,6 @@ async def stop_agent_run_with_helpers(agent_run_id: str, error_message: Optional
     logger.warning(f"🛑 Stopping agent run: {agent_run_id} (source: {stop_source}, error: {error_message or 'none'})")
     
     # Import here to avoid circular dependency
-    from core.services.supabase import DBConnection
     from core.agents.api import _cancellation_events
     
     # Set in-memory cancellation event (if run is on this instance)

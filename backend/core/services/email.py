@@ -2,7 +2,6 @@ import os
 import logging
 from typing import Optional
 import mailtrap as mt
-from core.utils.config import config
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class EmailService:
             logger.error("Cannot send email: MAILTRAP_API_TOKEN not configured")
             return False
         
-        subject = f"🎉 You're invited!"
+        subject = "🎉 You're invited!"
         html_content = self._get_referral_email_template(recipient_name, sender_name, referral_url)
         text_content = self._get_referral_email_text(recipient_name, sender_name, referral_url)
         

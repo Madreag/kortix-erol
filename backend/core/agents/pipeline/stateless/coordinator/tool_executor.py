@@ -2,8 +2,7 @@ import asyncio
 import json
 import time
 import uuid
-from typing import Dict, Any, Optional, AsyncGenerator, List, Tuple
-from datetime import datetime, timezone
+from typing import Dict, Any, Optional, AsyncGenerator
 from dataclasses import dataclass, field
 
 from core.utils.logger import logger
@@ -275,7 +274,7 @@ class ToolExecutor:
 
             if tool_fn:
                 if name == "create_slide":
-                    logger.info(f"[ToolExecutor] About to call create_slide...")
+                    logger.info("[ToolExecutor] About to call create_slide...")
                 result = await tool_fn(**parsed)
                 if name == "create_slide":
                     logger.info(f"[ToolExecutor] create_slide returned: success={getattr(result, 'success', 'N/A')}, output={str(getattr(result, 'output', 'N/A'))[:200]}")
@@ -331,7 +330,7 @@ class ToolExecutor:
                 "type": "image_context",
                 **metadata
             })
-            logger.info(f"[DeferredImageContext] Added image_context to state messages")
+            logger.info("[DeferredImageContext] Added image_context to state messages")
             
             try:
                 from core.agentpress.thread_manager.services.state.thread_state import ThreadState
@@ -359,7 +358,7 @@ class ToolExecutor:
                 "created_by_user_id": None
             }
             
-            logger.info(f"[DeferredImageContext] Yielding image_context message for persistence")
+            logger.info("[DeferredImageContext] Yielding image_context message for persistence")
             yield image_msg
             
         except Exception as e:

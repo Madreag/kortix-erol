@@ -1,5 +1,4 @@
 import asyncio
-from typing import Optional
 from core.utils.logger import logger
 from core.services.supabase import DBConnection
 from core.utils.suna_default_agent_service import SunaDefaultAgentService

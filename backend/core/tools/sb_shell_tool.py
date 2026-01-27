@@ -229,7 +229,7 @@ Usage notes:
                             marker_idx = current_output.rfind(marker)
                             after_marker = current_output[marker_idx + len(marker):].strip().split()[0]
                             exit_code = int(after_marker) if after_marker.isdigit() else 0
-                        except:
+                        except Exception:
                             exit_code = 0
                         break
                 else:
@@ -239,7 +239,7 @@ Usage notes:
                 # Kill PTY session
                 try:
                     await pty_handle.kill()
-                except:
+                except Exception:
                     pass
                 
                 # Clean output (remove marker line and control sequences)
@@ -326,7 +326,7 @@ Usage notes:
             finally:
                 try:
                     await self.sandbox.process.delete_session(session_id)
-                except:
+                except Exception:
                     pass
                     
         except Exception as e:
@@ -400,7 +400,7 @@ Usage notes:
         finally:
             try:
                 await self.sandbox.process.delete_session(session_id)
-            except:
+            except Exception:
                 pass
 
     async def cleanup(self):

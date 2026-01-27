@@ -2,7 +2,6 @@ from typing import Dict, Optional
 from datetime import datetime, timezone
 
 from core.utils.logger import logger
-from core.billing.shared.config import get_tier_by_price_id, get_plan_type
 from core.billing.external.stripe.client import StripeAPIWrapper
 from ..repositories.subscription_repository import SubscriptionRepository
 

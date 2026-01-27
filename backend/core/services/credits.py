@@ -1,13 +1,12 @@
 from decimal import Decimal
 from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple
 from core.services.supabase import DBConnection
 from core.utils.logger import logger
 from core.utils.cache import Cache
 from core.utils.config import config, EnvMode
-from core.billing.shared.config import FREE_TIER_INITIAL_CREDITS, TRIAL_ENABLED, get_tier_by_name
+from core.billing.shared.config import FREE_TIER_INITIAL_CREDITS, get_tier_by_name
 from core.utils.distributed_lock import DistributedLock
-import asyncio
 
 class CreditService:
     def __init__(self):

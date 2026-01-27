@@ -1,0 +1,48 @@
+---
+const navItems = [
+  { href: '/features', label: 'Features' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/docs', label: 'Docs' },
+  { href: '/blog', label: 'Blog' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-800">
+  <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2">
+      <img src="/logo.svg" alt="Kortix" class="h-8 w-auto" />
+      <span class="font-bold text-xl">Kortix</span>
+    </a>
+    
+    <div class="hidden md:flex items-center gap-8">
+      {navItems.map(item => (
+        <a 
+          href={item.href}
+          class:list={[
+            'text-sm font-medium transition-colors',
+            currentPath === item.href ? 'text-white' : 'text-gray-400 hover:text-white'
+          ]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+    
+    <div class="flex items-center gap-4">
+      <a 
+        href="/auth/login"
+        class="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+      >
+        Log in
+      </a>
+      <a 
+        href="/auth/signup"
+        class="px-4 py-2 text-sm font-medium bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+      >
+        Get Started
+      </a>
+    </div>
+  </nav>
+</header>

@@ -1,11 +1,9 @@
-import json
 from typing import Optional, Dict, Any, List
 from uuid import uuid4
 from core.agentpress.tool import Tool, ToolResult, openapi_schema, tool_metadata
 from core.agentpress.thread_manager import ThreadManager
 from core.utils.logger import logger
 from core.utils.core_tools_helper import ensure_core_tools_enabled
-from core.utils.config import config
 
 @tool_metadata(
     display_name="Agent Builder",
@@ -532,13 +530,13 @@ class AgentCreationTool(Tool):
                 success_message += f"**Tools Enabled**: {len([k for k, v in agentpress_tools.items() if v])}\n"
                 success_message += f"**MCPs Configured**: {len(configured_mcps)}\n\n"
                 success_message += "The agent is now available in your agent library and ready to use!\n\n"
-                success_message += f"🔧 **For Advanced Configuration:**\n"
-                success_message += f"Visit the agent configuration page to further customize:\n"
-                success_message += f"• Set up triggers and schedules\n" 
-                success_message += f"• Configure additional MCP integrations\n"
-                success_message += f"• Fine-tune tool settings\n"
-                success_message += f"• Create agent versions\n\n"
-                success_message += f"You can access this from your agents dashboard."
+                success_message += "🔧 **For Advanced Configuration:**\n"
+                success_message += "Visit the agent configuration page to further customize:\n"
+                success_message += "• Set up triggers and schedules\n" 
+                success_message += "• Configure additional MCP integrations\n"
+                success_message += "• Fine-tune tool settings\n"
+                success_message += "• Create agent versions\n\n"
+                success_message += "You can access this from your agents dashboard."
 
                 return self.success_response({
                     "message": success_message,
@@ -551,7 +549,7 @@ class AgentCreationTool(Tool):
                 logger.error(f"Failed to create agent version: {e}")
                 try:
                     await client.table('agents').delete().eq("agent_id", agent_id).execute()
-                except:
+                except Exception:
                     pass
                 return self.fail_response("Failed to create agent configuration")
 
@@ -579,7 +577,6 @@ class AgentCreationTool(Tool):
     async def search_mcp_servers_for_agent(self, search_query: str) -> ToolResult:
         try:
             from core.composio_integration.composio_service import get_integration_service
-            from core.composio_integration.toolkit_service import ToolkitService
             
             integration_service = get_integration_service()
             
@@ -602,7 +599,7 @@ class AgentCreationTool(Tool):
                     result_text += f"- Categories: {', '.join(toolkit.categories)}\n"
                 result_text += "\n"
             
-            result_text += f"\n💡 Use `create_credential_profile_for_agent` with the slug to set up authentication for any of these services."
+            result_text += "\n💡 Use `create_credential_profile_for_agent` with the slug to set up authentication for any of these services."
             
             formatted_toolkits = []
             for toolkit in toolkits:
@@ -664,7 +661,7 @@ class AgentCreationTool(Tool):
             if toolkit_data.tags:
                 result_text += f"**Tags**: {', '.join(toolkit_data.tags)}\n"
             
-            result_text += f"\n✅ **Ready to integrate!**\n"
+            result_text += "\n✅ **Ready to integrate!**\n"
             result_text += f"Use `create_credential_profile_for_agent` with slug '{toolkit_data.slug}' to set up authentication."
             
             return self.success_response({
@@ -739,16 +736,16 @@ class AgentCreationTool(Tool):
             
             success_message = f"🔐 **AUTHENTICATION REQUIRED FOR {result.toolkit.name.upper()}**\n\n"
             success_message += f"I've created a credential profile for {result.toolkit.name}.\n\n"
-            success_message += f"**⚠️ CRITICAL NEXT STEP - AUTHENTICATION REQUIRED:**\n"
+            success_message += "**⚠️ CRITICAL NEXT STEP - AUTHENTICATION REQUIRED:**\n"
             success_message += f"1. **Click this link to authenticate:** {auth_url}\n"
             success_message += f"2. Log in to your {result.toolkit.name} account\n"
-            success_message += f"3. Authorize the connection\n"
-            success_message += f"4. Return here and confirm you've completed authentication\n\n"
-            success_message += f"**IMPORTANT:** The integration will NOT work without completing this authentication.\n\n"
-            success_message += f"**Profile Details:**\n"
+            success_message += "3. Authorize the connection\n"
+            success_message += "4. Return here and confirm you've completed authentication\n\n"
+            success_message += "**IMPORTANT:** The integration will NOT work without completing this authentication.\n\n"
+            success_message += "**Profile Details:**\n"
             success_message += f"- Profile Name: {profile_name}\n"
             success_message += f"- Service: {result.toolkit.name}\n\n"
-            success_message += f"Once authenticated, use `discover_mcp_tools_for_agent` with the profile name to see available tools."
+            success_message += "Once authenticated, use `discover_mcp_tools_for_agent` with the profile name to see available tools."
             
             return self.success_response({
                 "message": success_message,
@@ -803,10 +800,10 @@ class AgentCreationTool(Tool):
             
             if not profile.is_connected:
                 return self.fail_response(
-                    f"Profile is not authenticated yet. Please complete authentication first:\n"
-                    f"1. Click the authentication link provided earlier\n"
-                    f"2. Log in and authorize the connection\n"
-                    f"3. Then try discovering tools again"
+                    "Profile is not authenticated yet. Please complete authentication first:\n"
+                    "1. Click the authentication link provided earlier\n"
+                    "2. Log in and authorize the connection\n"
+                    "3. Then try discovering tools again"
                 )
             
             if not profile.mcp_url:
@@ -834,8 +831,8 @@ class AgentCreationTool(Tool):
                     response_text += f"   - {tool['description']}\n"
                 response_text += "\n"
             
-            response_text += f"\n✅ **Profile is authenticated and ready!**\n"
-            response_text += f"Use `configure_agent_integration` with this profile name and selected tool names to add to your agent."
+            response_text += "\n✅ **Profile is authenticated and ready!**\n"
+            response_text += "Use `configure_agent_integration` with this profile name and selected tool names to add to your agent."
             
             return self.success_response({
                 "message": response_text,
@@ -1010,7 +1007,7 @@ class AgentCreationTool(Tool):
                 logger.warning(f"Could not dynamically register MCP tools in current runtime: {str(e)}. Tools will be available on next agent run.")
             
             success_message = f"✅ Successfully configured {profile.toolkit_name} integration for agent!\n\n"
-            success_message += f"**Integration Details:**\n"
+            success_message += "**Integration Details:**\n"
             success_message += f"- Service: {profile.toolkit_name}\n"
             success_message += f"- Profile: {profile.profile_name}\n"
             success_message += f"- Enabled Tools: {len(enabled_tools)}\n"
@@ -1107,13 +1104,13 @@ class AgentCreationTool(Tool):
                 )
                 
                 success_message = f"✅ Successfully created scheduled trigger '{name}' for agent!\n\n"
-                success_message += f"**Trigger Details:**\n"
+                success_message += "**Trigger Details:**\n"
                 success_message += f"- Name: {name}\n"
                 success_message += f"- Schedule: `{cron_expression}`\n"
-                success_message += f"- Type: Worker execution\n"
+                success_message += "- Type: Worker execution\n"
                 success_message += f"- Prompt: {agent_prompt[:50]}{'...' if len(agent_prompt) > 50 else ''}\n"
-                success_message += f"- Status: **Active**\n\n"
-                success_message += f"The trigger is now active and will run according to the schedule."
+                success_message += "- Status: **Active**\n\n"
+                success_message += "The trigger is now active and will run according to the schedule."
                 
                 return self.success_response({
                     "message": success_message,
@@ -1127,7 +1124,7 @@ class AgentCreationTool(Tool):
                         "created_at": trigger.created_at.isoformat()
                     }
                 })
-            except ValueError as ve:
+            except ValueError:
                 return self.fail_response("Validation error: Invalid trigger configuration")
             except Exception as e:
                 logger.error(f"Error creating trigger through manager: {str(e)}")
@@ -1264,7 +1261,7 @@ class AgentCreationTool(Tool):
                 status = "enabled" if is_active else "disabled"
                 
                 success_message = f"✅ Scheduled trigger '{updated_config.name}' has been {status}!\n\n"
-                success_message += f"**Trigger Details:**\n"
+                success_message += "**Trigger Details:**\n"
                 success_message += f"- Name: {updated_config.name}\n"
                 success_message += f"- Status: **{'Active' if is_active else 'Inactive'}**\n\n"
                 if is_active:
@@ -1534,15 +1531,15 @@ class AgentCreationTool(Tool):
             updated_agent = updated_agent_result.data[0] if updated_agent_result.data else agent_data
             
             success_message = f"✅ Successfully updated agent '{updated_agent['name']}'!\n\n"
-            success_message += f"**Changes Made:**\n"
+            success_message += "**Changes Made:**\n"
             for update in updates:
                 success_message += f"• {update}\n"
             
             if version_changes:
-                success_message += f"\n📝 **New Version Created**\n"
+                success_message += "\n📝 **New Version Created**\n"
                 success_message += f"The agent now has version {updated_agent['version_count']} with your configuration changes.\n"
             
-            success_message += f"\n🔧 **Current Configuration:**\n"
+            success_message += "\n🔧 **Current Configuration:**\n"
             success_message += f"• Name: {updated_agent['name']}\n"
             success_message += f"• Description: {updated_agent.get('description', 'No description')}\n"
             success_message += f"• Icon: {updated_agent['icon_name']} ({updated_agent['icon_color']} on {updated_agent['icon_background']})\n"
@@ -1551,7 +1548,7 @@ class AgentCreationTool(Tool):
                 success_message += f"• Model: {new_model}\n"
                 success_message += f"• Tools Enabled: {len([k for k, v in new_agentpress_tools.items() if v])}\n"
             
-            success_message += f"\nYour agent has been updated and is ready to use!"
+            success_message += "\nYour agent has been updated and is ready to use!"
 
             return self.success_response({
                 "message": success_message,

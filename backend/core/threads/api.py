@@ -1,11 +1,9 @@
 import asyncio
-import json
 import traceback
 import uuid
-from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, Form, Query, Body, Request
-from core.utils.auth_utils import verify_and_get_user_id_from_jwt, verify_and_authorize_thread_access, require_thread_access, require_thread_write_access, AuthorizedThreadAccess, get_optional_user_id
+from core.utils.auth_utils import verify_and_get_user_id_from_jwt, verify_and_authorize_thread_access, require_thread_write_access, AuthorizedThreadAccess, get_optional_user_id
 from core.utils.logger import logger
 from core.sandbox.sandbox import create_sandbox, delete_sandbox
 from core.utils.config import config, EnvMode
@@ -121,7 +119,7 @@ async def get_project_threads(
     limit: Optional[int] = Query(100, ge=1, le=1000, description="Number of items per page (max 1000)")
 ):
     logger.debug(f"Fetching threads for project: {project_id} (page={page}, limit={limit})")
-    client = await db.client
+    await db.client
     
     try:
         from core.threads import repo as threads_repo
@@ -174,7 +172,7 @@ async def create_thread_in_project(
     from core.threads.repo import get_project_access, create_thread as repo_create_thread
     
     logger.debug(f"Creating new thread in project: {project_id}")
-    client = await db.client
+    await db.client
     account_id = user_id
     
     try:

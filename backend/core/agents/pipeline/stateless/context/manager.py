@@ -1,6 +1,6 @@
 import json
 import uuid
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 
 from core.utils.logger import logger
@@ -61,7 +61,7 @@ class ContextManager:
         for msg in messages:
             if msg.get('type') == 'thread_summary' or msg.get('_is_summary'):
                 summary_msg = msg
-            elif not msg.get('type') in ['thread_summary']:
+            elif msg.get('type') not in ['thread_summary']:
                 working_memory.append(msg)
         
         if not summary_msg:

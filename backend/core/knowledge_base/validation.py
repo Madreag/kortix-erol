@@ -58,7 +58,6 @@ class FileNameValidator:
         if not name or not name.strip():
             return False, f"{item_type.capitalize()} name cannot be empty"
         
-        original_name = name
         name = name.strip()
         
         # Check length

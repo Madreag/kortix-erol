@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Testimonials from '../components/Testimonials.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+
+// Animated demo is an Island (needs JS)
+import AnimatedDemo from '../components/AnimatedDemo';
+---
+
+<BaseLayout title="AI-Powered Development Platform">
+  <Header />
+  
+  <main class="pt-20">
+    <Hero />
+    
+    <!-- Interactive demo - React Island -->
+    <section class="container mx-auto px-6 py-20">
+      <AnimatedDemo client:visible />
+    </section>
+    
+    <Features />
+    <HowItWorks />
+    <Testimonials />
+    <CTA />
+  </main>
+  
+  <Footer />
+</BaseLayout>

@@ -3,7 +3,6 @@
 import subprocess
 import sys
 import os
-import re
 
 def check_with_uv_run(code_snippet):
     """Run Python code with uv run and capture errors."""

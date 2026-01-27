@@ -1,14 +1,13 @@
-from typing import Dict, Optional
+from typing import Dict
 from decimal import Decimal
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta # type: ignore
 
 from core.utils.logger import logger
 from core.utils.cache import Cache
 from core.billing.shared.config import (
     get_tier_by_price_id, 
-    get_plan_type,
-    get_price_type
+    get_plan_type
 )
 from core.billing.credits.manager import credit_manager
 from core.billing import repo as billing_repo

@@ -7,8 +7,7 @@ Ensures JIT loader respects each agent's enabled/disabled tools.
 Single Source of Truth: agent_config['agentpress_tools']
 """
 
-from typing import Dict, Optional, Set
-from core.utils.logger import logger
+from typing import Optional, Set
 
 
 class JITConfig:

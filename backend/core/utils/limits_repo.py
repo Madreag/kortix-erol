@@ -1,7 +1,6 @@
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from datetime import datetime, timezone, timedelta
-from core.services.db import execute, execute_one, execute_scalar
-from core.utils.logger import logger
+from core.services.db import execute, execute_one
 
 
 async def count_running_agent_runs(account_id: str) -> Dict[str, Any]:

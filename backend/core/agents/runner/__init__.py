@@ -1,8 +1,3 @@
-from typing import Optional, AsyncGenerator, Dict, Any, TYPE_CHECKING
-import asyncio
-
-if TYPE_CHECKING:
-    from langfuse.client import StatefulTraceClient
 
 from core.agents.runner.config import AgentConfig
 from core.agents.runner.tool_manager import ToolManager

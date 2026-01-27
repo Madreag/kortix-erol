@@ -2,7 +2,6 @@ import asyncio
 import json
 import time
 import uuid
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import structlog
@@ -125,7 +124,7 @@ async def prewarm_user_context(account_id: str) -> None:
             locale_prompt = get_locale_context_prompt(locale)
             context_parts.append(f"\n\n{locale_prompt}\n")
         if username:
-            username_info = f"\n\n=== USER INFORMATION ===\n"
+            username_info = "\n\n=== USER INFORMATION ===\n"
             username_info += f"The user's name is: {username}\n"
             username_info += "Use this information to personalize your responses and address the user appropriately.\n"
             context_parts.append(username_info)

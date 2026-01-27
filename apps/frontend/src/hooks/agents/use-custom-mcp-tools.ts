@@ -16,7 +16,7 @@ export interface CustomMCPToolsResponse {
 export const useCustomMCPToolsData = (agentId: string, mcpConfig: any) => {
   const queryClient = useQueryClient();
   
-  const { data, isLoading, error, refetch } = useQuery<CustomMCPToolsResponse>({
+  const { data, isPending: isLoading, error, refetch } = useQuery<CustomMCPToolsResponse>({
     queryKey: ['custom-mcp-tools', agentId, mcpConfig?.url],
     queryFn: async () => {
       const response = await backendApi.get(`/agents/${agentId}/custom-mcp-tools`, {

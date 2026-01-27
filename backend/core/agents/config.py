@@ -75,13 +75,13 @@ async def load_agent_config(
 ) -> Optional[Dict[str, Any]]:
     from core.agents import repo as agents_repo
     
-    t = time.time()
+    time.time()
     logger.info(f"⏱️ [AGENT CONFIG] Starting load_agent_config for agent_id={agent_id}")
     user_id = user_id or account_id
     
     try:
         if not agent_id:
-            logger.debug(f"[AGENT LOAD] Loading default agent")
+            logger.debug("[AGENT LOAD] Loading default agent")
             
             if is_new_thread:
                 from core.utils.ensure_suna import ensure_suna_installed
@@ -122,7 +122,7 @@ async def load_agent_config(
             agent_config = cached_config
             logger.info(f"⏱️ [AGENT CONFIG] get_cached_agent_config: {(time.time() - t_cache) * 1000:.1f}ms (CACHE HIT)")
         elif account_id:
-            logger.info(f"⏱️ [AGENT CONFIG] Cache miss, loading from DB...")
+            logger.info("⏱️ [AGENT CONFIG] Cache miss, loading from DB...")
             t_db = time.time()
             from core.agents.agent_loader import get_agent_loader
             loader = await get_agent_loader()

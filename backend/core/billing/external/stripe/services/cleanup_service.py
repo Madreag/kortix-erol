@@ -27,7 +27,7 @@ class CleanupService:
         if canceled_subs:
             logger.info(f"[CLEANUP SUMMARY] ✅ Canceled {len(canceled_subs)} old subscriptions: {canceled_subs}")
         else:
-            logger.info(f"[CLEANUP SUMMARY] No duplicate subscriptions found to cancel")
+            logger.info("[CLEANUP SUMMARY] No duplicate subscriptions found to cancel")
             
         return canceled_subs
     
@@ -92,7 +92,7 @@ class CleanupService:
         if old_amount == 0 and new_amount > 0:
             return f"New subscription is PAID (${new_amount/100:.2f}), canceling old FREE subscription"
         elif old_amount == 0 and new_amount == 0:
-            return f"Both are $0, keeping newer subscription, canceling old duplicate"
+            return "Both are $0, keeping newer subscription, canceling old duplicate"
         else:
             return f"Cleaning up old subscription (${old_amount/100:.2f})"
     

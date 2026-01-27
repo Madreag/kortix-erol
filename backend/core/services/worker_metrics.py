@@ -7,9 +7,7 @@ Provides:
 - CloudWatch publishing for monitoring
 """
 import asyncio
-import os
 from datetime import datetime, timezone
-from typing import Optional, Dict, List
 
 from core.utils.logger import logger
 from core.utils.config import config, EnvMode

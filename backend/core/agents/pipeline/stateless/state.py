@@ -153,7 +153,7 @@ class RunState:
             
             if not can_run:
                 logger.error(f"[RunState] {message}")
-                self._terminate(f"insufficient_credits")
+                self._terminate("insufficient_credits")
                 await stream_user_error(
                     stream_key=self.stream_key,
                     error=message,
@@ -527,7 +527,7 @@ class RunState:
             writes = self._pending_writes.copy()
             self._pending_writes.clear()
 
-            start_time = time.time()
+            time.time()
 
             try:
                 for w in writes:

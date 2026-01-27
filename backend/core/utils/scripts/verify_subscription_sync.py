@@ -2,8 +2,7 @@
 import asyncio
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
-from datetime import datetime, timezone
+from typing import Dict, Optional
 from decimal import Decimal
 import time
 
@@ -14,7 +13,7 @@ import stripe
 from core.services.supabase import DBConnection
 from core.utils.config import config
 from core.utils.logger import logger
-from core.billing.shared.config import get_tier_by_price_id, TIERS
+from core.billing.shared.config import get_tier_by_price_id
 
 stripe.api_key = config.STRIPE_SECRET_KEY
 

@@ -8,7 +8,6 @@ Dataset: https://huggingface.co/datasets/gaia-benchmark/GAIA
 """
 
 import os
-import sys
 import json
 import shutil
 from pathlib import Path

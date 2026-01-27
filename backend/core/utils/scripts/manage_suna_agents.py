@@ -21,7 +21,6 @@ Note: Sync is no longer needed - Suna agents automatically use the current confi
 import asyncio
 import argparse
 import sys
-import json
 from pathlib import Path
 
 # Add the backend directory to the path so we can import modules
@@ -29,7 +28,6 @@ backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
 from core.utils.suna_default_agent_service import SunaDefaultAgentService
-from core.services.supabase import DBConnection
 from core.utils.logger import logger
 
 
@@ -43,7 +41,7 @@ class SunaAgentManager:
         
         result = await self.service.install_for_all_users()
         
-        print(f"✅ Installation completed!")
+        print("✅ Installation completed!")
         print(f"   📦 Installed: {result['installed_count']}")
         print(f"   ❌ Failed: {result['failed_count']}")
         
@@ -105,13 +103,13 @@ class SunaAgentManager:
         
         version_dist = stats.get('version_distribution', {})
         if version_dist:
-            print(f"\nVersion Distribution:")
+            print("\nVersion Distribution:")
             for version, count in version_dist.items():
                 print(f"  {version}: {count} agents")
         
         creation_dates = stats.get('creation_dates', {})
         if creation_dates:
-            print(f"\nCreation Dates (Last 12 months):")
+            print("\nCreation Dates (Last 12 months):")
             for month, count in sorted(creation_dates.items(), reverse=True):
                 print(f"  {month}: {count} agents")
 

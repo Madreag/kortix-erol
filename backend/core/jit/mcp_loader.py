@@ -30,7 +30,7 @@ class MCPJITLoader:
         custom_mcp_singular = fresh_config.get('custom_mcp', [])
         configured_mcps = fresh_config.get('configured_mcps', [])
         
-        old_tools = list(self.tool_map.keys())
+        list(self.tool_map.keys())
         old_agent_config = dict(self.agent_config)
         
         normalized_fresh_config = {

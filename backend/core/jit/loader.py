@@ -279,7 +279,6 @@ class JITLoader:
         project_id: Optional[str] = None,
         jit_config: Optional[JITConfig] = None
     ) -> BatchActivationResult:
-        from .dependencies import get_dependency_resolver
         
         start_time = time.time()
         logger.info(f"⚡ [JIT] Activating {len(tool_names)} tools (regular + MCP with dependency resolution)")

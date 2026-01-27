@@ -48,7 +48,7 @@ export function useExternalImage(
 ) {
   const {
     data: blobData,
-    isLoading,
+    isPending: isLoading,
     error,
     failureCount,
   } = useQuery({

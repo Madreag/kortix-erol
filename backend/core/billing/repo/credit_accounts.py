@@ -211,7 +211,7 @@ async def check_renewal_already_processed(account_id: str, period_start: int) ->
 
 async def upsert_credit_account(account_id: str, data: Dict[str, Any]) -> bool:
     columns = ["account_id"] + list(data.keys())
-    values = [account_id] + list(data.values())
+    [account_id] + list(data.values())
     
     placeholders = ", ".join(f":{col}" for col in columns)
     columns_str = ", ".join(columns)

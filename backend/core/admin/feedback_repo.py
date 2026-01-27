@@ -1,7 +1,6 @@
 from typing import Dict, Any, Optional, List, Tuple
 from datetime import datetime, timezone, timedelta
-from core.services.db import execute, execute_one, serialize_row, serialize_rows
-from core.utils.logger import logger
+from core.services.db import execute, execute_one
 
 
 async def get_feedback_stats() -> Dict[str, Any]:
@@ -196,7 +195,7 @@ async def get_feedback_time_series(
     else:
         date_trunc = "day"
     
-    sql = f"""
+    sql = """
     SELECT 
         DATE_TRUNC(:date_trunc, created_at) as period,
         COUNT(*) as count,

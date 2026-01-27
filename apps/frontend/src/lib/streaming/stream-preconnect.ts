@@ -16,12 +16,19 @@ interface StreamPreconnectConfig {
   maxBufferSize: number;
   staleTimeoutMs: number;
   cleanupIntervalMs: number;
+  authTokenBufferMs: number; // Buffer time before token expiry
+}
+
+interface CachedAuthToken {
+  token: string;
+  expiresAt: number;
 }
 
 const DEFAULT_CONFIG: StreamPreconnectConfig = {
   maxBufferSize: 1000,
   staleTimeoutMs: 30000,
   cleanupIntervalMs: 5000,
+  authTokenBufferMs: 5 * 60 * 1000, // 5 minute buffer
 };
 
 class StreamPreconnectService {
@@ -30,10 +37,76 @@ class StreamPreconnectService {
   private config: StreamPreconnectConfig;
   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
   private listeners: Map<string, Set<(data: string) => void>> = new Map();
+  
+  // Auth token caching for eager preconnection
+  private authTokenCache: CachedAuthToken | null = null;
+  private authTokenPromise: Promise<string | null> | null = null;
 
   constructor(config: Partial<StreamPreconnectConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.startCleanupInterval();
+  }
+  
+  /**
+   * Pre-fetch auth token BEFORE agent run is created.
+   * Call this immediately when user starts typing or clicks send.
+   * This eliminates auth latency from the critical path.
+   */
+  async preconnectEagerly(): Promise<void> {
+    // Skip if we have a valid cached token
+    if (this.authTokenCache && this.authTokenCache.expiresAt > Date.now()) {
+      return;
+    }
+
+    // Start fetching token if not already in progress
+    if (!this.authTokenPromise) {
+      this.authTokenPromise = this.fetchAndCacheAuthToken();
+    }
+
+    await this.authTokenPromise;
+  }
+
+  private async fetchAndCacheAuthToken(): Promise<string | null> {
+    try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session?.access_token) {
+        // Cache token with buffer before expiry
+        const expiresAt = session.expires_at
+          ? (session.expires_at * 1000) - this.config.authTokenBufferMs
+          : Date.now() + (30 * 60 * 1000); // Default 30 min if no expiry
+
+        this.authTokenCache = {
+          token: session.access_token,
+          expiresAt,
+        };
+
+        return session.access_token;
+      }
+      return null;
+    } catch (error) {
+      console.error('[StreamPreconnect] Failed to fetch auth token:', error);
+      return null;
+    } finally {
+      this.authTokenPromise = null;
+    }
+  }
+
+  /**
+   * Get cached auth token or fetch new one.
+   * Used internally for preconnection.
+   */
+  async getCachedAuthToken(): Promise<string | null> {
+    // Return cached token if valid
+    if (this.authTokenCache && this.authTokenCache.expiresAt > Date.now()) {
+      return this.authTokenCache.token;
+    }
+
+    // Otherwise fetch new token
+    await this.preconnectEagerly();
+    return this.authTokenCache?.token || null;
   }
 
   private startCleanupInterval(): void {

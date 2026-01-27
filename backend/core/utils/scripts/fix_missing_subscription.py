@@ -85,11 +85,11 @@ async def fix_missing_subscription(user_email: str):
     
     subscription = active_sub
     
-    logger.info(f"\nActive subscription found:")
+    logger.info("\nActive subscription found:")
     logger.info(f"  ID: {subscription.id}")
     logger.info(f"  Status: {subscription.status}")
     if subscription.status == 'past_due':
-        logger.info(f"  ⚠️  GRACE PERIOD: Payment failed, Stripe will retry automatically")
+        logger.info("  ⚠️  GRACE PERIOD: Payment failed, Stripe will retry automatically")
     logger.info(f"  Created: {datetime.fromtimestamp(subscription.created).isoformat()}")
     logger.info(f"  Current period: {datetime.fromtimestamp(subscription.current_period_start).isoformat()} to {datetime.fromtimestamp(subscription.current_period_end).isoformat()}")
     
@@ -100,7 +100,7 @@ async def fix_missing_subscription(user_email: str):
                 subscription.schedule,
                 expand=['phases.items.price']
             )
-            logger.info(f"\n  Schedule details:")
+            logger.info("\n  Schedule details:")
             logger.info(f"    Status: {schedule.status}")
             logger.info(f"    Phases: {len(schedule.phases)}")
             for idx, phase in enumerate(schedule.phases):
@@ -129,7 +129,7 @@ async def fix_missing_subscription(user_email: str):
     
     try:
         items_data = subscription.items.data if hasattr(subscription.items, 'data') else []
-    except:
+    except Exception:
         items_data = []
     
     if items_data and len(items_data) > 0:
@@ -179,7 +179,7 @@ async def fix_missing_subscription(user_email: str):
         logger.error("❌ Could not determine price ID")
         return
     
-    logger.info(f"\nSubscription details:")
+    logger.info("\nSubscription details:")
     logger.info(f"  Price ID: {price_id}")
     logger.info(f"  Amount: ${price.unit_amount / 100:.2f}")
     logger.info(f"  Currency: {price.currency}")
@@ -211,7 +211,7 @@ async def fix_missing_subscription(user_email: str):
     
     if credit_account.data:
         acc = credit_account.data[0]
-        logger.info(f"Current credit account state:")
+        logger.info("Current credit account state:")
         logger.info(f"  Tier: {acc.get('tier', 'none')}")
         logger.info(f"  Balance: ${acc.get('balance', 0)}")
         logger.info(f"  Subscription ID: {acc.get('stripe_subscription_id', 'None')}")
@@ -247,10 +247,10 @@ async def fix_missing_subscription(user_email: str):
             'can_cancel_after': end_date.isoformat()
         })
         
-        logger.info(f"Setting up yearly commitment:")
+        logger.info("Setting up yearly commitment:")
         logger.info(f"  Start date: {start_date.date()}")
         logger.info(f"  End date: {end_date.date()}")
-        logger.info(f"  Duration: 12 months")
+        logger.info("  Duration: 12 months")
     else:
         update_data.update({
             'commitment_type': None,
@@ -260,7 +260,7 @@ async def fix_missing_subscription(user_email: str):
             'can_cancel_after': None
         })
         
-        logger.info(f"Clearing commitment data (this is a regular monthly subscription)")
+        logger.info("Clearing commitment data (this is a regular monthly subscription)")
     
     await client.from_('credit_accounts').upsert(
         {**update_data, 'account_id': account_id},
@@ -324,7 +324,7 @@ async def fix_missing_subscription(user_email: str):
     
     if final_account.data:
         acc = final_account.data[0]
-        logger.info(f"Final credit account state:")
+        logger.info("Final credit account state:")
         logger.info(f"  ✅ Tier: {acc.get('tier')}")
         logger.info(f"  ✅ Balance: ${acc.get('balance')}")
         logger.info(f"  ✅ Subscription ID: {acc.get('stripe_subscription_id')}")

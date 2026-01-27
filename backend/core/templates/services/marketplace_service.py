@@ -1,7 +1,6 @@
 from typing import List, Dict, Any, Optional
-from core.utils.pagination import PaginationService, PaginationParams, PaginatedResponse, PaginationMeta
+from core.utils.pagination import PaginationParams, PaginatedResponse, PaginationMeta
 from core.utils.logger import logger
-from core.utils.query_utils import batch_query_in
 
 
 class MarketplaceFilters:
@@ -53,7 +52,7 @@ class MarketplaceService:
                 tags=filters.tags
             )
             
-            base_query = self._build_marketplace_base_query(filters)
+            self._build_marketplace_base_query(filters)
             count_query = self._build_marketplace_count_query(filters)
             count_result = await count_query.execute()
             total_items = count_result.count if count_result.count is not None else 0

@@ -89,7 +89,7 @@ class SunaDefaultAgentService:
                 if replace_existing:
                     # Delete existing agent
                     await self._delete_agent(existing_agent_id)
-                    logger.debug(f"Deleted existing Suna agent for replacement")
+                    logger.debug("Deleted existing Suna agent for replacement")
                 else:
                     logger.debug(f"User {account_id} already has Suna agent: {existing_agent_id}")
                     return existing_agent_id

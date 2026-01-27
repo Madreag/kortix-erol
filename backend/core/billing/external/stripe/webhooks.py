@@ -33,9 +33,9 @@ class WebhookService:
                     payload, sig_header, config.STRIPE_WEBHOOK_SECRET,
                     tolerance=60
                 )
-            except stripe.error.SignatureVerificationError as e:
+            except stripe.error.SignatureVerificationError:
                 raise HTTPException(status_code=400, detail="Invalid webhook signature")
-            except ValueError as e:
+            except ValueError:
                 raise HTTPException(status_code=400, detail="Invalid payload")
 
             can_process, reason = await WebhookLock.check_and_mark_webhook_processing(
@@ -57,7 +57,7 @@ class WebhookService:
             logger.info(f"[WEBHOOK] Processing event type: {event.type} (ID: {event.id})")
             
             if event.type == 'checkout.session.completed':
-                logger.info(f"[WEBHOOK] Handling checkout.session.completed")
+                logger.info("[WEBHOOK] Handling checkout.session.completed")
                 await CheckoutHandler.handle_checkout_session_completed(event, client)
             
             elif event.type in ['customer.subscription.created', 'customer.subscription.updated']:
@@ -99,7 +99,7 @@ class WebhookService:
                 }
                 error_message = f"{error_details['error_type']}: {error_details['error_message']} (event: {error_details['event_type']})"
             except Exception:
-                error_message = f"Webhook processing failed - error details could not be serialized"
+                error_message = "Webhook processing failed - error details could not be serialized"
             
             if event and hasattr(event, 'id'):
                 await WebhookLock.mark_webhook_failed(event.id, error_message)

@@ -1,13 +1,12 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, Request, HTTPException, Response, Depends, APIRouter, Query
+from fastapi import FastAPI, Request, HTTPException, Depends, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse
 from core.services import redis
 from core.utils.openapi_config import configure_openapi
 from contextlib import asynccontextmanager
-from core.agentpress.thread_manager import ThreadManager
 from core.services.supabase import DBConnection
 from datetime import datetime, timezone
 from core.utils.config import config, EnvMode
@@ -18,7 +17,6 @@ from collections import OrderedDict
 import os
 import psutil
 
-from pydantic import BaseModel
 import uuid
 
 
@@ -60,7 +58,7 @@ if sys.platform == "win32":
 
 db = DBConnection()
 # Use shared instance ID for distributed deployments
-from core.utils.instance import get_instance_id, INSTANCE_ID
+from core.utils.instance import INSTANCE_ID
 instance_id = INSTANCE_ID  # Keep backward compatibility
 
 
@@ -260,6 +258,15 @@ app = FastAPI(
 # Configure OpenAPI docs with API Key and Bearer token auth
 configure_openapi(app)
 
+# Setup OpenTelemetry distributed tracing (imp6.md)
+try:
+    from core.telemetry import setup_telemetry
+    setup_telemetry(app, None)  # Engine passed as None - SQLAlchemy instrumented globally
+except ImportError:
+    pass  # Telemetry packages not installed
+except Exception as e:
+    logger.warning(f"Failed to setup OpenTelemetry: {e}")
+
 @app.middleware("http")
 async def log_requests_middleware(request: Request, call_next):
     structlog.contextvars.clear_contextvars()
@@ -396,8 +403,10 @@ api_router.include_router(google_docs_router)
 
 from core.referrals import router as referrals_router
 from core.memory.api import router as memory_router
+from core.health import router as health_router
 api_router.include_router(referrals_router)
 api_router.include_router(memory_router)
+api_router.include_router(health_router)
 
 from core.test_harness.api import router as test_harness_router, e2e_router
 api_router.include_router(test_harness_router)
@@ -536,6 +545,19 @@ async def health_check_docker():
 
 
 app.include_router(api_router, prefix="/v1")
+
+# Mount Litestar /v2 API alongside FastAPI (imp2.md)
+# High-performance backend using Litestar + msgspec + uvloop
+try:
+    from core.config.feature_flags import FeatureFlags
+    if FeatureFlags.ENABLE_LITESTAR_V2:
+        from litestar_app import litestar_app
+        app.mount("/v2", litestar_app)
+        logger.info("[STARTUP] Litestar /v2 API mounted successfully")
+except ImportError as e:
+    logger.warning(f"[STARTUP] Litestar /v2 API not available: {e}")
+except Exception as e:
+    logger.error(f"[STARTUP] Failed to mount Litestar /v2 API: {e}")
 
 
 async def _memory_watchdog():

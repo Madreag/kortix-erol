@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Library, Menu, Plus, Zap, MessageCircle, PanelLeftOpen, PanelLeftClose, Search, Users, FolderOpen } from 'lucide-react';
+import { Library, Menu, Plus, Zap, MessageCircle, PanelLeftOpen, PanelLeftClose, Search, Users, FolderOpen, Heart, ChevronRight, Sparkles } from 'lucide-react';
 
 import { NavAgents } from '@/components/sidebar/nav-agents';
 import { NavWorkers } from '@/components/sidebar/nav-workers';
@@ -14,6 +14,7 @@ import { siteConfig } from '@/lib/site-config';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarRail,
   useSidebar,
@@ -36,8 +37,13 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useAdminRole } from '@/hooks/admin';
 import posthog from 'posthog-js';
 import { useDocumentModalStore } from '@/stores/use-document-modal-store';
-import { isLocalMode } from '@/lib/config';
+import { isLocalMode, isProductionMode } from '@/lib/config';
 import { useAccountState, accountStateSelectors } from '@/hooks/billing';
+import { useReferralDialog } from '@/stores/referral-dialog';
+import { ReferralDialog } from '@/components/referrals/referral-dialog';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { PlanSelectionModal } from '@/components/billing/pricing';
+import { trackCtaUpgrade } from '@/lib/analytics/gtm';
 
 import { getPlanIcon } from '@/components/billing/plan-utils';
 import { Kbd } from '../ui/kbd';
@@ -119,7 +125,15 @@ export function SidebarLeft({
   const searchParams = useSearchParams();
   const [showNewAgentDialog, setShowNewAgentDialog] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
   const { isOpen: isDocumentModalOpen } = useDocumentModalStore();
+  const { isOpen: isReferralDialogOpen, openDialog: openReferralDialog, closeDialog: closeReferralDialog } = useReferralDialog();
+  const { data: accountState } = useAccountState({ enabled: true });
+  
+  // Check if user is on free tier
+  const isFreeTier = accountState?.subscription?.tier_key === 'free' ||
+    accountState?.tier?.name === 'free' ||
+    !accountState?.subscription?.tier_key;
 
   // Extract pathname info
   const { isOnLibrary, isOnThread } = useMemo(() => {
@@ -314,16 +328,10 @@ export function SidebarLeft({
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] relative overflow-hidden">
+      <SidebarContent className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] overflow-hidden min-h-0 flex-1">
         {/* Collapsed layout: + button and state buttons only */}
-        <div
-          className={cn(
-            "absolute inset-0 px-6 pt-4 space-y-3 flex flex-col items-center transition-opacity duration-150 ease-out transform-gpu",
-            state === 'collapsed' 
-              ? "opacity-100 pointer-events-auto delay-100" 
-              : "opacity-0 pointer-events-none delay-0"
-          )}
-        >
+        {state === 'collapsed' && (
+        <div className="px-6 pt-4 space-y-3 flex flex-col items-center">
           {/* + button */}
           <div className="w-full flex flex-col items-center space-y-3">
             <Button
@@ -388,16 +396,11 @@ export function SidebarLeft({
             ))}
           </div>
         </div>
+        )}
 
         {/* Expanded layout */}
-        <div
-          className={cn(
-            "flex flex-col h-full transition-opacity duration-150 ease-out transform-gpu",
-            state === 'collapsed' 
-              ? "opacity-0 pointer-events-none delay-0" 
-              : "opacity-100 pointer-events-auto delay-100"
-          )}
-        >
+        {state !== 'collapsed' && (
+        <div className="flex flex-col h-full">
           <div className="px-6 pt-4 space-y-4">
             {/* New Chat button */}
             <div className="w-full">
@@ -481,8 +484,8 @@ export function SidebarLeft({
             </div>
           </div>
 
-          {/* Content area */}
-          <div className="px-6 flex-1 overflow-hidden">
+          {/* Content area - with padding to leave room for footer (referral ~60px + user ~64px + gap ~16px = ~140px) */}
+          <div className="px-6 flex-1 min-h-0 overflow-hidden pb-36">
             {activeView === 'chats' && <NavAgents />}
             {activeView === 'workers' && <NavWorkers />}
             {activeView === 'starred' && (
@@ -493,6 +496,7 @@ export function SidebarLeft({
             )}
           </div>
         </div>
+        )}
       </SidebarContent>
 
       {/* Enterprise Demo Card - Only show when expanded */}
@@ -526,9 +530,39 @@ export function SidebarLeft({
         )
       } */}
 
-      <div className="px-6 pb-4">
+      <SidebarFooter className="px-4 pb-4 shrink-0 group-data-[collapsible=icon]:px-2">
+        {/* Referral Card - only show when expanded */}
+        {!isProductionMode() && (
+          <SpotlightCard className="bg-zinc-200/60 dark:bg-zinc-800/60 backdrop-blur-md cursor-pointer group-data-[collapsible=icon]:hidden">
+            <div
+              onClick={openReferralDialog}
+              className="flex items-center gap-3 px-3 py-2.5"
+            >
+              <Heart className="h-4 w-4 text-zinc-700 dark:text-zinc-300 flex-shrink-0" />
+              <div className="flex-1 text-left">
+                <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{t('referralShareTitle')}</div>
+                <div className="text-xs text-zinc-600 dark:text-zinc-400">{t('referralShareSubtitle')}</div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-zinc-500 flex-shrink-0" />
+            </div>
+          </SpotlightCard>
+        )}
+        {/* Upgrade Button - only show when expanded */}
+        {isFreeTier && (
+          <Button
+            onClick={() => {
+              trackCtaUpgrade();
+              setShowPlanModal(true);
+            }}
+            variant="default"
+            size="lg"
+            className="w-full group-data-[collapsible=icon]:hidden"
+          >
+            {t('upgrade')}
+          </Button>
+        )}
         <UserProfileSection user={user} />
-      </div>
+      </SidebarFooter>
       <SidebarRail />
       <NewAgentDialog
         open={showNewAgentDialog}
@@ -537,6 +571,15 @@ export function SidebarLeft({
       <ThreadSearchModal
         open={showSearchModal}
         onOpenChange={setShowSearchModal}
+      />
+      <PlanSelectionModal
+        open={showPlanModal}
+        onOpenChange={setShowPlanModal}
+        returnUrl={typeof window !== 'undefined' ? window?.location?.href || '/' : '/'}
+      />
+      <ReferralDialog
+        open={isReferralDialogOpen}
+        onOpenChange={closeReferralDialog}
       />
     </Sidebar>
   );

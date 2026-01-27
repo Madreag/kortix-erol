@@ -3,7 +3,6 @@ import asyncio
 import sys
 from pathlib import Path
 from typing import Dict
-from datetime import datetime, timezone
 from decimal import Decimal
 import time
 

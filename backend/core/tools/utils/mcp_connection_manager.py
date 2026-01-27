@@ -6,7 +6,7 @@ Connections are ephemeral - we connect, fetch tools, then disconnect.
 No active sessions are stored.
 """
 import asyncio
-from typing import Dict, Any, List
+from typing import Dict, Any
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.sse import sse_client
 from mcp.client.stdio import stdio_client

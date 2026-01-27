@@ -3,7 +3,7 @@ from .agent_config_tool import AgentConfigTool
 from .mcp_search_tool import MCPSearchTool
 from .credential_profile_tool import CredentialProfileTool
 from .trigger_tool import TriggerTool
-from typing import List, Type, Dict, Any
+from typing import List, Type, Dict
 from core.agentpress.thread_manager import ThreadManager
 from core.utils.logger import logger
 

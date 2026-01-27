@@ -3,14 +3,13 @@ import uuid
 import mimetypes
 import structlog
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
+from typing import Optional
 from pathlib import Path
 
 from core.agentpress.tool import ToolResult, openapi_schema, tool_metadata
 from core.sandbox.tool_base import SandboxToolsBase
 from core.agentpress.thread_manager import ThreadManager
 from core.utils.logger import logger
-from core.utils.config import config
 
 @tool_metadata(
     display_name="File Upload",
@@ -124,7 +123,7 @@ class SandboxUploadFileTool(SandboxToolsBase):
 
             try:
                 client = await self.db.client
-                storage_response = await client.storage.from_(bucket_name).upload(
+                await client.storage.from_(bucket_name).upload(
                     storage_path,
                     file_content,
                     {"content-type": content_type}
@@ -161,7 +160,7 @@ class SandboxUploadFileTool(SandboxToolsBase):
                 message += f"⏰ URL expires: {url_expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}\n"
                 if file_upload_id:
                     message += f"📋 File ID: {file_upload_id}\n"
-                message += f"\n🔐 This file is stored in private, secure storage with account isolation."
+                message += "\n🔐 This file is stored in private, secure storage with account isolation."
                 
                 return self.success_response(message)
                 

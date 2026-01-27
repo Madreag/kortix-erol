@@ -33,13 +33,11 @@ Available datasets:
 import os
 import sys
 import argparse
-from pathlib import Path
 
 # Add backend to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Load config first to get env vars
-from core.utils.config import config
 
 from braintrust import Eval
 
@@ -184,7 +182,7 @@ def get_eval_data():
         
     except ValueError as e:
         print(f"❌ Error: {e}")
-        print(f"\n📋 Available datasets:")
+        print("\n📋 Available datasets:")
         for name in list_available_datasets():
             print(f"   - {name}")
         sys.exit(1)

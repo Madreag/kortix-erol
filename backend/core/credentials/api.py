@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, validator
-import urllib.parse
 
 from core.utils.logger import logger
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
@@ -121,7 +120,7 @@ async def store_credential(
     try:
         credential_service = get_credential_service(db)
         
-        credential_id = await credential_service.store_credential(
+        await credential_service.store_credential(
             account_id=user_id,
             mcp_qualified_name=request.mcp_qualified_name,
             display_name=request.display_name,
@@ -430,7 +429,7 @@ async def get_composio_profiles(
             if toolkit_slug not in toolkit_groups:
                 try:
                     icon_url = await toolkit_service.get_toolkit_icon(toolkit_slug)
-                except:
+                except Exception:
                     icon_url = None
                 
                 toolkit_groups[toolkit_slug] = {
@@ -444,7 +443,7 @@ async def get_composio_profiles(
             try:
                 mcp_url = await composio_service.get_mcp_url_for_runtime(profile.profile_id)
                 has_mcp_url = bool(mcp_url)
-            except:
+            except Exception:
                 has_mcp_url = False
             
             profile_summary = ComposioProfileSummary(

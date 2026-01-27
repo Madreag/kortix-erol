@@ -54,7 +54,6 @@ import os
 import sys
 from pathlib import Path
 from typing import Optional, Dict, Any, List
-from datetime import datetime
 
 # Add backend to path
 backend_dir = Path(__file__).parent.parent.parent.parent
@@ -344,7 +343,7 @@ class ProjectMigrator:
 
             # Migrate thread
             if not await self.upsert_thread(thread, staging_account_id):
-                print(f"      ERROR: Failed to migrate thread")
+                print("      ERROR: Failed to migrate thread")
                 continue
             print(f"      {'[DRY RUN] ' if self.dry_run else ''}Thread migrated")
 
@@ -379,11 +378,11 @@ class ProjectMigrator:
                 print(f"    ... and {len(self.stats['errors']) - 10} more")
 
         if self.dry_run:
-            print(f"\n  DRY RUN - No changes were made to staging database")
-            print(f"  Run without --dry-run flag to apply changes")
+            print("\n  DRY RUN - No changes were made to staging database")
+            print("  Run without --dry-run flag to apply changes")
         else:
-            print(f"\n  Migration complete!")
-            print(f"\n  Debug URLs:")
+            print("\n  Migration complete!")
+            print("\n  Debug URLs:")
             print(f"  Project: http://localhost:3000/projects/{project_id}")
             for thread in threads:
                 tid = thread['thread_id']
@@ -433,7 +432,7 @@ class ProjectMigrator:
 
         # Step 2: Fetch and migrate parent project (if exists)
         if project_id:
-            print(f"\n3. Fetching parent project from production...")
+            print("\n3. Fetching parent project from production...")
             project = await self.fetch_project(project_id)
 
             if project:
@@ -492,15 +491,15 @@ class ProjectMigrator:
                 print(f"    ... and {len(self.stats['errors']) - 10} more")
 
         if self.dry_run:
-            print(f"\n  DRY RUN - No changes were made to staging database")
-            print(f"  Run without --dry-run flag to apply changes")
+            print("\n  DRY RUN - No changes were made to staging database")
+            print("  Run without --dry-run flag to apply changes")
         else:
-            print(f"\n  Migration complete!")
-            print(f"\n  Debug URL:")
+            print("\n  Migration complete!")
+            print("\n  Debug URL:")
             if project_id:
                 print(f"  http://localhost:3000/projects/{project_id}/thread/{thread_id}")
             else:
-                print(f"  Thread has no project - check your frontend routing")
+                print("  Thread has no project - check your frontend routing")
 
         return True
 

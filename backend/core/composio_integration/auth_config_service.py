@@ -1,5 +1,4 @@
-from typing import Optional, List, Dict, Any, Union
-from composio_client import Composio
+from typing import Optional, List, Dict, Union
 from core.utils.logger import logger
 from pydantic import BaseModel
 

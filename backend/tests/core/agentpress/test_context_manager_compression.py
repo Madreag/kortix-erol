@@ -508,7 +508,7 @@ class TestLargeContextCompression200k:
             system_prompt = create_system_prompt(6000)
             
             # Count actual tokens
-            actual_tokens = await context_manager.count_tokens(
+            await context_manager.count_tokens(
                 model, 
                 large_conversation, 
                 system_prompt,
@@ -527,7 +527,7 @@ class TestLargeContextCompression200k:
             )
             
             # Count final tokens
-            final_tokens = await context_manager.count_tokens(
+            await context_manager.count_tokens(
                 model,
                 result,
                 system_prompt,
@@ -797,7 +797,7 @@ class TestMiddleOutCompression:
             if i % 3 == 1:
                 tool_call = create_tool_call(f"tool_{i}", {})
                 messages.append(create_assistant_message(
-                    f"Calling tool",
+                    "Calling tool",
                     f"msg_{i}",
                     [tool_call]
                 ))

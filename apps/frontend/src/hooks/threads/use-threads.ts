@@ -101,7 +101,7 @@ export const useThreadsForProject = (projectId: string, options?) => {
   
   return {
     data: projectThreads,
-    isLoading: threadsQuery.isLoading,
+    isLoading: threadsQuery.isPending,
     error: threadsQuery.error,
   };
 };

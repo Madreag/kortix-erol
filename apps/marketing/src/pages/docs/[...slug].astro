@@ -1,0 +1,90 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs.map(doc => ({
+    params: { slug: doc.slug },
+    props: doc,
+  }));
+}
+
+type Props = CollectionEntry<'docs'>;
+
+const doc = Astro.props;
+const { Content } = await doc.render();
+
+// Get all docs for sidebar
+const allDocs = (await getCollection('docs'))
+  .sort((a, b) => a.data.order - b.data.order);
+
+// Group by category
+const categories = allDocs.reduce((acc, d) => {
+  const cat = d.data.category;
+  if (!acc[cat]) acc[cat] = [];
+  acc[cat].push(d);
+  return acc;
+}, {} as Record<string, typeof allDocs>);
+---
+
+<BaseLayout 
+  title={doc.data.title}
+  description={doc.data.description}
+>
+  <Header />
+  
+  <main class="pt-28 pb-20">
+    <div class="container mx-auto px-6">
+      <div class="grid lg:grid-cols-4 gap-12">
+        <!-- Sidebar -->
+        <aside class="lg:col-span-1">
+          <nav class="sticky top-28">
+            {Object.entries(categories).map(([category, categoryDocs]) => (
+              <div class="mb-6">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  {category}
+                </h3>
+                <ul class="space-y-1">
+                  {categoryDocs.map(d => (
+                    <li>
+                      <a 
+                        href={`/docs/${d.slug}`}
+                        class:list={[
+                          'block py-1 text-sm transition-colors',
+                          d.slug === doc.slug 
+                            ? 'text-primary-500 font-medium' 
+                            : 'text-gray-400 hover:text-white'
+                        ]}
+                      >
+                        {d.data.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
+        </aside>
+        
+        <!-- Content -->
+        <article class="lg:col-span-3">
+          <header class="mb-8">
+            <h1 class="text-4xl font-bold mb-4">{doc.data.title}</h1>
+            {doc.data.description && (
+              <p class="text-xl text-gray-400">{doc.data.description}</p>
+            )}
+          </header>
+          
+          <div class="prose prose-invert prose-lg max-w-none">
+            <Content />
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+  
+  <Footer />
+</BaseLayout>

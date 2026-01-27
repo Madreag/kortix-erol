@@ -101,7 +101,7 @@ class SandboxCanvasTool(SandboxToolsBase):
         full_path = f"{self.workspace_path}/{self.canvases_dir}"
         logger.debug(f"[Canvas] Creating directory: {full_path} in sandbox {self._sandbox_id}")
         try:
-            result = await self.sandbox.process.exec(f"mkdir -p '{full_path}'")
+            await self.sandbox.process.exec(f"mkdir -p '{full_path}'")
             # Verify directory was created
             verify = await self.sandbox.process.exec(f"test -d '{full_path}' && echo 'EXISTS'")
             if hasattr(verify, 'stdout') and 'EXISTS' in str(verify.stdout):
@@ -209,7 +209,7 @@ class SandboxCanvasTool(SandboxToolsBase):
                     logger.debug(f"[Canvas] File verified: {full_path}")
                 else:
                     logger.warning(f"[Canvas] File may not have been saved: {full_path}")
-            except:
+            except Exception:
                 pass
         except Exception as e:
             logger.error(f"[Canvas] Failed to save canvas {full_path}: {e}")
@@ -263,7 +263,7 @@ class SandboxCanvasTool(SandboxToolsBase):
             try:
                 await self.sandbox.fs.download_file(full_path)
                 return self.fail_response(f"Canvas '{name}' already exists at {canvas_path}")
-            except:
+            except Exception:
                 pass  # File doesn't exist, continue
 
             # Create canvas data (infinite canvas - no dimensions)
@@ -458,7 +458,7 @@ class SandboxCanvasTool(SandboxToolsBase):
                 image_full_path = f"{self.workspace_path}/{image_path}"
                 try:
                     image_data = await self.sandbox.fs.download_file(image_full_path)
-                except:
+                except Exception:
                     return self.fail_response(f"Image not found at {image_path}")
                 
                 # Get image bytes to read dimensions (not for embedding)
@@ -1185,7 +1185,7 @@ class SandboxCanvasTool(SandboxToolsBase):
                 img = Image.open(io.BytesIO(result_bytes))
                 result_width, result_height = img.size
                 img.close()
-            except:
+            except Exception:
                 result_width = source_element.get("width", 400)
                 result_height = source_element.get("height", 400)
             

@@ -1,9 +1,8 @@
 import asyncio
 import time
-from typing import Optional, Dict, Any, TypeVar
+from typing import Optional, Dict, Any
 from core.agentpress.thread_manager import ThreadManager
 from core.tools.mcp_tool_wrapper import MCPToolWrapper
-from core.agentpress.tool import SchemaType
 from core.utils.logger import logger
 
 # Timeout for version service calls

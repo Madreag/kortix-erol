@@ -3,7 +3,6 @@ import openai
 import tempfile
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from pydantic import BaseModel
-from typing import Optional
 from core.utils.logger import logger
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 

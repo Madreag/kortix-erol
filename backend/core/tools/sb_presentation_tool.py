@@ -3,7 +3,7 @@ from core.sandbox.tool_base import SandboxToolsBase
 from core.agentpress.thread_manager import ThreadManager
 from core.utils.logger import logger
 from core.services.http_client import get_http_client
-from typing import List, Dict, Optional, Union, TYPE_CHECKING
+from typing import Dict, Optional, TYPE_CHECKING
 import json
 import os
 from datetime import datetime
@@ -333,7 +333,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         full_path = f"{self.workspace_path}/{self.presentations_dir}"
         try:
             await self.sandbox.fs.create_folder(full_path, "755")
-        except:
+        except Exception:
             pass
 
     async def _ensure_presentation_dir(self, presentation_name: str):
@@ -342,7 +342,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         presentation_path = f"{self.workspace_path}/{self.presentations_dir}/{safe_name}"
         try:
             await self.sandbox.fs.create_folder(presentation_path, "755")
-        except:
+        except Exception:
             pass
         return safe_name, presentation_path
 
@@ -392,7 +392,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         try:
             metadata_content = await self.sandbox.fs.download_file(metadata_path)
             return json.loads(metadata_content.decode())
-        except:
+        except Exception:
             # Create default metadata
             return {
                 "presentation_name": "",
@@ -415,7 +415,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         try:
             with open(metadata_path, 'r') as f:
                 return json.load(f)
-        except Exception as e:
+        except Exception:
             return {}
 
     def _read_template_slide(self, template_name: str, slide_filename: str) -> str:
@@ -424,7 +424,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         try:
             with open(slide_path, 'r') as f:
                 return f.read()
-        except Exception as e:
+        except Exception:
             return ""
 
     async def _copy_template_to_workspace(self, template_name: str, presentation_name: str) -> str:
@@ -455,7 +455,7 @@ class SandboxPresentationTool(SandboxToolsBase):
                 target_dir_path = target_dir.replace('\\', '/')  # Normalize path separators
                 try:
                     await self.sandbox.fs.create_folder(target_dir_path, "755")
-                except:
+                except Exception:
                     pass  # Directory might already exist
             else:
                 target_dir_path = presentation_path
@@ -568,7 +568,7 @@ class SandboxPresentationTool(SandboxToolsBase):
                 template_path = os.path.join(self.templates_dir, item)
                 if os.path.isdir(template_path) and not item.startswith('.'):
                     # Load metadata for this template
-                    metadata = self._load_template_metadata(item)
+                    self._load_template_metadata(item)
                     
                     # Check if image.png exists
                     image_path = os.path.join(template_path, "image.png")
@@ -1106,7 +1106,7 @@ class SandboxPresentationTool(SandboxToolsBase):
             slide_path = f"{presentation_path}/{slide_filename}"
             try:
                 await self.sandbox.fs.delete_file(slide_path)
-            except:
+            except Exception:
                 pass  # File might not exist
             
             # Remove from metadata

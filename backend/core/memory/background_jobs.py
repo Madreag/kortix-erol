@@ -1,7 +1,6 @@
 """Memory background job functions."""
 
 import asyncio
-from datetime import datetime, timezone
 from typing import List, Dict, Any
 
 from core.utils.logger import logger, structlog
@@ -169,7 +168,7 @@ class _DispatchWrapper:
     def send(self, **kwargs):
         import asyncio
         try:
-            loop = asyncio.get_running_loop()
+            asyncio.get_running_loop()
             asyncio.create_task(self._dispatch_fn(**kwargs))
         except RuntimeError:
             asyncio.run(self._dispatch_fn(**kwargs))

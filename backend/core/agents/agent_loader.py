@@ -263,6 +263,16 @@ class AgentLoader:
         Load a template as AgentData.
         
         Templates are basically agents with pre-configured settings.
+        Templates now use a unified 'config' JSONB column with structure:
+        {
+            "system_prompt": "...",
+            "tools": {
+                "agentpress": {...},
+                "mcp": [...],
+                "custom_mcp": [...]
+            },
+            "metadata": {"avatar": "...", "avatar_color": "..."}
+        }
         
         Args:
             template_row: Template database row
@@ -271,7 +281,16 @@ class AgentLoader:
         Returns:
             AgentData representing the template
         """
+        # Extract config from the unified JSONB column
+        config = template_row.get('config', {}) or {}
+        tools_config = config.get('tools', {}) or {}
+        config_metadata = config.get('metadata', {}) or {}
+        
+        # Build metadata from both sources
         metadata = template_row.get('metadata', {}) or {}
+        # Merge config metadata into main metadata
+        if config_metadata:
+            metadata.update(config_metadata)
         
         # Fetch creator name if requested (template marketplace operation)
         creator_name = None
@@ -292,6 +311,11 @@ class AgentLoader:
         if creator_name:
             metadata['creator_name'] = creator_name
         
+        # Extract tool configurations from unified config structure
+        agentpress_tools = tools_config.get('agentpress', {})
+        mcp_tools = tools_config.get('mcp', [])
+        custom_mcp_tools = tools_config.get('custom_mcp', [])
+        
         # Create AgentData from template
         agent_data = AgentData(
             agent_id=template_row.get('template_id', ''),
@@ -309,12 +333,12 @@ class AgentLoader:
             current_version_id=None,
             version_count=0,
             metadata=metadata,
-            # Template config is directly available
-            system_prompt=template_row.get('system_prompt', ''),
+            # Template config extracted from unified config JSONB
+            system_prompt=config.get('system_prompt', ''),
             model=metadata.get('model'),
-            configured_mcps=template_row.get('mcp_requirements', []),
-            custom_mcps=[],
-            agentpress_tools=template_row.get('agentpress_tools', {}),
+            configured_mcps=mcp_tools,
+            custom_mcps=custom_mcp_tools,
+            agentpress_tools=agentpress_tools,
             triggers=[],
             version_name='template',
             is_suna_default=False,

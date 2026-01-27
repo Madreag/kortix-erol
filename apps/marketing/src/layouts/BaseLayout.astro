@@ -1,0 +1,65 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description = 'AI-powered development platform', image = '/og-image.png' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Primary Meta Tags -->
+    <title>{title} | Kortix</title>
+    <meta name="title" content={`${title} | Kortix`} />
+    <meta name="description" content={description} />
+    
+    <!-- Canonical -->
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, Astro.site)} />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Font preload -->
+    <link rel="preload" href="/fonts/RoobertUprightsVF.woff2" as="font" type="font/woff2" crossorigin />
+    
+    <!-- Critical CSS will be inlined automatically -->
+  </head>
+  <body class="bg-gray-900 text-white antialiased">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  @font-face {
+    font-family: 'Roobert';
+    src: url('/fonts/RoobertUprightsVF.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+</style>

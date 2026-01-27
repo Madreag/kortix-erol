@@ -1,0 +1,49 @@
+---
+const steps = [
+  {
+    number: '01',
+    title: 'Describe Your Task',
+    description: 'Tell the AI what you want to build in natural language.',
+  },
+  {
+    number: '02',
+    title: 'Review the Plan',
+    description: 'The agent creates a step-by-step implementation plan.',
+  },
+  {
+    number: '03',
+    title: 'Watch It Build',
+    description: 'See real-time code generation with explanations.',
+  },
+  {
+    number: '04',
+    title: 'Deploy & Iterate',
+    description: 'One-click deploy and continue refining with AI.',
+  },
+];
+---
+
+<section class="container mx-auto px-6 py-20 bg-gray-800/30">
+  <div class="text-center max-w-2xl mx-auto mb-16">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+    <p class="text-gray-400">
+      From idea to production in minutes, not weeks.
+    </p>
+  </div>
+  
+  <div class="max-w-4xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-8">
+      {steps.map((step) => (
+        <div class="relative flex gap-4">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center font-bold text-sm">
+            {step.number}
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold mb-2">{step.title}</h3>
+            <p class="text-gray-400">{step.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

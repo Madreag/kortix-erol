@@ -103,7 +103,7 @@ export function useFileData(
     
     return {
         data,
-        isLoading: activeQuery.isLoading,
+        isLoading: activeQuery.isPending,
         error: activeQuery.error as Error | null,
         retryCount: activeQuery.failureCount || 0,
         isImage,

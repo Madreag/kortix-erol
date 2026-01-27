@@ -1,6 +1,5 @@
 import asyncio
-import weakref
-from typing import Dict, Set, Optional
+from typing import Dict, Optional
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 

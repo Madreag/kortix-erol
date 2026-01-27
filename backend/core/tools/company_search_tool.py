@@ -193,9 +193,9 @@ class CompanySearchTool(Tool):
                 try:
                     error_str = str(create_error)
                     logger.error(f"Failed to create webset - Error message: {error_str}")
-                except:
+                except Exception:
                     error_str = "Unknown error"
-                    logger.error(f"Failed to create webset - Could not convert error to string")
+                    logger.error("Failed to create webset - Could not convert error to string")
                 
                 if "401" in error_str:
                     return self.fail_response(
@@ -227,7 +227,7 @@ class CompanySearchTool(Tool):
                     self.exa_client.websets.items.list,
                     webset_id=webset.id
                 )
-                logger.info(f"Retrieved items from webset")
+                logger.info("Retrieved items from webset")
             except Exception as items_error:
                 logger.error(f"Error retrieving items: {type(items_error).__name__}: {repr(items_error)}")
                 return self.fail_response("Failed to retrieve search results. Please try again.")

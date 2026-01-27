@@ -153,7 +153,7 @@ export function useAgentStartInput(options: UseAgentStartInputOptions = {}): Use
   });
   
   // Fetch agents - only when user is authenticated
-  const { data: agentsResponse, isLoading: isLoadingAgents } = useAgents({
+  const { data: agentsResponse, isPending: isLoadingAgents } = useAgents({
     limit: agentLimit,
     sort_by: 'name',
     sort_order: 'asc'

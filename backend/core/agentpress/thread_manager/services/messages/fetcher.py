@@ -105,7 +105,7 @@ class MessageFetcher:
                 if pending_image_contexts:
                     for img_ctx in pending_image_contexts:
                         result.append(img_ctx)
-                        logger.debug(f"🖼️ Injected image_context after tool results")
+                        logger.debug("🖼️ Injected image_context after tool results")
                     pending_image_contexts = []
             else:
                 result.append(msg)
@@ -114,7 +114,7 @@ class MessageFetcher:
         if pending_image_contexts:
             for img_ctx in pending_image_contexts:
                 result.append(img_ctx)
-                logger.debug(f"🖼️ Appended image_context at end of conversation")
+                logger.debug("🖼️ Appended image_context at end of conversation")
         
         return result
     

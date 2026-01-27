@@ -1,12 +1,9 @@
-from fastapi import HTTPException, Request # type: ignore
 from typing import Dict
 from datetime import datetime, timezone
 
-import stripe
 from core.utils.logger import logger
 from core.utils.cache import Cache
-from core.utils.distributed_lock import DistributedLock
-from core.billing.shared.config import get_tier_by_price_id, get_tier_by_name, get_plan_type, is_commitment_price_id
+from core.billing.shared.config import get_tier_by_price_id, get_tier_by_name, is_commitment_price_id
 from core.billing.shared.cache_utils import invalidate_account_state_cache
 
 from ..services.subscription_service import SubscriptionService
@@ -37,7 +34,7 @@ class SubscriptionHandler:
         logger.info(f"[SUBSCRIPTION HANDLER] Event: {event.type}, Subscription: {subscription_info['subscription_id']}, Status: {subscription_info['status']}")
         
         if event.type == 'customer.subscription.updated':
-            previous_attributes = event.data.get('previous_attributes', {})
+            event.data.get('previous_attributes', {})
             await self._handle_subscription_updated(event, subscription, client)
         
         if event.type == 'customer.subscription.created':

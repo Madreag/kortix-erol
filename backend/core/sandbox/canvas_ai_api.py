@@ -8,8 +8,7 @@ import os
 import base64
 import asyncio
 import replicate
-from io import BytesIO
-from typing import Optional, Literal
+from typing import Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
@@ -919,7 +918,7 @@ async def health_check():
     # Check if vtracer is available
     vtracer_available = False
     try:
-        import vtracer
+        import vtracer  # noqa: F401 - availability check
         vtracer_available = True
     except ImportError:
         pass

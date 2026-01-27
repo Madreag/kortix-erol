@@ -14,7 +14,7 @@ import { useMemo } from 'react';
  */
 export function useThreadAgentStatuses(threadIds: string[]) {
   // Fetch all active agent runs - with smart polling
-  const { data: activeRuns = [], isLoading } = useQuery({
+  const { data: activeRuns = [], isPending: isLoading } = useQuery({
     queryKey: ['active-agent-runs'],
     queryFn: getActiveAgentRuns,
     staleTime: 10 * 1000, // Cache for 10 seconds

@@ -12,7 +12,6 @@ import sys
 import argparse
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
-from decimal import Decimal
 
 backend_dir = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(backend_dir))
@@ -21,7 +20,7 @@ import stripe
 from core.services.supabase import DBConnection
 from core.utils.config import config
 from core.utils.logger import logger
-from core.billing.shared.config import get_tier_by_name, get_tier_by_price_id, get_plan_type
+from core.billing.shared.config import get_tier_by_name, get_plan_type
 from core.billing.credits.manager import credit_manager
 from dateutil.relativedelta import relativedelta
 
@@ -202,7 +201,7 @@ Examples:
     args = parser.parse_args()
     
     logger.info("="*80)
-    logger.info(f"MISSED RENEWAL CREDITS RECOVERY")
+    logger.info("MISSED RENEWAL CREDITS RECOVERY")
     logger.info(f"Date: {args.date}")
     logger.info(f"Mode: {'DRY RUN' if args.dry_run else 'LIVE'}")
     logger.info("="*80)

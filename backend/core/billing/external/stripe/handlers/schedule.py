@@ -1,4 +1,3 @@
-from typing import Dict
 from core.utils.logger import logger
 from core.utils.cache import Cache
 from core.utils.distributed_lock import DistributedLock
@@ -27,7 +26,7 @@ class ScheduleHandler:
                 acquired = await downgrade_lock.acquire(wait=True, wait_timeout=15)
                 if acquired:
                     try:
-                        logger.info(f"[SCHEDULE COMPLETED] 🔒 Acquired lock for cleanup")
+                        logger.info("[SCHEDULE COMPLETED] 🔒 Acquired lock for cleanup")
                         
                         recheck = await billing_repo.get_credit_account_scheduled_changes(account_id)
                         

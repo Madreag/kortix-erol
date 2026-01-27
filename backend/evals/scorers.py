@@ -5,7 +5,6 @@ These scorers work with Braintrust to evaluate agent outputs.
 Uses LiteLLM for LLM-based scoring (works with Gemini, OpenAI, etc.)
 """
 
-import os
 import json
 from typing import Any, Dict, List, Optional, Union
 
@@ -94,7 +93,7 @@ def AnswerCorrectness(
             result_json = json.loads(result_text)
             score = float(result_json.get("score", 0))
             reason = result_json.get("reason", "")
-        except:
+        except Exception:
             # Fallback: look for score in text
             if "1.0" in result_text or "correct" in result_text.lower():
                 score = 1.0
@@ -422,13 +421,22 @@ def create_behavior_scorer(criteria: str):
     Create an LLM-based scorer for specific behavioral criteria.
     
     Uses autoevals LLMClassifier under the hood.
+    Requires: pip install autoevals
     
     Args:
         criteria: Description of what behavior to evaluate
         
     Returns:
         Scorer function compatible with Braintrust
+        
+    Raises:
+        ImportError: If autoevals is not installed
     """
+    try:
+        from autoevals import LLMClassifier
+    except ImportError:
+        raise ImportError("autoevals package required for create_behavior_scorer. Install with: pip install autoevals")
+    
     classifier = LLMClassifier(
         name="BehaviorCheck",
         prompt_template=f"""You are evaluating an AI agent's response.
@@ -449,7 +457,7 @@ Provide your rating as a single number between 0 and 1.""",
     return classifier
 
 
-# Export commonly used autoevals scorers for convenience
+# Export custom scorers only (autoevals must be imported directly from autoevals if needed)
 __all__ = [
     # Custom scorers
     "AnswerCorrectness",
@@ -458,14 +466,5 @@ __all__ = [
     "ResponseQualityScorer",
     "ResponseTimeScorer",
     "create_behavior_scorer",
-    # Autoevals scorers (re-exported)
-    "Factuality",
-    "ClosedQA",
-    "Summary",
-    "Levenshtein",
-    "NumericDiff",
-    "JSONDiff",
-    "ExactMatch",
-    "LLMClassifier",
 ]
 

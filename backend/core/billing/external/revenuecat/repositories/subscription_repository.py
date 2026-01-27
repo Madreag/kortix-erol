@@ -57,7 +57,7 @@ class SubscriptionRepository:
         try:
             await billing_repo.update_credit_account(app_user_id, update_data)
             
-            logger.info(f"[REVENUECAT] Update executed, checking result...")
+            logger.info("[REVENUECAT] Update executed, checking result...")
             
             after_result = await billing_repo.get_credit_account(app_user_id)
             
@@ -72,13 +72,13 @@ class SubscriptionRepository:
                         f"This may be due to race condition with Stripe webhook"
                     )
                     
-                    logger.info(f"[REVENUECAT] 🔄 Retrying tier update to fix race condition...")
+                    logger.info("[REVENUECAT] 🔄 Retrying tier update to fix race condition...")
                     await billing_repo.update_credit_account(app_user_id, {
                         'tier': tier_name,
                         'provider': 'revenuecat',
                         'updated_at': datetime.now(timezone.utc).isoformat()
                     })
-                    logger.info(f"[REVENUECAT] ✅ Retry completed")
+                    logger.info("[REVENUECAT] ✅ Retry completed")
             
         except Exception as e:
             logger.error(f"[REVENUECAT] ❌ Exception during update: {e}", exc_info=True)

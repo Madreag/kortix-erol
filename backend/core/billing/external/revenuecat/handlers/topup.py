@@ -19,7 +19,7 @@ class TopupHandler:
             return
         
         if not transaction_id:
-            logger.error(f"[REVENUECAT ONE_TIME] No transaction ID found, using fallback")
+            logger.error("[REVENUECAT ONE_TIME] No transaction ID found, using fallback")
             transaction_id = f"rc_topup_{app_user_id}_{purchased_at_ms}"
         
         await CreditService.add_one_time_credits(

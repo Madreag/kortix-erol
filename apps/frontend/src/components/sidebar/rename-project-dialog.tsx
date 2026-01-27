@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useOptimistic, useTransition } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,8 +21,14 @@ export function RenameProjectDialog({
   onSave,
 }: RenameProjectDialogProps) {
   const [name, setName] = useState(currentName);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Optimistic state for instant UI feedback
+  const [optimisticName, setOptimisticName] = useOptimistic(
+    currentName,
+    (_current, newName: string) => newName
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -37,15 +43,20 @@ export function RenameProjectDialog({
   const handleSave = async () => {
     if (!projectId || name.trim() === '') return;
     
-    setIsSaving(true);
-    try {
-      await onSave(projectId, name.trim());
-      onClose();
-    } catch (error) {
-      // Error handling is done in parent
-    } finally {
-      setIsSaving(false);
-    }
+    const trimmedName = name.trim();
+    
+    // Close dialog immediately for instant feedback
+    onClose();
+    
+    // Start optimistic update
+    startTransition(async () => {
+      setOptimisticName(trimmedName);
+      try {
+        await onSave(projectId, trimmedName);
+      } catch (error) {
+        // Error handling is done in parent - will revert via query invalidation
+      }
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -72,22 +83,22 @@ export function RenameProjectDialog({
             onKeyDown={handleKeyDown}
             placeholder="Enter project name..."
             maxLength={50}
-            disabled={isSaving}
+            disabled={isPending}
           />
         </div>
         <DialogFooter>
           <Button
             variant="outline"
             onClick={onClose}
-            disabled={isSaving}
+            disabled={isPending}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isSaving || name.trim() === ''}
+            disabled={isPending || name.trim() === ''}
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isPending ? 'Saving...' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

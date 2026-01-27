@@ -1,6 +1,5 @@
 from typing import List, Dict, Any, Optional, Tuple
 from core.services.db import execute, execute_one, execute_mutate, serialize_row
-from core.utils.logger import logger
 from datetime import datetime, timezone
 
 

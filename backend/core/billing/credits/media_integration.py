@@ -12,10 +12,6 @@ from core.utils.logger import logger
 from core.billing.credits.manager import credit_manager
 from core.billing.credits.media_calculator import (
     calculate_media_cost,
-    calculate_replicate_image_cost,
-    calculate_replicate_video_cost,
-    calculate_replicate_voice_cost,
-    calculate_openrouter_image_cost,
     get_model_pricing_info,
     select_image_quality,
     cap_quality_for_tier,

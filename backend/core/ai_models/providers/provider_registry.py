@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Type
+from typing import Dict, Optional
 from .base import ProviderConfig, ProviderCapability
 from .anthropic import AnthropicProvider, BedrockProvider
 from .minimax import MiniMaxProvider, OpenRouterProvider

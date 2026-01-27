@@ -250,7 +250,7 @@ def from_dict(cls, data: Dict[str, Any]):
 
 
 class ThreadsClient:
-    """Client for interacting with threads APIs."""
+    """Client for interacting with threads APIs with V2 fallback support."""
 
     def __init__(
         self,
@@ -258,17 +258,25 @@ class ThreadsClient:
         auth_token: Optional[str] = None,
         custom_headers: Optional[Dict[str, str]] = None,
         timeout: float = 30.0,
+        fallback_url: Optional[str] = None,
     ):
         """Initialize the threads client.
 
         Args:
-            base_url: The base URL for the API
+            base_url: The base URL for the API (V2 if fallback enabled)
             auth_token: Optional authentication token
             custom_headers: Optional custom headers to include in requests
             timeout: Request timeout in seconds
+            fallback_url: Optional V1 fallback URL for resilience
         """
         self.base_url = base_url.rstrip("/")
+        self.fallback_url = fallback_url.rstrip("/") if fallback_url else None
         self.timeout = timeout
+        
+        # V2 circuit breaker state
+        self._v2_failure_count = 0
+        self._v2_circuit_open = False
+        self._v2_failure_threshold = 5
 
         # Set up default headers
         self.headers = {"Content-Type": "application/json"}
@@ -277,14 +285,19 @@ class ThreadsClient:
         if custom_headers:
             self.headers.update(custom_headers)
 
-        # Initialize HTTP client
+        # Initialize HTTP clients
         self.client = httpx.AsyncClient(
             headers=self.headers, timeout=timeout, base_url=self.base_url
         )
+        self.fallback_client = httpx.AsyncClient(
+            headers=self.headers, timeout=timeout, base_url=self.fallback_url
+        ) if self.fallback_url else None
 
     async def close(self):
-        """Close the HTTP client."""
+        """Close the HTTP clients."""
         await self.client.aclose()
+        if self.fallback_client:
+            await self.fallback_client.aclose()
 
     async def __aenter__(self):
         return self
@@ -312,6 +325,46 @@ class ThreadsClient:
         else:
             response.raise_for_status()
             return response.json()
+
+    async def _request_with_fallback(
+        self,
+        method: str,
+        path: str,
+        **kwargs,
+    ) -> httpx.Response:
+        """Make a request with automatic V1 fallback on V2 failure."""
+        # If circuit is open or no fallback, use appropriate client
+        if self._v2_circuit_open and self.fallback_client:
+            return await self.fallback_client.request(method, path, **kwargs)
+        
+        try:
+            response = await self.client.request(method, path, **kwargs)
+            
+            # Server error triggers fallback
+            if response.status_code >= 500 and self.fallback_client:
+                raise httpx.HTTPStatusError(
+                    f"Server error: {response.status_code}",
+                    request=response.request,
+                    response=response,
+                )
+            
+            # Success - reset failure count
+            self._v2_failure_count = 0
+            return response
+            
+        except (httpx.HTTPStatusError, httpx.ConnectError) as e:
+            if self.fallback_client:
+                self._v2_failure_count += 1
+                
+                # Open circuit after threshold
+                if self._v2_failure_count >= self._v2_failure_threshold:
+                    self._v2_circuit_open = True
+                    print(f"[Kortix SDK] V2 circuit breaker OPEN after {self._v2_failure_count} failures")
+                
+                # Fallback to V1
+                print(f"[Kortix SDK] V2 failed, falling back to V1: {path}")
+                return await self.fallback_client.request(method, path, **kwargs)
+            raise
 
     async def get_threads(
         self,
@@ -560,21 +613,24 @@ def create_threads_client(
     auth_token: Optional[str] = None,
     custom_headers: Optional[Dict[str, str]] = None,
     timeout: float = 120.0,
+    fallback_url: Optional[str] = None,
 ) -> ThreadsClient:
     """Create a new ThreadsClient instance.
 
     Args:
-        base_url: The base URL for the API
+        base_url: The base URL for the API (V2 if fallback enabled)
         auth_token: Optional authentication token
         custom_headers: Optional custom headers to include in requests
         timeout: Request timeout in seconds
+        fallback_url: Optional V1 fallback URL for resilience
 
     Returns:
-        A new ThreadsClient instance
+        A new ThreadsClient instance with V2→V1 fallback support
     """
     return ThreadsClient(
         base_url=base_url,
         auth_token=auth_token,
         custom_headers=custom_headers,
         timeout=timeout,
+        fallback_url=fallback_url,
     )

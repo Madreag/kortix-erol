@@ -5,7 +5,6 @@ from core.agentpress.thread_manager import ThreadManager
 from .base_tool import AgentBuilderBaseTool
 from core.composio_integration.composio_service import get_integration_service
 from core.composio_integration.composio_profile_service import ComposioProfileService
-from core.mcp_module.mcp_service import mcp_service
 from .mcp_search_tool import MCPSearchTool
 from core.utils.logger import logger
 
@@ -86,7 +85,7 @@ class CredentialProfileTool(AgentBuilderBaseTool):
                 "total_count": len(formatted_profiles)
             })
             
-        except Exception as e:
+        except Exception:
             return self.fail_response("Error getting credential profiles")
 
     @openapi_schema({
@@ -163,7 +162,7 @@ After connecting, you'll be able to use {result.toolkit.name} tools in your agen
             
             return self.success_response(response_data)
             
-        except Exception as e:
+        except Exception:
             return self.fail_response("Error creating credential profile")
 
     @openapi_schema({
@@ -257,7 +256,7 @@ After connecting, you'll be able to use {result.toolkit.name} tools in your agen
             
             from core.versioning.version_service import get_version_service
             version_service = await get_version_service()
-            new_version = await version_service.create_version(
+            await version_service.create_version(
                 agent_id=self.agent_id,
                 user_id=account_id,
                 system_prompt=current_config.get('system_prompt', ''),
@@ -376,7 +375,7 @@ After connecting, you'll be able to use {result.toolkit.name} tools in your agen
                                 agentpress_tools=current_config.get('tools', {}).get('agentpress', {}),
                                 change_description=f"Deleted credential profile {profile.display_name}"
                             )
-                        except Exception as e:
+                        except Exception:
                             return self.fail_response("Failed to update agent config")
             
             # Delete the profile
@@ -390,5 +389,5 @@ After connecting, you'll be able to use {result.toolkit.name} tools in your agen
                 }
             })
             
-        except Exception as e:
+        except Exception:
             return self.fail_response("Error deleting credential profile")

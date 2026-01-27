@@ -135,23 +135,25 @@ async def get_thread_project_id(thread_id: str) -> Optional[str]:
 
 
 async def delete_thread_data(thread_id: str) -> bool:
+    """
+    Delete thread and all related data in a single atomic transaction.
+    
+    Uses CTE for efficiency - single round-trip instead of 3 sequential queries.
+    """
     from core.services.db import execute_mutate
     
-    await execute_mutate(
-        "DELETE FROM agent_runs WHERE thread_id = :thread_id",
-        {"thread_id": thread_id}
+    sql = """
+    WITH deleted_runs AS (
+        DELETE FROM agent_runs WHERE thread_id = :thread_id
+    ),
+    deleted_messages AS (
+        DELETE FROM messages WHERE thread_id = :thread_id
     )
+    DELETE FROM threads WHERE thread_id = :thread_id
+    RETURNING thread_id
+    """
     
-    await execute_mutate(
-        "DELETE FROM messages WHERE thread_id = :thread_id",
-        {"thread_id": thread_id}
-    )
-    
-    result = await execute_mutate(
-        "DELETE FROM threads WHERE thread_id = :thread_id RETURNING thread_id",
-        {"thread_id": thread_id}
-    )
-    
+    result = await execute_mutate(sql, {"thread_id": thread_id})
     return len(result) > 0
 
 
@@ -405,6 +407,58 @@ async def get_project_by_id(project_id: str) -> Optional[Dict[str, Any]]:
     WHERE project_id = :project_id
     """
     result = await execute_one(sql, {"project_id": project_id})
+    return serialize_row(dict(result)) if result else None
+
+
+async def list_user_projects(
+    account_id: str,
+    limit: int = 50,
+    offset: int = 0
+) -> Tuple[List[Dict[str, Any]], int]:
+    """List all projects for a user with pagination."""
+    sql = """
+    SELECT 
+        p.project_id,
+        p.name,
+        p.description,
+        p.account_id,
+        p.is_public,
+        p.icon_name,
+        p.created_at,
+        p.updated_at,
+        r.external_id AS sandbox_id,
+        r.config AS sandbox_config,
+        COUNT(*) OVER() AS total_count
+    FROM projects p
+    LEFT JOIN resources r ON p.sandbox_resource_id = r.id
+    WHERE p.account_id = :account_id
+    ORDER BY p.created_at DESC
+    LIMIT :limit OFFSET :offset
+    """
+    
+    rows = await execute(sql, {
+        "account_id": account_id,
+        "limit": limit,
+        "offset": offset
+    })
+    
+    if not rows:
+        return [], 0
+    
+    total_count = rows[0]["total_count"] if rows else 0
+    projects = [serialize_row(dict(row)) for row in rows]
+    
+    return projects, total_count
+
+
+async def get_resource_by_id(resource_id: str) -> Optional[Dict[str, Any]]:
+    """Get a resource by ID."""
+    sql = """
+    SELECT id, account_id, resource_type, external_id, config, status, created_at, updated_at
+    FROM resources
+    WHERE id = :resource_id
+    """
+    result = await execute_one(sql, {"resource_id": resource_id})
     return serialize_row(dict(result)) if result else None
 
 

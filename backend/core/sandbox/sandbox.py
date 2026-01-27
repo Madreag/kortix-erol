@@ -123,7 +123,7 @@ async def create_sandbox(password: str, project_id: str = None) -> AsyncSandbox:
     # Start supervisord in a session for new sandbox
     await start_supervisord_session(sandbox)
     
-    logger.info(f"Sandbox environment successfully initialized")
+    logger.info("Sandbox environment successfully initialized")
     return sandbox
 
 async def delete_sandbox(sandbox_id: str) -> bool:

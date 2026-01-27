@@ -21,7 +21,6 @@ import argparse
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal
-from typing import List, Dict
 
 backend_dir = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(backend_dir))
@@ -40,7 +39,7 @@ stripe.api_key = config.STRIPE_SECRET_KEY
 async def fix_new_signups(target_date: str, dry_run: bool = False):
     """Fix users stuck on 'none' tier who have active Stripe subscriptions."""
     logger.info("="*80)
-    logger.info(f"FIXING USERS STUCK ON 'NONE' TIER")
+    logger.info("FIXING USERS STUCK ON 'NONE' TIER")
     logger.info("="*80)
     
     db = DBConnection()
@@ -282,7 +281,7 @@ async def fix_renewals(target_date: str, dry_run: bool = False):
 async def fix_upgrades(target_date: str, dry_run: bool = False):
     """Fix users whose actual Stripe subscription doesn't match their database tier."""
     logger.info("="*80)
-    logger.info(f"FIXING TIER MISMATCHES")
+    logger.info("FIXING TIER MISMATCHES")
     logger.info("="*80)
     
     db = DBConnection()
@@ -434,7 +433,7 @@ Examples:
     args = parser.parse_args()
     
     logger.info("="*80)
-    logger.info(f"MISSED WEBHOOK RECOVERY SCRIPT")
+    logger.info("MISSED WEBHOOK RECOVERY SCRIPT")
     logger.info(f"Date: {args.date}")
     logger.info(f"Mode: {'DRY RUN' if args.dry_run else 'LIVE'}")
     logger.info(f"Types: {args.only if args.only else 'ALL'}")

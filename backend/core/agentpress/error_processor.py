@@ -5,7 +5,7 @@ This module provides a unified way to handle, format, and propagate errors
 throughout the agent execution pipeline using LiteLLM's standardized exceptions.
 """
 
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional
 from dataclasses import dataclass
 from core.utils.logger import logger
 

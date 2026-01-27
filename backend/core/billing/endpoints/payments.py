@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query # type: ignore
 from typing import Optional, Dict
-from decimal import Decimal
 from datetime import datetime, timezone, timedelta
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger

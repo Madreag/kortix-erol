@@ -1,6 +1,5 @@
 from typing import Dict, Optional
 
-from core.utils.config import config
 from core.utils.logger import logger
 from core.billing.shared.config import get_tier_by_price_id
 from core.billing.external.stripe import StripeAPIWrapper
@@ -165,9 +164,9 @@ class SubscriptionCheckoutHandler:
         else:
             # Use 'auto' to let Stripe detect locale from customer's browser
             session_params['locale'] = 'auto'
-            logger.debug(f"[CHECKOUT] Using locale 'auto' - Stripe will detect from browser")
+            logger.debug("[CHECKOUT] Using locale 'auto' - Stripe will detect from browser")
         
-        logger.debug(f"[CHECKOUT] Adaptive pricing enabled - Stripe will auto-detect currency from customer IP/location")
+        logger.debug("[CHECKOUT] Adaptive pricing enabled - Stripe will auto-detect currency from customer IP/location")
         
         
         return await StripeAPIWrapper.create_checkout_session(**session_params)

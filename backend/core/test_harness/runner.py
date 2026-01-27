@@ -18,9 +18,8 @@ from typing import Optional, List, Dict, Any
 from core.utils.logger import logger
 from core.utils.config import config
 
-from .prompts import TEST_PROMPTS, get_prompt, get_all_prompt_ids
+from .prompts import TEST_PROMPTS, get_prompt
 from .metrics import MetricsCollector, BenchmarkResult
-from .mock_llm import get_mock_provider
 
 
 class TestHarnessRunner:

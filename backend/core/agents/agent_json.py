@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
 from typing import Optional, Dict, List, Any
 from fastapi import APIRouter, HTTPException, Depends
-from uuid import uuid4
 
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger
-from core.templates.template_service import MCPRequirementValue, ConfigType, ProfileId, QualifiedName
+from core.templates.template_service import MCPRequirementValue
 
 from core.api_models import JsonAnalysisRequest, JsonAnalysisResponse, JsonImportRequestModel, JsonImportResponse
 from core.services.supabase import DBConnection
@@ -180,8 +179,6 @@ class JsonImportService:
         custom_configs: Optional[Dict[str, Dict[str, Any]]]
     ) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         
-        missing_profiles = []
-        missing_configs = []
         
         from core.templates.installation_service import InstallationService
         installation_service = InstallationService(self._db)
@@ -271,7 +268,7 @@ class JsonImportService:
         agent_config: Dict[str, Any]
     ) -> str:
         
-        client = await self._db.client
+        await self._db.client
         
         agent_name = request.instance_name or json_data.get('name', 'Imported Agent')
         
@@ -430,7 +427,7 @@ async def import_agent_from_json(
     logger.debug(f"Importing agent from JSON - user: {user_id}")
     
     
-    client = await db.client
+    await db.client
     from core.utils.limits_checker import check_agent_count_limit
     limit_check = await check_agent_count_limit(user_id)
     

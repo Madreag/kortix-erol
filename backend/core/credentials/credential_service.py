@@ -131,7 +131,7 @@ class CredentialService:
                 'updated_at': datetime.now(timezone.utc).isoformat()
             }).eq('credential_id', existing.data[0]['credential_id']).execute()
         
-        result = await client.table('user_mcp_credentials').insert({
+        await client.table('user_mcp_credentials').insert({
             'credential_id': credential_id,
             'account_id': account_id,
             'mcp_qualified_name': mcp_qualified_name,

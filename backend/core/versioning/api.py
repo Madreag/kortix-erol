@@ -8,12 +8,10 @@ from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from .version_service import (
     get_version_service,
     VersionService,
-    AgentVersion,
     VersionNotFoundError,
     AgentNotFoundError,
     UnauthorizedError,
-    InvalidVersionError,
-    VersionConflictError
+    InvalidVersionError
 )
 
 router = APIRouter(tags=["agent-versions"])

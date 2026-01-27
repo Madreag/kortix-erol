@@ -4,14 +4,12 @@ import mimetypes
 import asyncio
 from urllib.parse import urlparse
 from typing import Optional, Tuple
-import requests
 import aiohttp
 import logging
 from core.agentpress.tool import ToolResult, openapi_schema, tool_metadata
 from core.utils.config import config
 from core.sandbox.tool_base import SandboxToolsBase
 from core.agentpress.thread_manager import ThreadManager
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +122,7 @@ class RealityDefenderTool(SandboxToolsBase):
                     
                     # Get content type and size
                     mime_type = head_response.headers.get('Content-Type', '')
-                    content_length = head_response.headers.get('Content-Length')
+                    head_response.headers.get('Content-Length')
                 
                 # Download the file
                 async with session.get(url, headers=headers, allow_redirects=True) as response:
@@ -139,7 +137,7 @@ class RealityDefenderTool(SandboxToolsBase):
                     # Determine media type
                     media_type = self.get_media_type(url, mime_type)
                     if not media_type:
-                        raise Exception(f"Unsupported file type. URL must point to an image, audio, or video file.")
+                        raise Exception("Unsupported file type. URL must point to an image, audio, or video file.")
                     
                     # Check file size
                     max_size = self.get_max_size(media_type)
@@ -164,13 +162,13 @@ class RealityDefenderTool(SandboxToolsBase):
             file_info = await self.sandbox.fs.get_file_info(full_path)
             if file_info.is_dir:
                 raise Exception(f"Path '{cleaned_path}' is a directory, not a file.")
-        except Exception as e:
+        except Exception:
             raise Exception(f"File not found at path: '{cleaned_path}'")
         
         # Determine media type
         media_type = self.get_media_type(cleaned_path)
         if not media_type:
-            raise Exception(f"Unsupported file type. File must be an image, audio, or video file.")
+            raise Exception("Unsupported file type. File must be an image, audio, or video file.")
         
         # Check file size
         max_size = self.get_max_size(media_type)
@@ -180,7 +178,7 @@ class RealityDefenderTool(SandboxToolsBase):
         # Read file content
         try:
             file_bytes = await self.sandbox.fs.download_file(full_path)
-        except Exception as e:
+        except Exception:
             raise Exception(f"Could not read file: {cleaned_path}")
         
         # Determine MIME type
@@ -314,7 +312,7 @@ Provide either a file path relative to /workspace (e.g., 'images/suspect.jpg') o
                                     continue
                                 else:
                                     # Out of time, return error
-                                    return self.fail_response(f"Reality Defender API timeout - analysis is taking longer than expected. Please try again later.")
+                                    return self.fail_response("Reality Defender API timeout - analysis is taking longer than expected. Please try again later.")
                             else:
                                 # Other errors should be raised
                                 raise

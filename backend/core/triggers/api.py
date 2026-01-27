@@ -1,11 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends, Request, Body, Query
+from fastapi import APIRouter, HTTPException, Depends, Request, Query
 from fastapi.responses import JSONResponse
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 import os
-import uuid
-from datetime import datetime, timezone
-import json
 import hmac
 
 from core.services.supabase import DBConnection
@@ -13,7 +10,6 @@ from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger
 from core.utils.config import config, EnvMode
 # Billing checks now handled by billing_integration.check_model_and_billing_access
-from core.billing.credits.integration import billing_integration
 
 from .trigger_service import get_trigger_service, TriggerType
 from .provider_service import get_provider_service
@@ -290,7 +286,7 @@ async def create_agent_trigger(
     
     try:
         if config.ENV_MODE != EnvMode.LOCAL:
-            client = await db.client
+            await db.client
             
             provider_service = get_provider_service(db)
             provider_trigger_type = await provider_service.get_provider_trigger_type(request.provider_id)
@@ -585,7 +581,7 @@ async def trigger_webhook(
         raw_data = {}
         try:
             raw_data = await request.json()
-        except:
+        except Exception:
             pass
         
         # Process trigger event
@@ -633,7 +629,7 @@ async def trigger_webhook(
             else:
                 logger.warning(f"Trigger {trigger_id} not found for execution")
         
-        logger.debug(f"Webhook processed but no execution needed")
+        logger.debug("Webhook processed but no execution needed")
         return JSONResponse(content={
             "success": True,
             "message": "Trigger processed successfully (no execution needed)",

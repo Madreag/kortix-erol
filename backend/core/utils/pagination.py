@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional, TypeVar, Generic, Callable, Awaitable
+from typing import List, Dict, Any, Optional, TypeVar, Generic, Callable
 from pydantic import BaseModel
 from dataclasses import dataclass
 from core.utils.logger import logger

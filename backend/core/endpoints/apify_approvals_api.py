@@ -10,8 +10,7 @@ from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger
 from core.services.supabase import DBConnection
 from core.tools.apify_tool import ApifyTool
-from core.agentpress.thread_manager import ThreadManager
-from core.services.redis import get_client, get as redis_get, set as redis_set
+from core.services.redis import get_client, set as redis_set
 from core.utils.distributed_lock import DistributedLock
 from datetime import datetime, timezone
 import json
@@ -158,7 +157,6 @@ async def approve_apify_request(
                 )
             
             # Now deduct credits (status is already 'approved', so retry won't double-charge)
-            deduction_success = False
             if max_cost_usd > 0:
                 try:
                     from core.billing.credits.manager import CreditManager
@@ -173,7 +171,6 @@ async def approve_apify_request(
                     )
                     
                     if result.get('success'):
-                        deduction_success = True
                         approval['deducted_on_approve_credits'] = float(max_cost_with_markup)
                         approval['deducted_on_approve_usd'] = float(max_cost_usd)
                         logger.info(f"✅ Deducted ${max_cost_with_markup:.6f} USD (with markup) on approve for {approval_id} (max cost hold: ${max_cost_usd:.6f} USD)")

@@ -5,9 +5,8 @@ Provides context for streaming tool outputs back to the frontend in real-time.
 """
 
 import json
-import asyncio
 from contextvars import ContextVar
-from typing import Optional, Dict, Any
+from typing import Optional
 from dataclasses import dataclass
 
 from core.utils.logger import logger
@@ -66,7 +65,7 @@ async def stream_tool_output(
 ) -> None:
     ctx = get_tool_output_streaming_context()
     if not ctx:
-        logger.debug(f"[STREAM] No tool output streaming context available, skipping output stream")
+        logger.debug("[STREAM] No tool output streaming context available, skipping output stream")
         return
     
     try:

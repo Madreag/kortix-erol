@@ -13,13 +13,23 @@ from sqlalchemy.pool import NullPool, AsyncAdaptedQueuePool
 from sqlalchemy.exc import OperationalError, InterfaceError
 
 from core.utils.config import EnvMode
+from enum import Enum
 
 from psycopg.types.json import set_json_dumps, set_json_loads
+
+
+class QueryType(Enum):
+    """Database query type for read replica routing."""
+    READ = "read"
+    WRITE = "write"
+
+
 from core.utils.logger import logger
 
 try:
     import orjson
-    _json_serialize = lambda obj: orjson.dumps(obj).decode('utf-8')
+    def _json_serialize(obj):
+        return orjson.dumps(obj).decode('utf-8')
     _json_deserialize = orjson.loads
 except ImportError:
     import json
@@ -29,7 +39,7 @@ except ImportError:
 set_json_dumps(_json_serialize)
 set_json_loads(_json_deserialize)
 
-from core.utils.config import config, EnvMode
+from core.utils.config import config
 
 def _get_db_config():
     """

@@ -1,11 +1,9 @@
-import asyncio
 from typing import Optional, List
 from core.agentpress.tool import ToolResult, openapi_schema, tool_metadata
 from core.sandbox.tool_base import SandboxToolsBase
 from core.agentpress.thread_manager import ThreadManager
 from core.utils.config import config
-from core.knowledge_base.validation import FileNameValidator, ValidationError
-from core.utils.logger import logger
+from core.knowledge_base.validation import FileNameValidator
 
 @tool_metadata(
     display_name="Knowledge Base",
@@ -385,11 +383,11 @@ class SandboxKbTool(SandboxToolsBase):
                         folder_structure[folder_name] = []
                     folder_structure[folder_name].append(filename)
                     
-                except Exception as e:
+                except Exception:
                     continue
             
             # Create README
-            readme_content = f"""# Global Knowledge Base
+            readme_content = """# Global Knowledge Base
 
 This directory contains your agent's knowledge base files, synced from the cloud.
 
@@ -463,7 +461,6 @@ Agent ID: {agent_id}
             if not agent_id:
                 return self.fail_response("No agent ID found for knowledge base operations")
             
-            from core.knowledge_base.validation import validate_folder_name_unique
             client = await self.thread_manager.db.client
             
             # Get agent's account ID
@@ -549,7 +546,6 @@ Agent ID: {agent_id}
             if not agent_id:
                 return self.fail_response("No agent ID found for knowledge base operations")
             
-            from core.services.supabase import DBConnection
             from core.knowledge_base.file_processor import FileProcessor
             import os
             import mimetypes

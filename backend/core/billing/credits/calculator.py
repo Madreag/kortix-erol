@@ -20,7 +20,7 @@ def calculate_token_cost(prompt_tokens: int, completion_tokens: int, model: str)
         
         # Skip cost calculation for test harness mock model
         if model == "mock-ai":
-            logger.debug(f"[COST_CALC] Skipping cost calculation for mock-ai (test harness)")
+            logger.debug("[COST_CALC] Skipping cost calculation for mock-ai (test harness)")
             return Decimal('0')
         
         # Use get_pricing which handles registry models, aliases, and fallback LiteLLM IDs

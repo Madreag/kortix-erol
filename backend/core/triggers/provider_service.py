@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 from abc import ABC, abstractmethod
@@ -615,7 +614,7 @@ class ComposioEventProvider(TriggerProvider):
             composio_trigger_id = trigger.config.get("composio_trigger_id")
             
             if not composio_trigger_id or not self._api_key:
-                logger.info(f"TEARDOWN: Skipping - no composio_id or api_key")
+                logger.info("TEARDOWN: Skipping - no composio_id or api_key")
                 return True
             
             # Check if other ACTIVE triggers are using this composio_trigger_id

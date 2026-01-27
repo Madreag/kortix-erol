@@ -69,7 +69,30 @@ export function NavWorkers() {
 
   return (
     <div className="flex flex-col h-full pt-4">
-      <div className="relative mb-3">
+      {/* Create Worker button - at the top for visibility */}
+      <div className="mb-3 shrink-0">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start gap-2 h-10"
+          onClick={handleCreateWorker}
+        >
+          {isFreeTier ? (
+            <>
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-primary">Create Worker</span>
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4" />
+              <span>Create Worker</span>
+            </>
+          )}
+        </Button>
+      </div>
+
+      {/* Search box - fixed height */}
+      <div className="relative mb-3 shrink-0">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <input
           type="text"
@@ -80,7 +103,8 @@ export function NavWorkers() {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+      {/* Worker list - scrollable */}
+      <div className="flex-1 min-h-0 overflow-y-auto space-y-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <KortixLoader size="small" />
@@ -150,27 +174,6 @@ export function NavWorkers() {
             )}
           </>
         )}
-      </div>
-
-      <div className="pt-3 border-t border-border/50 mt-3">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2 h-10"
-          onClick={handleCreateWorker}
-        >
-          {isFreeTier ? (
-            <>
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-primary">Create Worker</span>
-            </>
-          ) : (
-            <>
-              <Plus className="h-4 w-4" />
-              <span>Create Worker</span>
-            </>
-          )}
-        </Button>
       </div>
 
       <NewAgentDialog

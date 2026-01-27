@@ -4,7 +4,7 @@ from core.agentpress.tool import ToolResult, openapi_schema, tool_metadata
 from core.agentpress.thread_manager import ThreadManager
 from .base_tool import AgentBuilderBaseTool
 from core.utils.logger import logger
-from core.utils.core_tools_helper import ensure_core_tools_enabled, is_core_tool
+from core.utils.core_tools_helper import ensure_core_tools_enabled
 from core.utils.tool_discovery import validate_tool_config
 
 @tool_metadata(

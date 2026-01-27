@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import stripe # type: ignore
 
 from core.utils.logger import logger
-from core.billing.shared.config import get_tier_by_price_id, get_price_type
+from core.billing.shared.config import get_tier_by_price_id
 from core.billing.external.stripe import StripeAPIWrapper
 from ..repositories.credit_account import CreditAccountRepository
 

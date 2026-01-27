@@ -2,14 +2,14 @@ import asyncio
 import time
 import uuid
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from dataclasses import dataclass, field
 
 from daytona_sdk import SessionExecuteRequest, SandboxState
 
 from core.utils.logger import logger
 from core.sandbox.pool_config import get_pool_config, SandboxPoolConfig
-from core.sandbox.sandbox import create_sandbox, delete_sandbox, get_or_start_sandbox, daytona
+from core.sandbox.sandbox import create_sandbox, delete_sandbox, daytona
 from core.sandbox import pool_repo
 
 

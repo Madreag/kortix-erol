@@ -181,5 +181,5 @@ echo ""
 fi
 echo "  Dashboard: python dashboard.py"
 echo "  Logs: $LOG_DIR/"
-echo "  Stop: ./scripts/stop.sh"
+echo "  Stop: ./stop.sh"
 echo ""

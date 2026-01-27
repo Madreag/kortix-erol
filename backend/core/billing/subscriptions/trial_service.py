@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from typing import Dict, Optional
+from typing import Dict
 from datetime import datetime, timezone
 import stripe
 from core.utils.config import config
@@ -8,11 +8,9 @@ from core.billing import repo as billing_repo
 from ..shared.config import (
     TRIAL_ENABLED,
     TRIAL_DURATION_DAYS,
-    TRIAL_TIER,
     TRIAL_CREDITS,
 )
-from ..credits.manager import credit_manager
-from ..external.stripe import generate_trial_idempotency_key, StripeAPIWrapper
+from ..external.stripe import StripeAPIWrapper
 
 
 class TrialService:

@@ -9,7 +9,6 @@ from core.utils.config import config
 from core.services.supabase import DBConnection
 from .service import ReferralService
 from .config import MAX_EARNABLE_CREDITS_FROM_REFERRAL
-from core.utils.config import config
 
 router = APIRouter(prefix="/referrals", tags=["referrals"])
 

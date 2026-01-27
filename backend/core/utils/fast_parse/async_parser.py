@@ -1,13 +1,11 @@
 from __future__ import annotations
 import asyncio
-import base64
-import io
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, BinaryIO, Callable
 
-from .parser import FastParse, ParseResult, ParseError, FileType
+from .parser import FastParse, ParseResult, FileType
 from .config import FastParseConfig, DEFAULT_CONFIG
 
 

@@ -190,7 +190,7 @@ async def publish_template(
     user_id: str = Depends(verify_and_get_user_id_from_jwt)
 ):
     try:
-        template = await validate_template_ownership_and_get(template_id, user_id)
+        await validate_template_ownership_and_get(template_id, user_id)
         
         logger.debug(f"User {user_id} publishing template {template_id}")
         
@@ -230,7 +230,7 @@ async def unpublish_template(
     user_id: str = Depends(verify_and_get_user_id_from_jwt)
 ):
     try:
-        template = await validate_template_ownership_and_get(template_id, user_id)
+        await validate_template_ownership_and_get(template_id, user_id)
         
         logger.debug(f"User {user_id} unpublishing template {template_id}")
         
@@ -262,7 +262,7 @@ async def delete_template(
     user_id: str = Depends(verify_and_get_user_id_from_jwt)
 ):
     try:
-        template = await validate_template_ownership_and_get(template_id, user_id)
+        await validate_template_ownership_and_get(template_id, user_id)
         
         logger.debug(f"User {user_id} deleting template {template_id}")
         
@@ -295,7 +295,7 @@ async def install_template(
 ):
     try:
         await validate_template_access_and_get(request.template_id, user_id)
-        client = await db.client
+        await db.client
         from core.utils.limits_checker import check_agent_count_limit
         limit_check = await check_agent_count_limit(user_id)
         
@@ -358,7 +358,6 @@ async def install_template(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-from core.utils.pagination import PaginationParams
 
 class MarketplacePaginationInfo(BaseModel):
     current_page: int
@@ -442,7 +441,7 @@ async def get_marketplace_templates(
                 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
                 user_id = await verify_and_get_user_id_from_jwt(request)
                 creator_id_filter = user_id
-            except Exception as e:
+            except Exception:
                 raise HTTPException(status_code=401, detail="Authentication required for 'mine' filter")
         
         tags_list = []

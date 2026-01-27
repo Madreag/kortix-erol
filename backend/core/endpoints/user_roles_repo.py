@@ -1,9 +1,8 @@
 """
 User Roles Repository - Direct Postgres queries
 """
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 from core.services.db import execute_one
-from core.utils.logger import logger
 
 
 async def get_user_admin_role(user_id: str) -> Dict[str, Any]:

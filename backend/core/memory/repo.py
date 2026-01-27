@@ -1,6 +1,5 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 from core.services.db import execute, execute_one, execute_mutate
-from core.utils.logger import logger
 
 
 async def count_user_memories(account_id: str) -> int:

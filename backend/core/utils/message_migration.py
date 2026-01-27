@@ -11,9 +11,7 @@ Can be run:
 3. One-time - migrate entire database
 """
 
-import json
 import uuid
-import re
 from typing import Dict, Any, List, Optional
 from core.utils.logger import logger
 from core.agentpress.xml_tool_parser import strip_xml_tool_calls, parse_xml_tool_calls
@@ -176,7 +174,7 @@ def migrate_tool_message(message: Dict[str, Any], assistant_messages: Optional[L
     """
     content = safe_json_parse(message.get('content', '{}'), {})
     metadata = safe_json_parse(message.get('metadata', '{}'), {})
-    message_id = message.get('message_id')
+    message.get('message_id')
     
     # PREFER frontend_content if available (it has both result and arguments nicely structured)
     frontend_content = metadata.get('frontend_content', {})
@@ -247,7 +245,7 @@ def migrate_tool_message(message: Dict[str, Any], assistant_messages: Optional[L
                             "output": parsed_content,
                             "error": None
                         }
-                except:
+                except Exception:
                     result_data = {
                         "success": True,
                         "output": content_value,
@@ -290,7 +288,7 @@ def migrate_tool_message(message: Dict[str, Any], assistant_messages: Optional[L
                         "output": parsed,
                         "error": None
                     }
-            except:
+            except Exception:
                 # Fallback: use content as-is
                 function_name = "unknown"
                 result_data = {
@@ -512,7 +510,7 @@ async def migrate_thread_messages(client, thread_id: str, save: bool = False) ->
         # Separate assistant and tool messages
         assistant_messages = [m for m in all_messages if m.get('type') == 'assistant']
         tool_messages = [m for m in all_messages if m.get('type') == 'tool']
-        other_messages = [m for m in all_messages if m.get('type') not in ['assistant', 'tool']]
+        [m for m in all_messages if m.get('type') not in ['assistant', 'tool']]
         
         # Migrate assistant messages first
         for msg in assistant_messages:

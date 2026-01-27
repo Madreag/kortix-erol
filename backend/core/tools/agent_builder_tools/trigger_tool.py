@@ -1,13 +1,10 @@
-import json
 import re
+import httpx
 from typing import Optional, Dict, Any, List
 from core.agentpress.tool import ToolResult, openapi_schema, tool_metadata
 from core.agentpress.thread_manager import ThreadManager
 from .base_tool import AgentBuilderBaseTool
 from core.utils.logger import logger
-from core.utils.config import config, EnvMode
-from datetime import datetime
-from core.services.supabase import DBConnection
 from core.services.http_client import get_http_client
 from core.triggers import get_trigger_service
 import os
@@ -175,12 +172,12 @@ class TriggerTool(AgentBuilderBaseTool):
                 result_message = f"Scheduled trigger '{name}' created successfully!\n\n"
                 result_message += f"**Schedule**: {cron_expression}\n"
                 result_message += f"**Model**: {trigger_config['model']}\n"
-                result_message += f"**Type**: Worker execution\n"
+                result_message += "**Type**: Worker execution\n"
                 result_message += f"**Prompt**: {agent_prompt}\n"
                 if variables:
                     result_message += f"**Template Variables Detected**: {', '.join(['{{' + v + '}}' for v in variables])}\n"
-                    result_message += f"*Note: Users will be prompted to provide values for these variables when installing this agent as a template.*\n"
-                result_message += f"\nThe trigger is now active and will run according to the schedule."
+                    result_message += "*Note: Users will be prompted to provide values for these variables when installing this agent as a template.*\n"
+                result_message += "\nThe trigger is now active and will run according to the schedule."
                 
                 # Sync triggers to version config
                 try:
@@ -199,7 +196,7 @@ class TriggerTool(AgentBuilderBaseTool):
                         "variables": variables if variables else []
                     }
                 })
-            except ValueError as ve:
+            except ValueError:
                 return self.fail_response("Validation error")
             except Exception as e:
                 logger.error(f"Error creating trigger through manager: {str(e)}")
@@ -547,7 +544,7 @@ class TriggerTool(AgentBuilderBaseTool):
                 resp = await http_client.post(upsert_url, headers=headers, json=body, timeout=20.0)
                 try:
                     resp.raise_for_status()
-                except httpx.HTTPStatusError as e:
+                except httpx.HTTPStatusError:
                     ct = resp.headers.get("content-type", "")
                     detail = resp.json() if "application/json" in ct else resp.text
                     logger.error(f"Composio upsert error - status: {resp.status_code}, detail: {detail}")
@@ -626,7 +623,7 @@ class TriggerTool(AgentBuilderBaseTool):
             message += "Worker execution configured."
             if variables:
                 message += f"\n**Template Variables Detected**: {', '.join(['{{' + v + '}}' for v in variables])}\n"
-                message += f"*Note: Users will be prompted to provide values for these variables when installing this agent as a template.*"
+                message += "*Note: Users will be prompted to provide values for these variables when installing this agent as a template.*"
 
             return self.success_response({
                 "message": message,

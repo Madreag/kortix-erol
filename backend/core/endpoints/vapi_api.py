@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException
 from core.endpoints.vapi_webhooks import VapiWebhookHandler
 from core.utils.logger import logger
-from core.utils.config import config
-from typing import Dict, Any
 
 router = APIRouter(tags=["vapi"])
 

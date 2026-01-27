@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 from decimal import Decimal
 from datetime import datetime, timezone, timedelta
 from core.utils.logger import logger

@@ -12,8 +12,7 @@ from typing import Any, Dict, List, Optional, Callable, Union
 from dataclasses import dataclass, field
 from datetime import datetime
 
-import braintrust
-from braintrust import Eval, init_logger
+from braintrust import init_logger
 
 # Load config FIRST to get env vars
 from core.utils.config import config
@@ -91,7 +90,7 @@ class AgentEvalRunner:
         if self.project_id:
             logger.info(f"🔧 Using existing project {self.project_id} for evals")
         else:
-            logger.info(f"🔧 Will create new project per eval case (sandbox tools enabled)")
+            logger.info("🔧 Will create new project per eval case (sandbox tools enabled)")
         
         # Speed up evals by disabling expensive features
         os.environ["EVAL_MODE"] = "true"
@@ -117,7 +116,6 @@ class AgentEvalRunner:
         if self._test_user_initialized and self.test_account_id:
             return self.test_account_id
         
-        from core.utils.config import config
         
         # For evals, just use the system admin user
         if hasattr(config, 'SYSTEM_ADMIN_USER_ID') and config.SYSTEM_ADMIN_USER_ID:
@@ -417,7 +415,7 @@ class AgentEvalRunner:
                                         if isinstance(args, str):
                                             try:
                                                 args = json.loads(args)
-                                            except:
+                                            except Exception:
                                                 pass
                                         if isinstance(args, dict):
                                             clean_output = args.get('text', args.get('message', ''))
@@ -466,7 +464,7 @@ class AgentEvalRunner:
                                         if isinstance(content_dict, dict):
                                             # Look for text in the tool result
                                             output = content_dict.get('text', content_dict.get('message', ''))
-                                    except:
+                                    except Exception:
                                         # If not JSON, use as-is
                                         if content.strip():
                                             output = content
@@ -491,7 +489,7 @@ class AgentEvalRunner:
                                                     try:
                                                         import json
                                                         args = json.loads(args)
-                                                    except:
+                                                    except Exception:
                                                         pass
                                                 if isinstance(args, dict):
                                                     output = args.get('text', args.get('message', ''))
@@ -741,14 +739,12 @@ def create_agent_task(
                 pass
             
             try:
-                from core.services.redis import _redis_client
                 import core.services.redis as redis_module
                 redis_module._redis_client = None
             except Exception:
                 pass
             
             try:
-                from core.utils.db_helpers import _db_instance
                 import core.utils.db_helpers as db_helpers_module
                 db_helpers_module._db_instance = None
             except Exception:

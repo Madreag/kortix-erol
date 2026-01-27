@@ -18,9 +18,8 @@ backend_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..')
 sys.path.append(backend_dir)
 
 from core.services.supabase import DBConnection
-from core.billing.shared.config import get_tier_by_price_id, TIERS
+from core.billing.shared.config import get_tier_by_price_id
 from core.billing.credits.manager import credit_manager
-from core.utils.logger import logger
 import stripe
 from core.utils.config import config
 
@@ -75,7 +74,7 @@ async def find_user_by_email(email: str, client):
                             'email': email,
                             'account_name': account['name']
                         }
-                except:
+                except Exception:
                     continue
                     
             print(f"❌ User with email {email} not found via fallback either")

@@ -1,7 +1,6 @@
 from typing import List, Dict, Any, Optional
 
 from .template_service import AgentTemplate, MCPRequirementValue, ConfigType, ProfileId, QualifiedName
-from .installation_service import TemplateInstallationError
 
 
 
@@ -110,7 +109,6 @@ def is_suna_default_agent(agent_data: Dict[str, Any]) -> bool:
 
 
 def format_template_for_response(template: AgentTemplate) -> Dict[str, Any]:
-    from core.utils.logger import logger
     
     # logger.debug(f"Formatting template {template.template_id}: usage_examples = {template.usage_examples}")
     

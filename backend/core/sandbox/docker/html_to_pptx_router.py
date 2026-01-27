@@ -8,9 +8,8 @@ Uses smart batching and resource cleanup to handle large presentations efficient
 
 import json
 import asyncio
-import os
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 import tempfile
 import shutil
 from dataclasses import dataclass
@@ -743,7 +742,7 @@ class OptimizedHTMLToPPTXConverter:
                                     containers.forEach(container => container.remove());
                                 }
                             """)
-                        except:
+                        except Exception:
                             pass
                         continue
             
@@ -778,7 +777,7 @@ class OptimizedHTMLToPPTXConverter:
                         containers.forEach(container => container.remove());
                     }
                 """)
-                print(f"🧹 Final cleanup completed: backgrounds restored, capture IDs removed")
+                print("🧹 Final cleanup completed: backgrounds restored, capture IDs removed")
             except Exception as e:
                 print(f"Warning: Failed to perform final cleanup: {e}")
             
@@ -809,7 +808,7 @@ class OptimizedHTMLToPPTXConverter:
                         elementsWithCaptureId.forEach(el => el.removeAttribute('data-capture-id'));
                     }
                 """)
-            except:
+            except Exception:
                 pass
             return []
 
@@ -906,7 +905,7 @@ class OptimizedHTMLToPPTXConverter:
             
             return background_path
             
-        except Exception as e:
+        except Exception:
             # Create a simple white background as fallback
             from PIL import Image
             background_path = temp_dir / f"clean_background_{html_path.stem}.png"
@@ -1083,7 +1082,7 @@ class OptimizedHTMLToPPTXConverter:
                         else:
                             try:
                                 line_height = float(line_height_str)
-                            except:
+                            except Exception:
                                 line_height = 1.2
                     
                     # Parse color - handle complex color scenarios
@@ -1204,7 +1203,7 @@ class OptimizedHTMLToPPTXConverter:
                     spacing_px = float(letter_spacing[:-2])
                     if hasattr(font, 'character_spacing'):
                         font.character_spacing = spacing_px
-                except:
+                except Exception:
                     pass
             
             # Handle text transform
@@ -1251,7 +1250,7 @@ class OptimizedHTMLToPPTXConverter:
     
     async def build_slide_from_analysis(self, presentation, slide_analysis: Dict, temp_dir: Path) -> None:
         """Build a PowerPoint slide from pre-analyzed data."""
-        slide_info = slide_analysis['slide_info']
+        slide_analysis['slide_info']
         visual_elements = slide_analysis['visual_elements']
         background_path = slide_analysis['background_path']
         text_elements = slide_analysis['text_elements']
@@ -1334,7 +1333,7 @@ class OptimizedHTMLToPPTXConverter:
                     async def process_single_slide(slide_info: Dict) -> Dict:
                         """Process a single slide with controlled concurrency."""
                         async with semaphore:
-                            slide_num = slide_info['number']
+                            slide_info['number']
                             
                             try:
                                 # Create a new page for this slide
@@ -1492,7 +1491,7 @@ class OptimizedHTMLToPPTXConverter:
                 try:
                     with open(temp_output_path, 'rb') as f:
                         pptx_content = f.read()
-                except Exception as e:
+                except Exception:
                     raise
                 
                 return pptx_content, len(presentation.slides), presentation_name

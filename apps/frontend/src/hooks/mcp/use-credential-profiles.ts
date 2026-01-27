@@ -239,7 +239,7 @@ export function useGetDefaultProfile(mcpQualifiedName: string | null) {
 }
 
 export function useHasCredentialProfiles(mcpQualifiedName: string | null) {
-  const { data: profiles, isLoading } = useCredentialProfilesForMcp(mcpQualifiedName);
+  const { data: profiles, isPending: isLoading } = useCredentialProfilesForMcp(mcpQualifiedName);
   return {
     hasProfiles: (profiles?.length || 0) > 0,
     profileCount: profiles?.length || 0,

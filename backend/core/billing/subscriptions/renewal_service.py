@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Dict, List, Optional
 from datetime import datetime, timezone
 from core.billing import repo as billing_repo
@@ -72,7 +71,7 @@ class RenewalService:
         try:
             from core.billing.credits.manager import credit_manager
             
-            result = await credit_manager.add_credits(
+            await credit_manager.add_credits(
                 account_id=account_id,
                 amount=monthly_credits,
                 is_expiring=True,

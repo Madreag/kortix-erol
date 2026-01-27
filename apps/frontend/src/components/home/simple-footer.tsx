@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { siteConfig } from '@/lib/site-config';
 import { KortixLogo } from '@/components/sidebar/kortix-logo';
@@ -8,7 +9,11 @@ import { ThemeToggle } from '@/components/home/theme-toggle';
 import { useGitHubStars } from '@/hooks/utils';
 
 export function SimpleFooter() {
-  const currentYear = new Date().getFullYear();
+  // Use state with useEffect to avoid new Date() during SSR/prerender
+  const [currentYear, setCurrentYear] = useState(2026);
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
   const { formattedStars, loading: starsLoading } = useGitHubStars('kortix-ai', 'suna');
 
   return (

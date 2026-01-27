@@ -196,7 +196,6 @@ logger: structlog.stdlib.BoundLogger = structlog.get_logger()
 
 from pathlib import Path
 from datetime import datetime
-from typing import Optional, Any
 import time
 
 class FileDebugLogger:
@@ -254,7 +253,7 @@ class FileDebugLogger:
             line = f"[{elapsed_ms:10.1f}ms] {message}{extras_str}\n"
             file.write(line)
             file.flush()
-        except Exception as e:
+        except Exception:
             pass
     
     def close(self, session: str = None, category: str = None):
@@ -263,7 +262,7 @@ class FileDebugLogger:
             if key in self._files:
                 try:
                     self._files[key].close()
-                except:
+                except Exception:
                     pass
                 del self._files[key]
                 if key in self._start_times:
@@ -272,7 +271,7 @@ class FileDebugLogger:
             for f in self._files.values():
                 try:
                     f.close()
-                except:
+                except Exception:
                     pass
             self._files.clear()
             self._start_times.clear()
@@ -282,7 +281,7 @@ class FileDebugLogger:
         for key in keys_to_remove:
             try:
                 self._files[key].close()
-            except:
+            except Exception:
                 pass
             del self._files[key]
             if key in self._start_times:

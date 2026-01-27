@@ -42,7 +42,7 @@ class CreditRepository:
     def log_renewal_result(result_data: Dict, app_user_id: str) -> None:
         if not result_data:
             logger.error(
-                f"[REVENUECAT RENEWAL] No data returned from atomic_grant_renewal_credits"
+                "[REVENUECAT RENEWAL] No data returned from atomic_grant_renewal_credits"
             )
             return
         
@@ -137,5 +137,5 @@ class CreditRepository:
                 "transaction_id": transaction_id,
                 "error_message": error_message
             })
-        except:
+        except Exception:
             pass

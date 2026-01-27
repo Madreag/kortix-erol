@@ -19,8 +19,8 @@ class ProductChangeHandler:
 
         if not new_product_id:
             logger.warning(
-                f"[REVENUECAT PRODUCT_CHANGE] No new_product_id - this might be a "
-                f"cancellation/reactivation, not an actual product change. Skipping."
+                "[REVENUECAT PRODUCT_CHANGE] No new_product_id - this might be a "
+                "cancellation/reactivation, not an actual product change. Skipping."
             )
             return
         

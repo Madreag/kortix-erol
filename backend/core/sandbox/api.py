@@ -9,17 +9,17 @@ from datetime import datetime, timezone
 from enum import Enum
 
 import httpx
-from fastapi import FastAPI, UploadFile, File, HTTPException, APIRouter, Form, Depends, Request, WebSocket, WebSocketDisconnect
+from fastapi import UploadFile, File, HTTPException, APIRouter, Form, Depends, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response
 from pydantic import BaseModel
 from daytona_sdk import AsyncSandbox, SessionExecuteRequest
 
-from core.sandbox.sandbox import get_or_start_sandbox, delete_sandbox, create_sandbox, daytona
+from core.sandbox.sandbox import get_or_start_sandbox, delete_sandbox, daytona
 from core.utils.logger import logger
 from core.utils.auth_utils import get_optional_user_id, verify_and_get_user_id_from_jwt, verify_sandbox_access, verify_sandbox_access_optional
 from core.services.supabase import DBConnection
 from core.utils.sandbox_utils import generate_unique_filename, get_uploads_directory
-from core.utils.file_name_generator import rename_ugly_files, has_ugly_name
+from core.utils.file_name_generator import rename_ugly_files
 
 T = TypeVar('T')
 
@@ -343,7 +343,7 @@ async def list_files(
     try:
         # Verify the user has access to this sandbox
         await verify_sandbox_access_optional(client, sandbox_id, user_id)
-    except HTTPException as http_err:
+    except HTTPException:
         # Re-raise HTTP exceptions as-is (they already have proper status codes)
         raise
     except Exception as access_err:
@@ -356,7 +356,7 @@ async def list_files(
         elif 'authentication required' in error_str or '401' in error_str:
             raise HTTPException(status_code=401, detail="Authentication required for this private project")
         elif 'not authorized' in error_str or 'forbidden' in error_str or '403' in error_str:
-            raise HTTPException(status_code=403, detail=f"Access denied: Not authorized to access this sandbox")
+            raise HTTPException(status_code=403, detail="Access denied: Not authorized to access this sandbox")
         else:
             # For other errors, return 500 but with a clear message
             raise HTTPException(status_code=500, detail=f"Error verifying sandbox access: {str(access_err)}")
@@ -449,7 +449,7 @@ async def read_file(
     try:
         # Verify the user has access to this sandbox
         await verify_sandbox_access_optional(client, sandbox_id, user_id)
-    except HTTPException as http_err:
+    except HTTPException:
         # Re-raise HTTP exceptions as-is (they already have proper status codes)
         raise
     except Exception as access_err:
@@ -462,7 +462,7 @@ async def read_file(
         elif 'authentication required' in error_str or '401' in error_str:
             raise HTTPException(status_code=401, detail="Authentication required for this private project")
         elif 'not authorized' in error_str or 'forbidden' in error_str or '403' in error_str:
-            raise HTTPException(status_code=403, detail=f"Access denied: Not authorized to access this sandbox")
+            raise HTTPException(status_code=403, detail="Access denied: Not authorized to access this sandbox")
         else:
             # For other errors, return 500 but with a clear message
             raise HTTPException(status_code=500, detail=f"Error verifying sandbox access: {str(access_err)}")
@@ -614,7 +614,7 @@ async def ensure_project_sandbox_active(
                 raise HTTPException(status_code=403, detail="Not authorized to access this project")
     
     try:
-        from core.resources import ResourceService, ResourceType
+        from core.resources import ResourceService
         
         resource_service = ResourceService(client)
         sandbox_resource = await resource_service.get_project_sandbox_resource(project_id)
@@ -625,7 +625,7 @@ async def ensure_project_sandbox_active(
         sandbox_id = sandbox_resource.get('external_id')
         
         logger.debug(f"Ensuring sandbox is active for project {project_id}")
-        sandbox = await get_or_start_sandbox(sandbox_id)
+        await get_or_start_sandbox(sandbox_id)
         
         # Update last_used_at
         try:
@@ -681,7 +681,7 @@ async def get_project_sandbox_details(
                 raise HTTPException(status_code=403, detail="Not authorized to access this project")
     
     try:
-        from core.resources import ResourceService, ResourceType
+        from core.resources import ResourceService
         
         resource_service = ResourceService(client)
         sandbox_resource = await resource_service.get_project_sandbox_resource(project_id)
@@ -1099,7 +1099,7 @@ async def get_sandbox_status_by_id(
         client = await db.client
         from core.resources import ResourceService, ResourceType
 
-        resource_service = ResourceService(client)
+        ResourceService(client)
         # Find resource by external_id (sandbox_id) - column is 'type' not 'resource_type'
         resource_result = await client.table('resources').select('*').eq('external_id', sandbox_id).eq('type', ResourceType.SANDBOX.value).execute()
 
@@ -1972,7 +1972,7 @@ async def list_files_at_commit(
             if len(meta_parts) < 3:
                 continue
             
-            mode, obj_type, obj_hash = meta_parts[0], meta_parts[1], meta_parts[2]
+            mode, obj_type, _obj_hash = meta_parts[0], meta_parts[1], meta_parts[2]
             name = parts[1]
 
             is_dir = obj_type == "tree"
@@ -2366,7 +2366,7 @@ async def websocket_pty_terminal(
             elif message.get("type") == "websocket.disconnect":
                 return
             else:
-                await websocket.send_json({"type": "error", "message": f"Unexpected message type"})
+                await websocket.send_json({"type": "error", "message": "Unexpected message type"})
                 await websocket.close()
                 return
                 
@@ -2467,7 +2467,7 @@ async def websocket_pty_terminal(
         logger.error(f"[PTY WS] Error for sandbox {sandbox_id}: {str(e)}")
         try:
             await websocket.send_json({"type": "error", "message": str(e)})
-        except:
+        except Exception:
             pass
     finally:
         if pty_handle:
@@ -2478,7 +2478,7 @@ async def websocket_pty_terminal(
                 logger.warning(f"[PTY WS] Error killing PTY session: {e}")
         try:
             await websocket.close()
-        except:
+        except Exception:
             pass
 
 

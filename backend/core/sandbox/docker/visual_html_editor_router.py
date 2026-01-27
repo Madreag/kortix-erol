@@ -6,13 +6,10 @@ Provides visual HTML editing endpoints as a FastAPI router that can be included 
 """
 
 import os
-import re
-from typing import Optional, Dict, Any
-from pathlib import Path
+from typing import Dict, Any
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from bs4 import BeautifulSoup, NavigableString, Comment
 
@@ -114,7 +111,6 @@ async def get_editable_elements(file_path: str):
             
             # Strategy 2: Elements with mixed content - wrap raw text nodes individually
             elif element.contents:
-                has_mixed_content = False
                 # Process each child node
                 for child in list(element.contents):  # Use list() to avoid modification during iteration
                     # Skip comment nodes (Comments are a subclass of NavigableString)
@@ -143,7 +139,6 @@ async def get_editable_elements(file_path: str):
                                 'innerHTML': text_content
                             })
                             editable_counter += 1
-                            has_mixed_content = True
                 
                 # Removed fallback - prevents complex containers from becoming editable text
         
@@ -396,7 +391,6 @@ def inject_editor_functionality(html_content: str, file_path: str) -> str:
         
         # Strategy 2: Elements with mixed content - wrap raw text nodes individually
         elif element.contents:
-            has_mixed_content = False
             # Process each child node
             for child in list(element.contents):  # Use list() to avoid modification during iteration
                 # Skip comment nodes (Comments are a subclass of NavigableString)
@@ -417,7 +411,6 @@ def inject_editor_functionality(html_content: str, file_path: str) -> str:
                         # Replace the text node with the wrapped span
                         child.replace_with(wrapper_span)
                         editable_counter += 1
-                        has_mixed_content = True
             
             # Removed fallback - prevents complex containers from becoming editable text
     

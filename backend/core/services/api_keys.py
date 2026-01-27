@@ -10,8 +10,8 @@ This module provides functionality for managing API keys including:
 
 import asyncio
 from datetime import datetime, timezone, timedelta
-from typing import Optional, List, Dict
-from uuid import UUID, uuid4
+from typing import Optional, List
+from uuid import UUID
 import secrets
 import string
 import hmac

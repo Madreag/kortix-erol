@@ -3,7 +3,7 @@ import time
 import uuid
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional
 
 from core.utils.logger import logger
 
@@ -153,7 +153,6 @@ class TransactionalWriter:
         credit_amount: Decimal,
     ) -> TransactionResult:
         from core.threads import repo as threads_repo
-        from core.billing.credits.manager import credit_manager
 
         start_time = time.time()
         transaction_id = str(uuid.uuid4())

@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 from daytona_sdk import AsyncSandbox
 from core.utils.logger import logger
 
@@ -25,7 +24,6 @@ async def generate_unique_filename(sandbox: AsyncSandbox, base_path: str, origin
     extension = file_path.suffix
     
     # Try original filename first
-    full_path = f"{base_path}/{original_filename}"
     
     try:
         # Check if file exists by trying to list it

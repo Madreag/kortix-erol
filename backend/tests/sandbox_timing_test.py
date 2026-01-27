@@ -26,7 +26,6 @@ load_dotenv()
 
 from daytona_sdk import AsyncDaytona, DaytonaConfig, CreateSandboxFromSnapshotParams, SandboxState, SessionExecuteRequest
 from core.utils.config import config, Configuration
-from core.utils.logger import logger
 
 # Initialize Daytona client
 daytona_config = DaytonaConfig(
@@ -137,7 +136,7 @@ async def test_start_stopped_sandbox() -> TimingResult:
             result.stop(success=False, error=f"Sandbox didn't stop, state: {sandbox.state}")
             return result
         
-        print(f"   Sandbox stopped, now measuring start time...")
+        print("   Sandbox stopped, now measuring start time...")
         
         # Now measure the start time
         result.start()

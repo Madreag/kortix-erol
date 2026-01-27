@@ -111,7 +111,7 @@ def check_syntax():
         # Filter out permission errors, focus on syntax errors
         syntax_errors = [l for l in output.split('\n') if 'SyntaxError' in l or 'IndentationError' in l]
         if syntax_errors:
-            print(f"❌ Syntax errors found:")
+            print("❌ Syntax errors found:")
             for error in syntax_errors[:10]:
                 print(f"  {error}")
             return False
@@ -137,7 +137,7 @@ def check_with_ruff():
     undefined_errors = [line for line in output.split('\n') if 'F821' in line and 'Undefined name' in line]
     
     if undefined_errors:
-        print(f"❌ Found undefined name errors:")
+        print("❌ Found undefined name errors:")
         for error in undefined_errors[:10]:
             print(f"  {error}")
         return False

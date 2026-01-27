@@ -3,7 +3,6 @@ from core.services.supabase import DBConnection
 from core.utils.logger import logger
 from core.utils.config import config
 from .novu_service import novu_service
-from .presence_service import presence_service
 from .models import UserNotificationSettings
 from core.services.email import email_service
 
@@ -415,7 +414,6 @@ class NotificationService:
         payload_template: Dict[str, Any],
         account_info: Dict[str, Any]
     ) -> Dict[str, Any]:
-        import re
         import json
         
         template_str = json.dumps(payload_template)

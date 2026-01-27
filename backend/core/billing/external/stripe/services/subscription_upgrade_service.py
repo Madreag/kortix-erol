@@ -1,9 +1,9 @@
-from typing import Dict, Optional
+from typing import Dict
 from datetime import datetime, timezone
 from decimal import Decimal
 from core.utils.logger import logger
 from core.utils.distributed_lock import DistributedLock
-from core.billing.shared.config import get_tier_by_price_id, is_commitment_price_id
+from core.billing.shared.config import get_tier_by_price_id
 from ..repositories.subscription_repository import SubscriptionRepository
 from .commitment_service import CommitmentService
 from core.billing.shared.config import get_plan_type

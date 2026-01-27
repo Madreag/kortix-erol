@@ -2,12 +2,10 @@
 Agent setup from natural language description.
 """
 import json
-from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from core.utils.logger import logger
 from core.services.llm import make_llm_api_call
-from core.utils.icon_generator import generate_icon_and_colors
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.versioning.version_service import get_version_service as _get_version_service
 from core.utils.core_tools_helper import ensure_core_tools_enabled
@@ -17,7 +15,6 @@ from core.ai_models import model_manager
 from core.services.supabase import DBConnection
 
 db = DBConnection()
-from core.api_models import AgentResponse
 
 router = APIRouter(tags=["agents"])
 
@@ -59,7 +56,7 @@ Example:
         user_message = f"Generate name and system prompt for:\n\n{description}"
         messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_message}]
 
-        logger.debug(f"Calling LLM for name/prompt generation")
+        logger.debug("Calling LLM for name/prompt generation")
         response = await make_llm_api_call(
             messages=messages,
             model_name=model_name,
@@ -191,7 +188,7 @@ async def setup_agent_from_chat(
         agent_name = config['name']
         system_prompt = config['system_prompt']
 
-        insert_data = {
+        {
             "account_id": user_id,
             "name": agent_name,
             "icon_name": config["icon_name"],

@@ -11,7 +11,7 @@ Handles:
 import uuid
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from core.services.supabase import DBConnection
 from core.utils.logger import logger
 

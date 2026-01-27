@@ -193,7 +193,7 @@ class TaskListTool(SandboxToolsBase):
     
     def _format_response(self, sections: List[Section], tasks: List[Task]) -> Dict[str, Any]:
         """Format data for response"""
-        section_map = {s.id: s for s in sections}
+        {s.id: s for s in sections}
         grouped_tasks = {}
         
         for task in tasks:
@@ -307,7 +307,7 @@ class TaskListTool(SandboxToolsBase):
                         if was_repaired:
                             try:
                                 sections = json.loads(repaired)
-                            except json.JSONDecodeError as e2:
+                            except json.JSONDecodeError:
                                 return ToolResult(success=False, output=f"❌ Invalid JSON in sections: {str(e)}")
                         else:
                             return ToolResult(success=False, output=f"❌ Invalid JSON in sections: {str(e)}")
@@ -327,16 +327,16 @@ class TaskListTool(SandboxToolsBase):
             if task_contents is not None and isinstance(task_contents, str):
                 try:
                     task_contents = json.loads(task_contents)
-                except json.JSONDecodeError as e:
+                except json.JSONDecodeError:
                     from core.utils.json_helpers import repair_json
                     repaired, was_repaired = repair_json(task_contents)
                     if was_repaired:
                         try:
                             task_contents = json.loads(repaired)
-                        except:
-                            return ToolResult(success=False, output=f"❌ Invalid JSON in task_contents")
+                        except Exception:
+                            return ToolResult(success=False, output="❌ Invalid JSON in task_contents")
                     else:
-                        return ToolResult(success=False, output=f"❌ Invalid JSON in task_contents")
+                        return ToolResult(success=False, output="❌ Invalid JSON in task_contents")
             
             existing_sections, existing_tasks = await self._load_data()
             section_map = {s.id: s for s in existing_sections}

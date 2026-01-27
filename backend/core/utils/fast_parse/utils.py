@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 import unicodedata
-from typing import Optional, Tuple, Dict, Any, List
+from typing import Tuple, Dict, List
 from pathlib import Path
 
 from .parser import ParseResult, FileType

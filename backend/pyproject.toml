@@ -103,6 +103,19 @@ dependencies = [
   "psycopg[binary]>=3.3.2",
   "sqlalchemy>=2.0.45",
   "greenlet>=3.3.0",
+  # Litestar v2 stack for high-performance /v2 API (imp2.md)
+  "litestar[standard]>=2.0",
+  "uvloop>=0.19;sys_platform!='win32'",  # Fast event loop (Linux/macOS/WSL2 only)
+  "msgspec>=0.18",  # Fast serialization (~65% faster than Pydantic)
+  # OpenTelemetry distributed tracing (imp6.md)
+  "opentelemetry-api>=1.20.0",
+  "opentelemetry-sdk>=1.20.0",
+  "opentelemetry-instrumentation-fastapi>=0.41b0",
+  "opentelemetry-instrumentation-sqlalchemy>=0.41b0",
+  "opentelemetry-instrumentation-redis>=0.41b0",
+  "opentelemetry-instrumentation-httpx>=0.41b0",
+  "opentelemetry-instrumentation-asgi>=0.41b0",
+  "opentelemetry-exporter-otlp>=1.20.0",
 ]
 
 [project.urls]
@@ -129,3 +142,16 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore:Field name.*shadows an attribute in parent:UserWarning",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+# E402: Module import not at top - intentional for load_dotenv() pattern
+# E501: Line too long - handled by formatter
+# E701: Multiple statements on one line - minor style, common in type detection
+# E721: Type comparison with == - acceptable for type checking patterns
+# E741: Ambiguous variable name (l) - common in list comprehensions
+# F403: Star imports - intentional for re-exporting in __init__.py
+ignore = ["E402", "E501", "E701", "E721", "E741", "F403"]

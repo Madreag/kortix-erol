@@ -1,8 +1,8 @@
-from typing import Dict, Optional
+from typing import Dict
 from datetime import datetime, timezone
 
 from core.utils.logger import logger
-from core.billing.shared.config import get_tier_by_price_id, get_plan_type, TRIAL_DURATION_DAYS, TRIAL_CREDITS
+from core.billing.shared.config import get_tier_by_price_id, TRIAL_DURATION_DAYS, TRIAL_CREDITS
 from core.billing.credits.manager import credit_manager
 from ..repositories.trial_repository import TrialRepository
 from ..repositories.subscription_repository import SubscriptionRepository

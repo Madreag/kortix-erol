@@ -20,14 +20,14 @@ async def test_redis_connection():
     print("-" * 40)
     
     try:
-        client = await redis_service.initialize_async()
+        await redis_service.initialize_async()
         print("✓ Successfully connected to Redis!")
         
         info = await redis_service.get_connection_info()
         if "error" not in info:
-            print(f"\nServer Info:")
+            print("\nServer Info:")
             print(f"  Connected clients: {info['server'].get('connected_clients', 'N/A')}")
-            print(f"\nPool Info:")
+            print("\nPool Info:")
             print(f"  Max connections: {info['pool'].get('max_connections', 'N/A')}")
         
         await redis_service.set("test_key", "test_value", ex=10)

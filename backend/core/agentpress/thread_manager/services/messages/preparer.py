@@ -186,7 +186,7 @@ class MessagePreparer:
             if new_msg_tokens > 0:
                 logger.debug(f"🔧 Auto-continue: adding {new_msg_tokens} tool result tokens from state")
             else:
-                logger.debug(f"✅ Auto-continue: no tool result tokens in state")
+                logger.debug("✅ Auto-continue: no tool result tokens in state")
             auto_continue_state['tool_result_tokens'] = 0
             return new_msg_tokens
         

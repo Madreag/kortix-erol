@@ -9,12 +9,11 @@ This module defines the base classes and decorators for creating tools:
 """
 
 from typing import Dict, Any, Union, Optional, List
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from abc import ABC
 import json
 import inspect
 from enum import Enum
-from core.utils.logger import logger
 
 class SchemaType(Enum):
     """Enumeration of supported schema types for tool definitions."""

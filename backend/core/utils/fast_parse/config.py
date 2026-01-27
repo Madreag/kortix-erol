@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Set, Optional
+from typing import Set
 
 @dataclass
 class FastParseConfig:

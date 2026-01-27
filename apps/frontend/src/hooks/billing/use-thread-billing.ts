@@ -61,6 +61,6 @@ export function useThreadBilling(
   return {
     checkBillingLimits,
     canRun,
-    isLoading: accountState.isLoading,
+    isLoading: accountState.isPending,
   };
 }

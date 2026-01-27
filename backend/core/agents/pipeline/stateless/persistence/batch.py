@@ -1,7 +1,6 @@
 import asyncio
 import time
 from dataclasses import dataclass
-from decimal import Decimal
 from typing import Dict, Any, List, Optional, Tuple
 
 from core.utils.logger import logger
@@ -191,7 +190,7 @@ class BatchWriter:
                 completion_tokens = int(usage.get("completion_tokens", 0) or 0)
                 
                 if prompt_tokens == 0 and completion_tokens == 0:
-                    logger.warning(f"[BatchWriter] Zero tokens in usage data, skipping billing")
+                    logger.warning("[BatchWriter] Zero tokens in usage data, skipping billing")
                     continue
                 
                 cache_read_tokens = int(usage.get("cache_read_input_tokens", 0) or 0)

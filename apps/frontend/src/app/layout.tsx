@@ -4,7 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
 import { PresenceProvider } from '@/components/presence-provider';
-import { ReactQueryProvider } from './react-query-provider';
+import { Providers } from './providers';
 import { Toaster } from '@/components/ui/sonner';
 import '@/lib/polyfills';
 import { roobert } from './fonts/roobert';
@@ -12,6 +12,8 @@ import { roobertMono } from './fonts/roobert-mono';
 import { Suspense, lazy } from 'react';
 import { I18nProvider } from '@/components/i18n-provider';
 import { featureFlags } from '@/lib/feature-flags';
+import { SpeculationRules } from '@/components/speculation-rules';
+import { CSRFMeta } from '@/components/csrf-meta';
 
 // Lazy load non-critical analytics and global components
 const Analytics = lazy(() => import('@vercel/analytics/react').then(mod => ({ default: mod.Analytics })));
@@ -22,6 +24,7 @@ const PlanSelectionModal = lazy(() => import('@/components/billing/pricing/plan-
 const AnnouncementDialog = lazy(() => import('@/components/announcements/announcement-dialog').then(mod => ({ default: mod.AnnouncementDialog })));
 const RouteChangeTracker = lazy(() => import('@/components/analytics/route-change-tracker').then(mod => ({ default: mod.RouteChangeTracker })));
 const AuthEventTracker = lazy(() => import('@/components/analytics/auth-event-tracker').then(mod => ({ default: mod.AuthEventTracker })));
+const WebVitalsInit = lazy(() => import('@/components/analytics/web-vitals-init').then(mod => ({ default: mod.WebVitalsInit })));
 
 
 export const viewport: Viewport = {
@@ -101,7 +104,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${roobert.variable} ${roobertMono.variable}`}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${roobert.variable} ${roobertMono.variable}`}>
       <head>
         {/* Preload critical fonts for faster FCP - local fonts need crossOrigin for CORS */}
         <link
@@ -186,6 +189,12 @@ export default function RootLayout({
           <meta name="apple-itunes-app" content="app-id=6754448524, app-argument=kortix://" />
         ) : null}
 
+        {/* Speculation Rules for browser-native prefetching/prerendering */}
+        <SpeculationRules />
+        
+        {/* CSRF Token for API requests */}
+        <CSRFMeta />
+
 
 
         <script
@@ -250,13 +259,13 @@ export default function RootLayout({
           <AuthProvider>
             <I18nProvider>
               <PresenceProvider>
-              <ReactQueryProvider>
+              <Providers>
                 {children}
                 <Toaster />
                 <Suspense fallback={null}>
                   <PlanSelectionModal />
                 </Suspense>
-              </ReactQueryProvider>
+              </Providers>
               </PresenceProvider>
             </I18nProvider>
           </AuthProvider>
@@ -280,6 +289,9 @@ export default function RootLayout({
           </Suspense>
           <Suspense fallback={null}>
             <AuthEventTracker />
+          </Suspense>
+          <Suspense fallback={null}>
+            <WebVitalsInit />
           </Suspense>
         </ThemeProvider>
       </body>

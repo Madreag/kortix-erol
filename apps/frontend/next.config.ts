@@ -43,9 +43,46 @@ const nextConfig = (): NextConfig => ({
     NEXT_PUBLIC_BACKEND_URL: getBackendUrl(),
   },
   
-  // Webpack configuration to make Konva work with Next.js
-  webpack: (config) => {
-    config.externals = [...config.externals, { canvas: 'canvas' }]; // required to make Konva & react-konva work
+  // Webpack configuration for Konva + bundle splitting
+  webpack: (config, { isServer }) => {
+    // Required to make Konva & react-konva work
+    config.externals = [...config.externals, { canvas: 'canvas' }];
+    
+    // Bundle splitting for better caching (client-side only)
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          // React core - changes rarely
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+            name: 'react',
+            priority: 30,
+            reuseExistingChunk: true,
+          },
+          // TanStack - data layer
+          tanstack: {
+            test: /[\\/]node_modules[\\/]@tanstack[\\/]/,
+            name: 'tanstack',
+            priority: 25,
+            reuseExistingChunk: true,
+          },
+          // UI libraries
+          ui: {
+            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
+            name: 'ui-libs',
+            priority: 20,
+            reuseExistingChunk: true,
+          },
+          // Common chunks
+          commons: {
+            minChunks: 2,
+            priority: 10,
+            reuseExistingChunk: true,
+          },
+        },
+      };
+    }
     return config;
   },
   
@@ -60,8 +97,25 @@ const nextConfig = (): NextConfig => ({
     },
   },
   
+  // React Compiler for automatic memoization (top-level in Next.js 16)
+  // Disabled in dev mode for faster TTFB - only needed for production optimization
+  reactCompiler: process.env.NODE_ENV === 'production',
+  
   // Performance optimizations
   experimental: {
+    // TODO: Enable cacheComponents (includes PPR) after refactoring app to use 
+    // Suspense boundaries for all dynamic data access in layouts/providers.
+    // Currently disabled because DashboardLayoutContent, AuthProvider, etc.
+    // use hooks (useParams, useAuth) that access uncached data during static generation.
+    // See: https://nextjs.org/docs/app/building-your-application/caching
+    // cacheComponents: true,
+    
+    // Client router cache configuration
+    staleTimes: {
+      dynamic: 30,   // seconds for dynamic pages
+      static: 180,   // seconds for static pages
+    },
+    
     // Optimize package imports for faster builds and smaller bundles
     optimizePackageImports: [
       'lucide-react',
@@ -80,9 +134,24 @@ const nextConfig = (): NextConfig => ({
   // Optimize images
   images: {
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     qualities: [75, 100],
+    // Cache optimized images for 1 year
+    minimumCacheTTL: 31536000,
+    // Remote patterns for external images
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+    ],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   async rewrites() {
@@ -102,9 +171,10 @@ const nextConfig = (): NextConfig => ({
     ];
   },
   
-  // HTTP headers for caching and performance
+  // HTTP headers for caching, performance, and security
   async headers() {
     return [
+      // Static assets - aggressive caching (fonts)
       {
         source: '/fonts/:path*',
         headers: [
@@ -120,6 +190,62 @@ const nextConfig = (): NextConfig => ({
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Static assets - aggressive caching (JS/CSS/images)
+      {
+        source: '/:path*.(js|css|png|jpg|svg|ico|webp|avif)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // API routes - short cache with revalidation
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'private, max-age=0, must-revalidate',
+          },
+        ],
+      },
+      // Client hints for adaptive optimization
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Accept-CH',
+            value: 'Sec-CH-UA, Sec-CH-UA-Mobile, Sec-CH-UA-Platform, Downlink, RTT, ECT',
+          },
+          {
+            key: 'Critical-CH',
+            value: 'Sec-CH-UA-Mobile',
+          },
+        ],
+      },
+      // Security headers
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
           },
         ],
       },
