@@ -3900,7 +3900,7 @@ export function CanvasRenderer({ content, filePath, fileName, sandboxId, classNa
                 toast.info('Converting to SVG...');
 
                 // Get base64 data
-                let imageBase64 = selectedElement.src;
+                const imageBase64 = selectedElement.src;
                 if (!imageBase64.startsWith('data:')) {
                   toast.error('SVG conversion requires base64 image data');
                   return;

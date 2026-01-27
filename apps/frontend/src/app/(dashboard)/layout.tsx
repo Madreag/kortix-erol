@@ -12,11 +12,10 @@ export default async function DashboardLayout({
 }: DashboardLayoutProps) {
   const queryClient = getQueryClient();
 
-  // Prefetch critical data in parallel (non-blocking)
-  // These run on the server and stream to client via ReactQueryStreamedHydration
-  await Promise.all([
-    queryClient.prefetchQuery(threadsQueryOptions(1, 20)),
-  ]);
+  // Fire-and-forget prefetch - DO NOT await to avoid blocking TTFB
+  // Data will stream to client via ReactQueryStreamedHydration
+  // Using void to explicitly indicate we're not awaiting
+  void queryClient.prefetchQuery(threadsQueryOptions(1, 20));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

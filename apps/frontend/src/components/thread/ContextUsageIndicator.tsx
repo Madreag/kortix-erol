@@ -21,7 +21,6 @@ export const ContextUsageIndicator = ({
   if (!contextUsage || !contextUsage.current_tokens) return null
 
   const { current_tokens } = contextUsage
-  console.log("current_tokens", current_tokens)
 
   const modelData = modelName ? allModels.find((m) => m.id === modelName) : null
   const context_window = modelData?.contextWindow || 200000

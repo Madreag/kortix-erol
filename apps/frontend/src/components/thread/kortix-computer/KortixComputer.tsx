@@ -382,8 +382,8 @@ export const KortixComputer = memo(function KortixComputer({
     };
   }, [internalIndex, toolCallSnapshots]);
 
-  let displayToolCall = currentToolCall;
-  let displayIndex = safeInternalIndex;
+  const displayToolCall = currentToolCall;
+  const displayIndex = safeInternalIndex;
   const displayTotalCalls = totalCalls;
 
   const isCurrentToolStreaming = currentToolCall != null && currentToolCall.toolResult === undefined;

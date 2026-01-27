@@ -106,14 +106,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${roobert.variable} ${roobertMono.variable}`}>
       <head>
-        {/* Preload critical fonts for faster FCP - local fonts need crossOrigin for CORS */}
-        <link
-          rel="preload"
-          href="/fonts/roobert/RoobertUprightsVF.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
+        {/* Note: Font preloading is handled automatically by next/font/local in fonts/*.ts */}
+        {/* Manual preload removed to prevent duplicate loading warning */}
         
         {/* DNS prefetch for analytics (loaded later but resolve DNS early) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
