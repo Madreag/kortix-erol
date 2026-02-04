@@ -12,6 +12,7 @@ import { ToolViewIconTitle } from '../shared/ToolViewIconTitle';
 import { LoadingState } from '../shared/LoadingState';
 import { useAuth } from '@/components/AuthProvider';
 import { useDownloadRestriction } from '@/hooks/billing';
+import { IframePreview } from '@/components/thread/iframe-preview';
 
 export function PdfExportToolView({
   toolCall,
@@ -147,52 +148,63 @@ export function PdfExportToolView({
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="p-4">
+      <CardContent className="p-0 flex-1 flex flex-col min-h-0">
         {isSuccess ? (
-          <div className="space-y-3">
-            {/* File info */}
-            <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-50 dark:bg-red-950/50 rounded-lg">
-                  <FileText className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <div className="flex flex-col h-full">
+            {/* PDF Preview iframe - shows Daytona warning, then preview after dismiss */}
+            {outputFile ? (
+              project?.sandbox?.sandbox_url ? (
+                <div className="flex-1 min-h-[300px] relative">
+                  <IframePreview
+                    url={`${project.sandbox.sandbox_url}/${outputFile.replace(/^\/workspace\//, '')}`}
+                    title={fileName}
+                    className="w-full h-full"
+                  />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                    {fileName}
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    PDF Document
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Download button */}
-            <Button
-              onClick={handleDownload}
-              disabled={isDownloading}
-              className="w-full h-11 bg-black hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-black font-medium transition-colors"
-            >
-              {isDownloading ? (
-                <>
-                  <KortixLoader customSize={16} variant="white" className="mr-2 dark:hidden" />
-                  <KortixLoader customSize={16} variant="black" className="mr-2 hidden dark:flex" />
-                  <span>Downloading...</span>
-                </>
               ) : (
-                <>
-                  <Download className="h-4 w-4 mr-2" />
-                  <span>Download PDF</span>
-                </>
-              )}
-            </Button>
+                <div className="flex-1 min-h-[200px] flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-muted-foreground text-sm">
+                  Waiting for preview... (sandbox loading)
+                </div>
+              )
+            ) : null}
+
+            {/* Download section - fixed at bottom */}
+            <div className="p-3 flex items-center gap-3 bg-zinc-50/50 dark:bg-zinc-900/50 border-t flex-shrink-0">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <div className="p-1.5 bg-red-50 dark:bg-red-950/50 rounded">
+                  <FileText className="h-4 w-4 text-red-600 dark:text-red-400" />
+                </div>
+                <span className="text-sm font-medium truncate">{fileName}</span>
+              </div>
+              <Button
+                onClick={handleDownload}
+                disabled={isDownloading}
+                size="sm"
+                className="bg-black hover:bg-zinc-800 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-black"
+              >
+                {isDownloading ? (
+                  <>
+                    <KortixLoader customSize={14} variant="white" className="mr-1.5 dark:hidden" />
+                    <KortixLoader customSize={14} variant="black" className="mr-1.5 hidden dark:flex" />
+                    <span>Downloading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-3.5 w-3.5 mr-1.5" />
+                    <span>Download</span>
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         ) : (
-          <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-            <p className="text-sm text-red-600 dark:text-red-400">
-              {message || 'Export failed'}
-            </p>
+          <div className="p-4">
+            <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+              <p className="text-sm text-red-600 dark:text-red-400">
+                {message || 'Export failed'}
+              </p>
+            </div>
           </div>
         )}
       </CardContent>

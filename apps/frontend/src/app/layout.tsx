@@ -26,16 +26,21 @@ const RouteChangeTracker = lazy(() => import('@/components/analytics/route-chang
 const AuthEventTracker = lazy(() => import('@/components/analytics/auth-event-tracker').then(mod => ({ default: mod.AuthEventTracker })));
 const WebVitalsInit = lazy(() => import('@/components/analytics/web-vitals-init').then(mod => ({ default: mod.WebVitalsInit })));
 
+// PWA components - lazy loaded for performance
+const ServiceWorkerRegister = lazy(() => import('@/components/pwa/service-worker-register').then(mod => ({ default: mod.ServiceWorkerRegister })));
+const OfflineBanner = lazy(() => import('@/components/pwa/offline-banner').then(mod => ({ default: mod.OfflineBanner })));
+const InstallPrompt = lazy(() => import('@/components/pwa/install-prompt').then(mod => ({ default: mod.InstallPrompt })));
+
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' }
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' }
   ],
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: 'cover',
 };
 
@@ -95,6 +100,14 @@ export const metadata: Metadata = {
     apple: [{ url: '/logo_black.png', sizes: '180x180' }],
   },
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Kortix',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   alternates: {
     canonical: siteMetadata.url,
   },
@@ -243,7 +256,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className="antialiased font-sans bg-background">
+      <body className="antialiased font-sans bg-background" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -286,6 +299,16 @@ export default function RootLayout({
           </Suspense>
           <Suspense fallback={null}>
             <WebVitalsInit />
+          </Suspense>
+          {/* PWA components */}
+          <Suspense fallback={null}>
+            <ServiceWorkerRegister />
+          </Suspense>
+          <Suspense fallback={null}>
+            <OfflineBanner />
+          </Suspense>
+          <Suspense fallback={null}>
+            <InstallPrompt />
           </Suspense>
         </ThemeProvider>
       </body>

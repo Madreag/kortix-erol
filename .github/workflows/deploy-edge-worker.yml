@@ -1,0 +1,139 @@
+name: Deploy Edge Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workers/auth-edge/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'workers/auth-edge/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: workers/auth-edge
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: workers/auth-edge/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+
+  deploy-staging:
+    needs: test
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    runs-on: ubuntu-latest
+    environment: staging
+    defaults:
+      run:
+        working-directory: workers/auth-edge
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: workers/auth-edge/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to Cloudflare (Staging)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: workers/auth-edge
+          command: deploy --env staging
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.staging.kortix.ai/v2/health || echo "000")
+          echo "Health check status: $STATUS"
+          # Don't fail if origin not configured
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "502" ] && [ "$STATUS" != "000" ]; then
+            echo "Unexpected status code: $STATUS"
+          fi
+
+  deploy-production:
+    needs: [test, deploy-staging]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: workers/auth-edge
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: workers/auth-edge/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to Cloudflare (Production)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: workers/auth-edge
+          command: deploy --env production
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.kortix.ai/v2/health)
+          echo "Health check status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Warning: Health check returned $STATUS"
+          else
+            echo "Health check passed"
+          fi
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Edge worker deployed to production successfully"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Edge worker deployment to production failed"

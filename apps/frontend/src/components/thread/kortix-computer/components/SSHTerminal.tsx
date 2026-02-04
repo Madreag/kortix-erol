@@ -71,7 +71,7 @@ const lightTheme: ITheme = {
 };
 
 const getWebSocketUrl = () => {
-  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
   return baseUrl.replace('https://', 'wss://').replace('http://', 'ws://');
 };
 

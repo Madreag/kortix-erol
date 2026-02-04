@@ -251,16 +251,16 @@ export default function DashboardLayoutContent({
         <Suspense fallback={null}>
           <PresentationViewerWrapper />
         </Suspense>
-        {/* Kortix App announcement banners */}
-        <Suspense fallback={null}>
+        {/* Kortix App announcement banners - disabled */}
+        {/* <Suspense fallback={null}>
           <KortixAppBanners disableMobileAdvertising={featureFlags.disableMobileAdvertising} />
-        </Suspense>
-        {/* Mobile app install interstitial - shown on actual mobile devices */}
-        {!featureFlags.disableMobileAdvertising ? (
+        </Suspense> */}
+        {/* Mobile app install interstitial - disabled */}
+        {/* {!featureFlags.disableMobileAdvertising ? (
           <Suspense fallback={null}>
             <MobileAppInterstitial />
           </Suspense>
-        ) : null}
+        ) : null} */}
       </div>
     </AppProviders>
     </NovuInboxProvider>

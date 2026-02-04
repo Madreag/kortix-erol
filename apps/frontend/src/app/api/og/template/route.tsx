@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     const templateResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000/v1'}/templates/public/${shareId}`
+      `${process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL}/templates/public/${shareId}`
     );
 
     if (!templateResponse.ok) {

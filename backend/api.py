@@ -310,6 +310,7 @@ allowed_origins = [
     "https://dev.kortix.com",
     "https://staging.kortix.com",
     "https://prod-test.kortix.com",
+    "https://kortix.broserver.com",  # Cloudflare tunnel for remote dev
 ]
 # Allow all *.kortix.com subdomains and Vercel preview deployments
 allow_origin_regex = r"https://([a-z0-9-]+\.)?kortix\.com|https://.*-kortixai\.vercel\.app"

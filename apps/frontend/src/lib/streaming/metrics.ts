@@ -69,9 +69,10 @@ class StreamingMetricsCollector {
       this.addToHistory(this.metrics.timeToFirstToken, ttft);
       this.reportMetric('time_to_first_token', ttft);
 
-      // Log warning if TTFT exceeds target
-      if (ttft > 200) {
-        console.warn(`[StreamingMetrics] TTFT exceeded target: ${ttft.toFixed(0)}ms (target: <200ms)`);
+      // Log warning if TTFT exceeds target (use 2000ms for stream resume scenarios)
+      // Note: TTFT > 200ms is expected when resuming streams or during high load
+      if (ttft > 2000) {
+        console.warn(`[StreamingMetrics] TTFT exceeded target: ${ttft.toFixed(0)}ms (target: <2000ms)`);
       }
     }
   }

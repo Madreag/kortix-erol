@@ -38,6 +38,7 @@ export function SpeculationRules() {
   return (
     <script
       type="speculationrules"
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(rules),
       }}

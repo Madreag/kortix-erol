@@ -1,11 +1,11 @@
 {
-  "name": "Kortix the Super Mega Giga Worker",
+  "name": "Kortix - AI Agent Platform",
   "short_name": "Kortix",
-  "description": "Kortix the Super Mega Giga Worker – A generalist AI Worker that is able to autonomously tackle complex tasks, browse the web, write and execute code, manage files, conduct research, automate workflows, and accomplish real-world objectives through natural conversation.",
+  "description": "Build and deploy AI agents that work for you. The ultimate AI assistant that handles everything from simple requests to mega-complex projects.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -22,15 +22,35 @@
     },
     {
       "src": "/logo_black.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_black.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "utilities", "business"],
+  "categories": ["productivity", "developer-tools", "business"],
   "scope": "/",
   "lang": "en-US",
   "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "New Thread",
+      "short_name": "New",
+      "description": "Start a new AI conversation",
+      "url": "/threads/new"
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "description": "View your dashboard",
+      "url": "/dashboard"
+    }
+  ],
   "related_applications": [
     {
       "platform": "play",
@@ -42,5 +62,5 @@
       "url": "https://apps.apple.com/ie/app/kortix/id6754448524"
     }
   ],
-  "prefer_related_applications": true
+  "prefer_related_applications": false
 }

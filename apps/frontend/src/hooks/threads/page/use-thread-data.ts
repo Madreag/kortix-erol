@@ -279,14 +279,25 @@ export function useThreadData(
           const seenIds = new Set<string>();
           const seenFingerprints = new Set<string>();
 
-          // First pass: collect content from server-confirmed user messages (non-temp IDs)
-          const serverUserContents = new Set<string>();
+          // PERFORMANCE FIX: Pre-compute server user message content -> timestamp map ONCE
+          // This converts O(n²) nested loops to O(n) with O(1) lookups
+          const serverUserMessageTimestamps = new Map<string, number>();
           mergedMessages.forEach((msg) => {
             if (msg.type === 'user' && msg.message_id && !msg.message_id.startsWith('temp-')) {
               const contentKey = extractUserMessageText(msg.content).trim().toLowerCase();
-              if (contentKey) serverUserContents.add(contentKey);
+              if (contentKey) {
+                const createdAt = msg.created_at ? new Date(msg.created_at).getTime() : 0;
+                // Keep the latest timestamp for each content key
+                const existing = serverUserMessageTimestamps.get(contentKey);
+                if (existing === undefined || createdAt > existing) {
+                  serverUserMessageTimestamps.set(contentKey, createdAt);
+                }
+              }
             }
           });
+
+          // Track temp user content we've already added (for deduplication)
+          const addedTempUserContents = new Set<string>();
 
           // Second pass: build deduped list
           // Only deduplicate temp messages when server version exists
@@ -304,27 +315,19 @@ export function useThreadData(
               if (isTemp && contentKey) {
                 const tempCreatedAt = msg.created_at ? new Date(msg.created_at).getTime() : Date.now();
 
-                // Find if there's a matching server message created at similar time
-                const hasMatchingServerVersion = mergedMessages.some((existing) => {
-                  if (existing.type !== 'user') return false;
-                  if (existing.message_id?.startsWith('temp-')) return false;
-                  if (extractUserMessageText(existing.content).trim().toLowerCase() !== contentKey) return false;
-
-                  const serverCreatedAt = existing.created_at ? new Date(existing.created_at).getTime() : 0;
-                  return Math.abs(serverCreatedAt - tempCreatedAt) < 30000;
-                });
+                // PERFORMANCE: O(1) Map lookup instead of O(n) .some() iteration
+                const serverTimestamp = serverUserMessageTimestamps.get(contentKey);
+                const hasMatchingServerVersion = serverTimestamp !== undefined && 
+                  Math.abs(serverTimestamp - tempCreatedAt) < 30000;
 
                 if (hasMatchingServerVersion) return;
               }
 
               // For temp messages, also check if we already added a temp with same content
+              // PERFORMANCE: O(1) Set lookup instead of O(n) .some() iteration
               if (isTemp && contentKey) {
-                const alreadyHasTempWithContent = dedupedMessages.some(
-                  (m) => m.type === 'user' &&
-                    m.message_id?.startsWith('temp-') &&
-                    extractUserMessageText(m.content).trim().toLowerCase() === contentKey
-                );
-                if (alreadyHasTempWithContent) return;
+                if (addedTempUserContents.has(contentKey)) return;
+                addedTempUserContents.add(contentKey);
               }
             }
 
@@ -480,14 +483,20 @@ export function useThreadData(
         // This handles race conditions where same message might appear twice
         const seenContentFingerprints = new Set<string>();
 
-        // First pass: collect content from server-confirmed user messages (non-temp IDs)
-        // This allows us to filter out temp messages that have been confirmed by server
-        const serverUserContents = new Set<string>();
+        // PERFORMANCE FIX: Pre-compute server user message content -> timestamp map ONCE
+        // This converts O(n²) nested loops to O(n) with O(1) lookups
+        const serverUserMessageTimestamps = new Map<string, number>();
         merged.forEach((msg) => {
           if (msg.type === 'user' && msg.message_id && !msg.message_id.startsWith('temp-')) {
-            // Use extractUserMessageText to properly parse JSON content
             const contentKey = extractUserMessageText(msg.content).trim().toLowerCase();
-            if (contentKey) serverUserContents.add(contentKey);
+            if (contentKey) {
+              const createdAt = msg.created_at ? new Date(msg.created_at).getTime() : 0;
+              // Keep the latest timestamp for each content key
+              const existing = serverUserMessageTimestamps.get(contentKey);
+              if (existing === undefined || createdAt > existing) {
+                serverUserMessageTimestamps.set(contentKey, createdAt);
+              }
+            }
           }
         });
 
@@ -505,19 +514,14 @@ export function useThreadData(
           // Uses timestamp-aware deduplication: only skip if server message was created within 30 seconds
           // This allows intentionally repeated messages (different turns) while preventing duplicates
           if (msg.type === 'user' && msgId?.startsWith('temp-')) {
-            // Use extractUserMessageText to properly parse JSON content
             const contentKey = extractUserMessageText(msg.content).trim().toLowerCase();
             if (contentKey) {
               const tempCreatedAt = msg.created_at ? new Date(msg.created_at).getTime() : Date.now();
 
-              const hasMatchingServerVersion = merged.some((existing) => {
-                if (existing.type !== 'user') return false;
-                if (existing.message_id?.startsWith('temp-')) return false;
-                if (extractUserMessageText(existing.content).trim().toLowerCase() !== contentKey) return false;
-
-                const serverCreatedAt = existing.created_at ? new Date(existing.created_at).getTime() : 0;
-                return Math.abs(serverCreatedAt - tempCreatedAt) < 30000;
-              });
+              // PERFORMANCE: O(1) Map lookup instead of O(n) .some() iteration
+              const serverTimestamp = serverUserMessageTimestamps.get(contentKey);
+              const hasMatchingServerVersion = serverTimestamp !== undefined && 
+                Math.abs(serverTimestamp - tempCreatedAt) < 30000;
 
               if (hasMatchingServerVersion) return;
             }

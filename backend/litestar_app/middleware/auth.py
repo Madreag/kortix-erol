@@ -46,9 +46,15 @@ class JWTAuthMiddleware(AbstractAuthenticationMiddleware):
             from core.utils.auth_utils import _decode_jwt_with_verification
             payload = _decode_jwt_with_verification(token)
             
+            # Validate required claims
+            sub = payload.get("sub")
+            if not sub:
+                logger.warning("[LITESTAR] Token missing required 'sub' claim")
+                raise NotAuthorizedException("Invalid token: missing required claims")
+            
             user = {
-                "user_id": payload.get("sub"),
-                "account_id": payload.get("account_id") or payload.get("sub"),
+                "user_id": sub,
+                "account_id": payload.get("account_id") or sub,
                 "email": payload.get("email"),
             }
             

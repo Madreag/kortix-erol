@@ -19,7 +19,7 @@ from litestar.di import Provide
 
 from .routes import health, threads, projects, agents, metrics
 from .dependencies import provide_db_session, provide_redis, provide_current_user
-from .middleware import JWTAuthMiddleware, MetricsMiddleware, RateLimitMiddleware
+from .middleware import JWTAuthMiddleware, MetricsMiddleware, RateLimitMiddleware, EarlyHintsMiddleware
 from .exception_handlers import exception_handlers
 from .lifespan import lifespan
 from core.utils.config import config, EnvMode
@@ -34,10 +34,11 @@ def create_litestar_app() -> Litestar:
         "https://kortix.com",
         "https://dev.kortix.com",
         "https://staging.kortix.com",
+        "https://kortix.broserver.com",
     ]
     
     if config.ENV_MODE == EnvMode.LOCAL:
-        allowed_origins.extend(["http://localhost:3000", "http://127.0.0.1:3000"])
+        allowed_origins.extend(["http://localhost:3000", "http://127.0.0.1:3000", "http://68.3.162.151:3000"])
     
     cors_config = CORSConfig(
         allow_origins=allowed_origins,
@@ -81,7 +82,7 @@ def create_litestar_app() -> Litestar:
             "redis": Provide(provide_redis),
             "current_user": Provide(provide_current_user),
         },
-        middleware=[RateLimitMiddleware, MetricsMiddleware, JWTAuthMiddleware],
+        middleware=[EarlyHintsMiddleware, RateLimitMiddleware, MetricsMiddleware, JWTAuthMiddleware],
         lifespan=[lifespan],
         debug=config.ENV_MODE == EnvMode.LOCAL,
     )

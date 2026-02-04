@@ -1,4 +1,15 @@
 import type { NextConfig } from 'next';
+import createBundleStatsPlugin from 'next-plugin-bundle-stats';
+import withSerwistInit from '@serwist/next';
+
+// Initialize Serwist for PWA - disabled in development
+const withSerwist = withSerwistInit({
+  swSrc: 'src/sw.ts',
+  swDest: 'public/sw.js',
+  disable: process.env.NODE_ENV === 'development',
+  reloadOnOnline: true,
+  cacheOnNavigation: true,
+});
 
 // Dynamically determine backend URL based on Vercel environment
 const getBackendUrl = (): string => {
@@ -174,6 +185,25 @@ const nextConfig = (): NextConfig => ({
   // HTTP headers for caching, performance, and security
   async headers() {
     return [
+      // Early Hints - Link preload headers for critical pages
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Link',
+            value: '</fonts/roobert/RoobertUprightsVF.woff2>; rel=preload; as=font; type=font/woff2; crossorigin',
+          },
+        ],
+      },
+      {
+        source: '/dashboard',
+        headers: [
+          {
+            key: 'Link',
+            value: '</fonts/roobert/RoobertUprightsVF.woff2>; rel=preload; as=font; type=font/woff2; crossorigin',
+          },
+        ],
+      },
       // Static assets - aggressive caching (fonts)
       {
         source: '/fonts/:path*',
@@ -249,10 +279,41 @@ const nextConfig = (): NextConfig => ({
           },
         ],
       },
+      // Service Worker headers
+      {
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
+          },
+        ],
+      },
     ];
   },
   
   skipTrailingSlashRedirect: true,
 });
 
-export default nextConfig;
+// Bundle analysis - only enable in CI or when ANALYZE=true
+const withBundleStats = createBundleStatsPlugin({
+  outDir: '.next/analyze',
+});
+
+// Compose plugins: Serwist for PWA, optional bundle stats for analysis
+const baseConfig = nextConfig();
+const withPWA = withSerwist(baseConfig);
+
+const config = process.env.ANALYZE === 'true'
+  ? withBundleStats(withPWA)
+  : withPWA;
+
+export default config;
